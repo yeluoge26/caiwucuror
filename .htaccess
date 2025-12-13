@@ -1,0 +1,15 @@
+# Apache 配置
+RewriteEngine On
+RewriteBase /
+
+# 如果文件或目录不存在，重定向到 index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?r=$1 [QSA,L]
+
+# 安全设置
+<FilesMatch "\.(sql|md|txt)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
