@@ -1,0 +1,66 @@
+═══════════════════════════════════════════════════════════
+  如何上传代码到 GitHub
+═══════════════════════════════════════════════════════════
+
+⚠️ 重要：GitHub 已不再支持密码认证！
+
+请使用 Personal Access Token：
+
+步骤1: 创建 Token
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 访问: https://github.com/settings/tokens
+2. 点击 "Generate new token" → "Generate new token (classic)"
+3. 设置名称: "Finance System"
+4. 选择过期时间（建议 90 天或自定义）
+5. 勾选权限: repo（全部）
+6. 点击 "Generate token"
+7. 复制 token（只显示一次，请保存好）
+
+步骤2: 在 GitHub 创建仓库（如果还没有）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 访问: https://github.com/new
+2. 仓库名: caiwucuror
+3. 描述: 财务管理系统
+4. 选择 Public 或 Private
+5. 不要勾选 "Initialize with README"
+6. 点击 "Create repository"
+
+步骤3: 推送代码
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+方式A: 使用批处理文件（推荐）
+  双击运行: push_to_github.bat
+  输入用户名: yeluoge26
+  输入密码: 粘贴刚才复制的 token
+
+方式B: 使用命令行
+  打开 PowerShell 或 CMD，执行：
+  
+  cd d:\code\caiwucuror
+  git push -u origin main
+  
+  输入用户名: yeluoge26
+  输入密码: 粘贴 token
+
+═══════════════════════════════════════════════════════════
+
+✅ 代码已准备好：
+- Git 仓库已初始化
+- 代码已提交（67 个文件）
+- 远程仓库已配置
+- 敏感文件已排除（.gitignore）
+
+═══════════════════════════════════════════════════════════
+
+📋 已排除的文件（不会上传）：
+- app/config/db.php（包含数据库密码）
+- public/uploads/*（上传的文件）
+- 日志和临时文件
+
+═══════════════════════════════════════════════════════════
+
+🔗 相关链接：
+- GitHub Token: https://github.com/settings/tokens
+- 创建仓库: https://github.com/new
+- 仓库地址: https://github.com/yeluoge26/caiwucuror
+
+═══════════════════════════════════════════════════════════
