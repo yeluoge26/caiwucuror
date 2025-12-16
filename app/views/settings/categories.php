@@ -6,6 +6,10 @@ $lang = I18n::current();
 
 <h2 style="margin-bottom: 20px;"><?= __('setting.categories') ?></h2>
 
+<?php if (isset($success)): ?>
+<div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+<?php endif; ?>
+
 <div class="card">
   <h3 style="margin-bottom: 16px;"><?= __('setting.categories') ?></h3>
   

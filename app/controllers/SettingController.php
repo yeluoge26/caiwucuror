@@ -13,7 +13,8 @@ class SettingController {
 
     $categories = Category::all();
     $error = null;
-    $success = null;
+    $success = $_SESSION['success_message'] ?? null;
+    unset($_SESSION['success_message']);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (!Csrf::check($_POST['_csrf'] ?? '')) {
@@ -44,6 +45,8 @@ class SettingController {
           $success = __('setting.category_deleted');
         }
         
+        // 使用session存储成功消息
+        $_SESSION['success_message'] = $success ?? __('setting.category_updated');
         header('Location: /index.php?r=settings/categories');
         exit;
       }
@@ -58,7 +61,8 @@ class SettingController {
 
     $paymentMethods = PaymentMethod::all();
     $error = null;
-    $success = null;
+    $success = $_SESSION['success_message'] ?? null;
+    unset($_SESSION['success_message']);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (!Csrf::check($_POST['_csrf'] ?? '')) {
@@ -85,6 +89,7 @@ class SettingController {
           $success = __('setting.payment_method_deleted');
         }
         
+        $_SESSION['success_message'] = $success ?? __('setting.payment_method_updated');
         header('Location: /index.php?r=settings/paymentMethods');
         exit;
       }
@@ -99,7 +104,8 @@ class SettingController {
 
     $vendors = Vendor::all();
     $error = null;
-    $success = null;
+    $success = $_SESSION['success_message'] ?? null;
+    unset($_SESSION['success_message']);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (!Csrf::check($_POST['_csrf'] ?? '')) {
@@ -128,12 +134,60 @@ class SettingController {
           $success = __('setting.vendor_deleted');
         }
         
+        $_SESSION['success_message'] = $success ?? __('setting.vendor_updated');
         header('Location: /index.php?r=settings/vendors');
         exit;
       }
     }
 
     include __DIR__ . '/../views/settings/vendors.php';
+  }
+
+  public function addVendorQuick() {
+    Auth::requireLogin();
+    Auth::requireRole(['owner', 'manager', 'accountant', 'staff']); // 员工也可以快速添加
+    
+    header('Content-Type: application/json');
+    
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      echo json_encode(['success' => false, 'error' => 'Invalid request']);
+      exit;
+    }
+    
+    if (!Csrf::check($_POST['_csrf'] ?? '')) {
+      echo json_encode(['success' => false, 'error' => __('csrf.invalid')]);
+      exit;
+    }
+    
+    $name = trim($_POST['name'] ?? '');
+    if (empty($name)) {
+      echo json_encode(['success' => false, 'error' => __('field.vendor') . ' ' . __('field.required')]);
+      exit;
+    }
+    
+    // 检查是否已存在
+    $existing = Vendor::all(['is_active' => 1]);
+    foreach ($existing as $v) {
+      if (strtolower(trim($v['name'])) === strtolower($name)) {
+        echo json_encode(['success' => true, 'id' => $v['id'], 'message' => __('vendor.already_exists')]);
+        exit;
+      }
+    }
+    
+    $vendorId = Vendor::create([
+      'name' => $name,
+      'phone' => $_POST['phone'] ?? null,
+      'note' => $_POST['note'] ?? null,
+      'is_active' => 1
+    ]);
+    
+    if ($vendorId) {
+      $newVendor = Vendor::find($vendorId);
+      echo json_encode(['success' => true, 'id' => $newVendor['id'], 'name' => $newVendor['name']]);
+    } else {
+      echo json_encode(['success' => false, 'error' => __('vendor.add_failed')]);
+    }
+    exit;
   }
 }
 

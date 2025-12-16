@@ -7,25 +7,27 @@ class ReportController {
   public function dashboard() {
     Auth::requireLogin();
 
-    // 今日统计
+    // 今日统计（只统计已审核的交易）
     $today = Transaction::getSummary([
       'from' => date('Y-m-d 00:00:00'),
-      'to' => date('Y-m-d 23:59:59')
+      'to' => date('Y-m-d 23:59:59'),
+      'status' => 'approved'
     ]) ?: ['income' => 0, 'expense' => 0];
 
-    // 本月统计
+    // 本月统计（只统计已审核的交易）
     $monthStart = date('Y-m-01 00:00:00');
     $monthEnd = date('Y-m-t 23:59:59');
     $month = Transaction::getSummary([
       'from' => $monthStart,
-      'to' => $monthEnd
+      'to' => $monthEnd,
+      'status' => 'approved'
     ]) ?: ['income' => 0, 'expense' => 0];
 
-    // 7天趋势
+    // 7天趋势（只统计已审核的交易）
     $trend = Transaction::getTrend(7);
 
-    // 最近10笔流水
-    $latest = Transaction::list(['limit' => 10]);
+    // 最近10笔流水（只显示已审核的）
+    $latest = Transaction::list(['per_page' => 10, 'page' => 1]);
 
     include __DIR__ . '/../views/reports/dashboard.php';
   }

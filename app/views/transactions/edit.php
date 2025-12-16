@@ -1,9 +1,9 @@
 <?php
-$title = __('tx.create');
+$title = __('btn.edit');
 include __DIR__ . '/../layout/header.php';
 ?>
 
-<h2 style="margin-bottom: 20px;"><?= __('tx.create') ?></h2>
+<h2 style="margin-bottom: 20px;"><?= __('btn.edit') ?> <?= __('tx.create') ?></h2>
 
 <div class="card">
   <?php if (isset($error)): ?>
@@ -16,23 +16,23 @@ include __DIR__ . '/../layout/header.php';
     <div class="form-group">
       <label><?= __('tx.type') ?></label>
       <select name="type" id="type-select" required>
-        <option value="income"><?= __('tx.income') ?></option>
-        <option value="expense"><?= __('tx.expense') ?></option>
+        <option value="income" <?= $transaction['type'] === 'income' ? 'selected' : '' ?>><?= __('tx.income') ?></option>
+        <option value="expense" <?= $transaction['type'] === 'expense' ? 'selected' : '' ?>><?= __('tx.expense') ?></option>
       </select>
     </div>
     
     <div class="form-group">
       <label><?= __('field.amount') ?> (₫)</label>
-      <input type="number" name="amount" id="amount-input" step="0.01" min="0.01" required>
+      <input type="number" name="amount" id="amount-input" step="0.01" min="0.01" value="<?= htmlspecialchars($transaction['amount']) ?>" required>
       <small style="color: #666; display: block; margin-top: 4px;"><?= __('tx.amount_hint') ?></small>
     </div>
     
     <div class="form-group">
       <label><?= __('field.currency') ?></label>
       <select name="currency">
-        <option value="VND">VND</option>
-        <option value="USD">USD</option>
-        <option value="CNY">CNY</option>
+        <option value="VND" <?= $transaction['currency'] === 'VND' ? 'selected' : '' ?>>VND</option>
+        <option value="USD" <?= $transaction['currency'] === 'USD' ? 'selected' : '' ?>>USD</option>
+        <option value="CNY" <?= $transaction['currency'] === 'CNY' ? 'selected' : '' ?>>CNY</option>
       </select>
     </div>
     
@@ -43,12 +43,12 @@ include __DIR__ . '/../layout/header.php';
         <?php
         $lang = I18n::current();
         foreach ($categories as $cat):
-          if ($cat['type'] === 'both' || $cat['type'] === ($_POST['type'] ?? 'income')):
+          if ($cat['type'] === 'both' || $cat['type'] === $transaction['type']):
             $name = $lang === 'zh' ? $cat['name_zh'] : $cat['name_vi'];
         ?>
         <option value="<?= $cat['id'] ?>" 
                 data-type="<?= $cat['type'] ?>"
-                <?= ($_POST['category_id'] ?? '') == $cat['id'] ? 'selected' : '' ?>>
+                <?= $transaction['category_id'] == $cat['id'] ? 'selected' : '' ?>>
           <?= htmlspecialchars($name) ?>
         </option>
         <?php endif; endforeach; ?>
@@ -63,21 +63,21 @@ include __DIR__ . '/../layout/header.php';
         foreach ($paymentMethods as $pm):
           $name = $lang === 'zh' ? $pm['name_zh'] : $pm['name_vi'];
         ?>
-        <option value="<?= $pm['id'] ?>" <?= ($_POST['payment_method_id'] ?? '') == $pm['id'] ? 'selected' : '' ?>>
+        <option value="<?= $pm['id'] ?>" <?= $transaction['payment_method_id'] == $pm['id'] ? 'selected' : '' ?>>
           <?= htmlspecialchars($name) ?>
         </option>
         <?php endforeach; ?>
       </select>
     </div>
     
-    <div class="form-group" id="vendor-group" style="display: none;">
+    <div class="form-group" id="vendor-group" style="display: <?= $transaction['type'] === 'expense' ? 'block' : 'none' ?>;">
       <label><?= __('field.vendor') ?></label>
       <div style="display: flex; gap: 8px; align-items: flex-end;">
         <div style="flex: 1;">
           <select name="vendor_id" id="vendor-select">
             <option value="">-- <?= __('field.vendor') ?> --</option>
             <?php foreach ($vendors as $vendor): ?>
-            <option value="<?= $vendor['id'] ?>" <?= ($_POST['vendor_id'] ?? '') == $vendor['id'] ? 'selected' : '' ?>>
+            <option value="<?= $vendor['id'] ?>" <?= ($transaction['vendor_id'] ?? null) == $vendor['id'] ? 'selected' : '' ?>>
               <?= htmlspecialchars($vendor['name']) ?>
             </option>
             <?php endforeach; ?>
@@ -117,12 +117,12 @@ include __DIR__ . '/../layout/header.php';
     <div class="form-group">
       <label><?= __('field.time') ?></label>
       <input type="datetime-local" name="occurred_at" 
-             value="<?= $_POST['occurred_at'] ?? date('Y-m-d\TH:i') ?>" required>
+             value="<?= date('Y-m-d\TH:i', strtotime($transaction['occurred_at'])) ?>" required>
     </div>
     
     <div class="form-group">
       <label><?= __('field.note') ?></label>
-      <textarea name="note"><?= htmlspecialchars($_POST['note'] ?? '') ?></textarea>
+      <textarea name="note"><?= htmlspecialchars($transaction['note'] ?? '') ?></textarea>
     </div>
     
     <div class="form-group">
@@ -144,7 +144,7 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <button type="submit" class="btn btn-success"><?= __('btn.save') ?></button>
-      <a href="/index.php?r=transactions/list" class="btn" style="background: #95a5a6;"><?= __('btn.cancel') ?></a>
+      <a href="/index.php?r=transactions/view&id=<?= $transaction['id'] ?>" class="btn" style="background: #95a5a6;"><?= __('btn.cancel') ?></a>
     </div>
   </form>
 </div>
@@ -155,14 +155,12 @@ document.getElementById('type-select').addEventListener('change', function() {
   const categorySelect = document.querySelector('select[name="category_id"]');
   const vendorGroup = document.getElementById('vendor-group');
   
-  // 显示/隐藏供应商字段
   if (type === 'expense') {
     vendorGroup.style.display = 'block';
   } else {
     vendorGroup.style.display = 'none';
   }
   
-  // 过滤分类选项
   Array.from(categorySelect.options).forEach(option => {
     if (option.value === '') return;
     const catType = option.dataset.type;
@@ -173,9 +171,6 @@ document.getElementById('type-select').addEventListener('change', function() {
     }
   });
 });
-
-// 初始化
-document.getElementById('type-select').dispatchEvent(new Event('change'));
 
 // 金额验证
 document.getElementById('transaction-form').addEventListener('submit', function(e) {
@@ -188,64 +183,6 @@ document.getElementById('transaction-form').addEventListener('submit', function(
   }
 });
 
-// 快速添加供应商
-function showAddVendorModal() {
-  document.getElementById('vendor-modal').style.display = 'flex';
-  document.getElementById('quick-vendor-name').focus();
-}
-
-function hideAddVendorModal() {
-  document.getElementById('vendor-modal').style.display = 'none';
-  document.getElementById('quick-vendor-form').reset();
-}
-
-function addVendorQuick(e) {
-  e.preventDefault();
-  const name = document.getElementById('quick-vendor-name').value.trim();
-  const phone = document.getElementById('quick-vendor-phone').value.trim();
-  const note = document.getElementById('quick-vendor-note').value.trim();
-  
-  if (!name) {
-    alert('<?= __('field.vendor') ?> <?= __('field.required') ?>');
-    return false;
-  }
-  
-  // AJAX提交
-  const formData = new FormData();
-  formData.append('action', 'create');
-  formData.append('name', name);
-  formData.append('phone', phone);
-  formData.append('note', note);
-  formData.append('_csrf', '<?= Csrf::token() ?>');
-  
-  fetch('/index.php?r=settings/addVendorQuick', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // 添加到下拉列表
-      const select = document.getElementById('vendor-select');
-      const option = document.createElement('option');
-      option.value = data.id;
-      option.textContent = name;
-      option.selected = true;
-      select.appendChild(option);
-      
-      hideAddVendorModal();
-    } else {
-      alert(data.error || '<?= __('vendor.add_failed') ?>');
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('<?= __('vendor.add_failed') ?>');
-  });
-  
-  return false;
-}
-
 // 图片上传处理
 let selectedFiles = [];
 
@@ -254,20 +191,17 @@ function handleFileSelect(event) {
   const maxFiles = 5;
   const maxSize = 5 * 1024 * 1024; // 5MB
   
-  // 限制文件数量
   if (selectedFiles.length + files.length > maxFiles) {
     alert('<?= __('upload.max_files') ?>');
     return;
   }
   
   files.forEach(file => {
-    // 验证文件大小
     if (file.size > maxSize) {
       alert('<?= __('upload.file_too_large') ?>: ' + file.name);
       return;
     }
     
-    // 验证文件类型
     if (!file.type.startsWith('image/')) {
       alert('<?= __('upload.invalid_type') ?>: ' + file.name);
       return;
@@ -344,6 +278,61 @@ function updateFileInput() {
   const dt = new DataTransfer();
   selectedFiles.forEach(file => dt.items.add(file));
   input.files = dt.files;
+}
+
+// 快速添加供应商
+function showAddVendorModal() {
+  document.getElementById('vendor-modal').style.display = 'flex';
+  document.getElementById('quick-vendor-name').focus();
+}
+
+function hideAddVendorModal() {
+  document.getElementById('vendor-modal').style.display = 'none';
+  document.getElementById('quick-vendor-form').reset();
+}
+
+function addVendorQuick(e) {
+  e.preventDefault();
+  const name = document.getElementById('quick-vendor-name').value.trim();
+  const phone = document.getElementById('quick-vendor-phone').value.trim();
+  const note = document.getElementById('quick-vendor-note').value.trim();
+  
+  if (!name) {
+    alert('<?= __('field.vendor') ?> <?= __('field.required') ?>');
+    return false;
+  }
+  
+  const formData = new FormData();
+  formData.append('action', 'create');
+  formData.append('name', name);
+  formData.append('phone', phone);
+  formData.append('note', note);
+  formData.append('_csrf', '<?= Csrf::token() ?>');
+  
+  fetch('/index.php?r=settings/addVendorQuick', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const select = document.getElementById('vendor-select');
+      const option = document.createElement('option');
+      option.value = data.id;
+      option.textContent = data.name;
+      option.selected = true;
+      select.appendChild(option);
+      hideAddVendorModal();
+    } else {
+      alert(data.error || '<?= __('vendor.add_failed') ?>');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('<?= __('vendor.add_failed') ?>');
+  });
+  
+  return false;
 }
 </script>
 

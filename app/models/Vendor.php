@@ -33,12 +33,17 @@ class Vendor {
       INSERT INTO vendors (name, phone, note, is_active)
       VALUES (?, ?, ?, ?)
     ");
-    return $stmt->execute([
+    $result = $stmt->execute([
       $data['name'],
       $data['phone'] ?? null,
       $data['note'] ?? null,
       $data['is_active'] ?? 1
     ]);
+    
+    if ($result) {
+      return DB::conn()->lastInsertId();
+    }
+    return false;
   }
 
   public static function update($id, $data) {
