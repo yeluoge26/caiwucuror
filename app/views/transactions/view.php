@@ -92,8 +92,41 @@ $lang = I18n::current();
     <?php endif; ?>
   </div>
   
+  <?php if (!empty($attachments)): ?>
+  <div style="margin-top: 20px;">
+    <h3 style="margin-bottom: 12px;"><?= __('field.attachments') ?></h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
+      <?php foreach ($attachments as $att): ?>
+      <div style="position: relative; aspect-ratio: 1; border-radius: 4px; overflow: hidden; border: 1px solid #ddd;">
+        <a href="/<?= htmlspecialchars($att['file_path']) ?>" target="_blank" style="display: block; width: 100%; height: 100%;">
+          <img src="/<?= htmlspecialchars($att['file_path']) ?>" 
+               alt="Attachment" 
+               style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">
+        </a>
+        <?php if (in_array($user['role_key'], ['owner', 'accountant']) || $att['uploaded_by'] == $user['id']): ?>
+        <button onclick="deleteAttachment(<?= $att['id'] ?>)" 
+                style="position: absolute; top: 4px; right: 4px; background: rgba(231, 76, 60, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 18px; line-height: 1;">
+          ×
+        </button>
+        <?php endif; ?>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endif; ?>
+  
   <div style="margin-top: 20px;">
     <a href="/index.php?r=transactions/list" class="btn"><?= __('btn.cancel') ?></a>
+    <?php if (in_array($user['role_key'], ['owner', 'manager', 'accountant']) && $transaction['status'] === 'pending'): ?>
+    <a href="/index.php?r=transactions/edit&id=<?= $transaction['id'] ?>" class="btn">
+      <?= __('btn.edit') ?>
+    </a>
+    <?php endif; ?>
+    <?php if ($user['role_key'] === 'owner' && $transaction['status'] === 'pending'): ?>
+    <a href="/index.php?r=transactions/approve&id=<?= $transaction['id'] ?>" class="btn btn-success">
+      <?= __('tx.approve') ?>
+    </a>
+    <?php endif; ?>
     <?php if (in_array($user['role_key'], ['owner', 'accountant']) && $transaction['status'] !== 'void'): ?>
     <a href="/index.php?r=transactions/void&id=<?= $transaction['id'] ?>" class="btn btn-danger">
       <?= __('btn.void') ?>
@@ -120,5 +153,32 @@ $lang = I18n::current();
   </div>
   <?php endif; ?>
 </div>
+
+<script>
+function deleteAttachment(id) {
+  if (!confirm('<?= __('upload.delete_confirm') ?>')) {
+    return;
+  }
+  
+  fetch('/index.php?r=transactions/deleteAttachment&id=' + id, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('<?= __('upload.delete_failed') ?>');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('<?= __('upload.delete_failed') ?>');
+  });
+}
+</script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>
