@@ -54,8 +54,8 @@ class Vendor {
   }
 
   public static function delete($id) {
-    $stmt = DB::conn()->prepare("DELETE FROM vendors WHERE id = ?");
+    // 软删除，避免外键引用报错
+    $stmt = DB::conn()->prepare("UPDATE vendors SET is_active = 0 WHERE id = ?");
     return $stmt->execute([$id]);
   }
 }
-

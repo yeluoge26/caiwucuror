@@ -53,8 +53,8 @@ class PaymentMethod {
   }
 
   public static function delete($id) {
-    $stmt = DB::conn()->prepare("DELETE FROM payment_methods WHERE id = ?");
+    // 软删除，避免外键引用报错
+    $stmt = DB::conn()->prepare("UPDATE payment_methods SET is_active = 0 WHERE id = ?");
     return $stmt->execute([$id]);
   }
 }
-

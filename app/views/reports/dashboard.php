@@ -1,27 +1,30 @@
 <?php
 $title = __('nav.dashboard');
 include __DIR__ . '/../layout/header.php';
+$lang = I18n::current();
 ?>
 
 <h2 style="margin-bottom: 20px;"><?= __('nav.dashboard') ?></h2>
 
-<!-- 今日统计 -->
-<div class="card">
-  <h3 style="margin-bottom: 16px;">📅 <?= __('dashboard.today') ?></h3>
-  <div class="kpi income">+ <?= number_format($today['income'] ?? 0, 0, ',', '.') ?> ₫</div>
-  <div class="kpi expense">- <?= number_format($today['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
-  <div class="kpi net">
-    = <?= number_format(($today['income'] ?? 0) - ($today['expense'] ?? 0), 0, ',', '.') ?> ₫
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+  <!-- 今日统计 -->
+  <div class="card">
+    <h3 style="margin-bottom: 16px;">📅 <?= __('dashboard.today') ?></h3>
+    <div class="kpi income">+ <?= number_format($today['income'] ?? 0, 0, ',', '.') ?> ₫</div>
+    <div class="kpi expense">- <?= number_format($today['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
+    <div class="kpi net">
+      = <?= number_format(($today['income'] ?? 0) - ($today['expense'] ?? 0), 0, ',', '.') ?> ₫
+    </div>
   </div>
-</div>
 
-<!-- 本月统计 -->
-<div class="card">
-  <h3 style="margin-bottom: 16px;">📊 <?= __('dashboard.month') ?></h3>
-  <div class="kpi income">+ <?= number_format($month['income'] ?? 0, 0, ',', '.') ?> ₫</div>
-  <div class="kpi expense">- <?= number_format($month['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
-  <div class="kpi net">
-    = <?= number_format(($month['income'] ?? 0) - ($month['expense'] ?? 0), 0, ',', '.') ?> ₫
+  <!-- 本月统计 -->
+  <div class="card">
+    <h3 style="margin-bottom: 16px;">📊 <?= __('dashboard.month') ?></h3>
+    <div class="kpi income">+ <?= number_format($month['income'] ?? 0, 0, ',', '.') ?> ₫</div>
+    <div class="kpi expense">- <?= number_format($month['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
+    <div class="kpi net">
+      = <?= number_format(($month['income'] ?? 0) - ($month['expense'] ?? 0), 0, ',', '.') ?> ₫
+    </div>
   </div>
 </div>
 
@@ -99,4 +102,3 @@ include __DIR__ . '/../layout/header.php';
 </div>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>
-

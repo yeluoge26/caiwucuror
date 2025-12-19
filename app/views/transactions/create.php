@@ -10,14 +10,15 @@ include __DIR__ . '/../layout/header.php';
   <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
   
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<?= Csrf::token() ?>">
     
     <div class="form-group">
       <label><?= __('tx.type') ?></label>
+      <?php $selectedType = $_POST['type'] ?? 'income'; ?>
       <select name="type" id="type-select" required>
-        <option value="income"><?= __('tx.income') ?></option>
-        <option value="expense"><?= __('tx.expense') ?></option>
+        <option value="income" <?= $selectedType === 'income' ? 'selected' : '' ?>><?= __('tx.income') ?></option>
+        <option value="expense" <?= $selectedType === 'expense' ? 'selected' : '' ?>><?= __('tx.expense') ?></option>
       </select>
     </div>
     
@@ -37,20 +38,19 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <label><?= __('field.category') ?></label>
-      <select name="category_id" required>
+      <select name="category_id" id="category-select" required>
         <option value="">-- <?= __('field.category') ?> --</option>
         <?php
         $lang = I18n::current();
         foreach ($categories as $cat):
-          if ($cat['type'] === 'both' || $cat['type'] === ($_POST['type'] ?? 'income')):
-            $name = $lang === 'zh' ? $cat['name_zh'] : $cat['name_vi'];
+          $name = $lang === 'zh' ? $cat['name_zh'] : $cat['name_vi'];
         ?>
         <option value="<?= $cat['id'] ?>" 
                 data-type="<?= $cat['type'] ?>"
                 <?= ($_POST['category_id'] ?? '') == $cat['id'] ? 'selected' : '' ?>>
           <?= htmlspecialchars($name) ?>
         </option>
-        <?php endif; endforeach; ?>
+        <?php endforeach; ?>
       </select>
     </div>
     
@@ -86,10 +86,23 @@ include __DIR__ . '/../layout/header.php';
       <input type="datetime-local" name="occurred_at" 
              value="<?= $_POST['occurred_at'] ?? date('Y-m-d\TH:i') ?>" required>
     </div>
+
+    <div class="form-group" id="payer-group" style="display: none;">
+      <label><?= __('field.payer') ?></label>
+      <input type="text" name="payer" value="<?= htmlspecialchars($_POST['payer'] ?? '') ?>">
+    </div>
     
     <div class="form-group">
       <label><?= __('field.note') ?></label>
       <textarea name="note"><?= htmlspecialchars($_POST['note'] ?? '') ?></textarea>
+    </div>
+
+    <div class="form-group">
+      <label><?= __('attachment.upload') ?></label>
+      <input type="file" name="attachments[]" accept="image/*" multiple>
+      <div style="font-size: 12px; color: #666; margin-top: 6px;">
+        <?= __('attachment.upload_hint') ?>
+      </div>
     </div>
     
     <div class="form-group">
@@ -102,26 +115,50 @@ include __DIR__ . '/../layout/header.php';
 <script>
 document.getElementById('type-select').addEventListener('change', function() {
   const type = this.value;
-  const categorySelect = document.querySelector('select[name="category_id"]');
+  const categorySelect = document.getElementById('category-select');
   const vendorGroup = document.getElementById('vendor-group');
+  const payerGroup = document.getElementById('payer-group');
   
   // 显示/隐藏供应商字段
   if (type === 'expense') {
     vendorGroup.style.display = 'block';
+    payerGroup.style.display = 'block';
   } else {
     vendorGroup.style.display = 'none';
+    payerGroup.style.display = 'none';
+    // 清除供应商选择
+    const vendorSelect = vendorGroup.querySelector('select[name="vendor_id"]');
+    if (vendorSelect) vendorSelect.value = '';
+    const payerInput = payerGroup.querySelector('input[name="payer"]');
+    if (payerInput) payerInput.value = '';
   }
   
+  // 保存当前选中的分类ID
+  const currentCategoryId = categorySelect.value;
+  
   // 过滤分类选项
+  let hasVisibleOption = false;
   Array.from(categorySelect.options).forEach(option => {
-    if (option.value === '') return;
+    if (option.value === '') {
+      option.style.display = '';
+      return;
+    }
     const catType = option.dataset.type;
     if (catType === 'both' || catType === type) {
       option.style.display = '';
+      hasVisibleOption = true;
     } else {
       option.style.display = 'none';
     }
   });
+  
+  // 如果当前选中的分类不在可见选项中，重置选择
+  if (currentCategoryId) {
+    const selectedOption = categorySelect.querySelector(`option[value="${currentCategoryId}"]`);
+    if (selectedOption && selectedOption.style.display === 'none') {
+      categorySelect.value = '';
+    }
+  }
 });
 
 // 初始化
@@ -129,4 +166,3 @@ document.getElementById('type-select').dispatchEvent(new Event('change'));
 </script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>
-

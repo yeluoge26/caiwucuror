@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   category_id INT NOT NULL COMMENT '分类ID',
   payment_method_id INT NOT NULL COMMENT '支付方式ID',
   vendor_id INT NULL COMMENT '供应商ID（支出时使用）',
+  payer VARCHAR(128) NULL COMMENT '付款人（支出时使用）',
   occurred_at DATETIME NOT NULL COMMENT '发生时间',
   note TEXT NULL COMMENT '备注',
   status ENUM('approved','pending','void') NOT NULL DEFAULT 'approved' COMMENT '状态：已审核/待审核/已作废',
@@ -98,6 +99,153 @@ CREATE TABLE IF NOT EXISTS attachments (
   INDEX idx_att_tx (transaction_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='附件表';
 
+-- 作废申请记录
+CREATE TABLE IF NOT EXISTS void_requests (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  transaction_id BIGINT NOT NULL COMMENT '交易ID',
+  requested_by INT NOT NULL COMMENT '申请人ID',
+  reason VARCHAR(255) NULL COMMENT '申请理由',
+  status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending' COMMENT '状态',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  CONSTRAINT fk_vr_tx FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+  CONSTRAINT fk_vr_user FOREIGN KEY (requested_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_vr_tx (transaction_id),
+  INDEX idx_vr_user (requested_by),
+  INDEX idx_vr_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='作废申请';
+
+-- 固定资产表
+CREATE TABLE IF NOT EXISTS assets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  category VARCHAR(64) NOT NULL COMMENT '店面：咖啡店/办公/威士忌吧',
+  subcategory VARCHAR(128) NULL COMMENT '品类',
+  name VARCHAR(128) NULL COMMENT '名称（可空）',
+  floor VARCHAR(32) NULL COMMENT '所在楼层',
+  location VARCHAR(128) NULL COMMENT '位置描述',
+  price DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '价格',
+  quantity DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '数量/库存',
+  acquired_at DATE NOT NULL COMMENT '入库时间',
+  note VARCHAR(255) NULL COMMENT '备注',
+  status ENUM('active','void') NOT NULL DEFAULT 'active' COMMENT '状态',
+  created_by INT NOT NULL COMMENT '创建人',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  CONSTRAINT fk_assets_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_assets_category (category),
+  INDEX idx_assets_floor (floor),
+  INDEX idx_assets_acquired (acquired_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='固定资产';
+
+-- 固定资产图片
+CREATE TABLE IF NOT EXISTS asset_attachments (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  asset_id INT NOT NULL,
+  file_path VARCHAR(255) NOT NULL,
+  file_type VARCHAR(32) NULL,
+  uploaded_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_asset_att FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE,
+  CONSTRAINT fk_asset_att_user FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_asset_att_asset (asset_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='固定资产图片';
+
+-- 原料库存
+CREATE TABLE IF NOT EXISTS materials (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(128) NOT NULL COMMENT '原料名称',
+  category VARCHAR(64) NOT NULL COMMENT '类别：咖啡豆/牛奶/糖浆粉/耗材等',
+  store VARCHAR(32) NOT NULL DEFAULT 'coffee' COMMENT '店面：coffee/office/whiskey',
+  unit VARCHAR(16) NOT NULL COMMENT '单位：g/kg/L/个等',
+  quantity DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '当前库存',
+  min_quantity DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '安全库存',
+  note VARCHAR(255) NULL,
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_materials_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_materials_category (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='原料库存';
+
+CREATE TABLE IF NOT EXISTS material_attachments (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  material_id INT NOT NULL,
+  file_path VARCHAR(255) NOT NULL,
+  file_type VARCHAR(32) NULL,
+  uploaded_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_mat_att FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE,
+  CONSTRAINT fk_mat_att_user FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_mat_att (material_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='原料附件';
+
+-- 饮品表
+CREATE TABLE IF NOT EXISTS drinks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(128) NOT NULL,
+  store VARCHAR(32) NOT NULL DEFAULT 'coffee',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='饮品';
+
+-- 饮品配方
+CREATE TABLE IF NOT EXISTS drink_recipes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  drink_id INT NOT NULL,
+  material_id INT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL COMMENT '每杯耗用量（与原料单位一致）',
+  CONSTRAINT fk_drink_recipe_drink FOREIGN KEY (drink_id) REFERENCES drinks(id) ON DELETE CASCADE,
+  CONSTRAINT fk_drink_recipe_material FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE RESTRICT,
+  UNIQUE KEY uk_drink_material (drink_id, material_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='饮品配方';
+
+-- 耗材消耗记录
+CREATE TABLE IF NOT EXISTS consumption_logs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  drink_id INT NOT NULL,
+  quantity INT NOT NULL COMMENT '饮品数量',
+  occurred_at DATE NOT NULL,
+  note VARCHAR(255) NULL,
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_consume_drink FOREIGN KEY (drink_id) REFERENCES drinks(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_consume_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_consume_date (occurred_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='耗材消耗记录';
+
+-- 巡店记录
+CREATE TABLE IF NOT EXISTS inspections (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  store VARCHAR(32) NOT NULL DEFAULT 'coffee',
+  floor VARCHAR(16) NOT NULL COMMENT '1F/2F/3F/4F',
+  visit_no TINYINT NOT NULL DEFAULT 1 COMMENT '1=首次/2=复巡',
+  room VARCHAR(64) NOT NULL DEFAULT 'general' COMMENT '卫生间/店面/楼梯等',
+  status ENUM('ok','issue') NOT NULL DEFAULT 'ok',
+  note VARCHAR(255) NULL,
+  reviewed_status ENUM('pending','confirmed','rejected') NOT NULL DEFAULT 'pending',
+  review_note VARCHAR(255) NULL,
+  reviewed_by INT NULL,
+  reviewed_at DATETIME NULL,
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  spot_date DATE NOT NULL,
+  CONSTRAINT fk_inspect_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_inspect_reviewer FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_inspect_date (spot_date),
+  INDEX idx_inspect_floor (floor),
+  INDEX idx_inspect_room (room),
+  INDEX idx_inspect_visit (visit_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='巡店检查';
+
+CREATE TABLE IF NOT EXISTS inspection_photos (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  inspection_id BIGINT NOT NULL,
+  file_path VARCHAR(255) NOT NULL,
+  file_type VARCHAR(32) NULL,
+  uploaded_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_insp_photo FOREIGN KEY (inspection_id) REFERENCES inspections(id) ON DELETE CASCADE,
+  CONSTRAINT fk_insp_photo_user FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_insp_photo (inspection_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='巡店照片';
+
 -- 初始化角色数据
 INSERT INTO roles(`key`, name_zh, name_vi) VALUES
 ('owner','老板','Chủ quán'),
@@ -108,8 +256,9 @@ ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
 
 -- 初始化默认用户（密码：admin123）
 -- 注意：实际使用时请修改密码
+-- 使用正确的 password_hash 生成：password_hash('admin123', PASSWORD_DEFAULT)
 INSERT INTO users(username, password_hash, display_name, role_id) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '管理员', 1)
+('admin', '$2y$12$cKipuCZmfNWohh5ZSFdWCuQhs/5tzzjbVL.g/lFeicgEn8tYEhHHS', '管理员', 1)
 ON DUPLICATE KEY UPDATE display_name=VALUES(display_name);
 
 -- 初始化分类数据
@@ -131,10 +280,17 @@ ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
 -- 初始化支付方式
 INSERT INTO payment_methods(name_zh, name_vi) VALUES
 ('现金', 'Tiền mặt'),
-('银行转账', 'Chuyển khoản ngân hàng'),
+('POS机刷卡', 'Quẹt thẻ POS'),
 ('VNPAY', 'VNPAY'),
 ('ZaloPay', 'ZaloPay'),
-('Momo', 'Momo'),
-('QR码', 'QR Code')
+('Momo', 'Momo')
 ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
 
+-- 初始化默认供应商
+INSERT INTO vendors(name, phone, note, is_active) VALUES
+('食材供应商A', '0123456789', '主要食材供应商', 1),
+('设备维修公司', '0987654321', '设备维护和维修', 1),
+('水电公司', '0111222333', '水电费缴纳', 1),
+('广告公司', '0444555666', '营销推广服务', 1),
+('其他供应商', NULL, '其他支出供应商', 1)
+ON DUPLICATE KEY UPDATE name=VALUES(name), phone=VALUES(phone), note=VALUES(note);

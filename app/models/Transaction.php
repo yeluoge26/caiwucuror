@@ -22,9 +22,9 @@ class Transaction {
 
   public static function create($data) {
     $sql = "INSERT INTO transactions
-      (`type`, amount, currency, category_id, payment_method_id, vendor_id,
+      (`type`, amount, currency, category_id, payment_method_id, vendor_id, payer,
        occurred_at, note, status, created_by)
-      VALUES (?,?,?,?,?,?,?,?,?,?)";
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     $stmt = DB::conn()->prepare($sql);
     $result = $stmt->execute([
@@ -34,6 +34,7 @@ class Transaction {
       $data['category_id'],
       $data['payment_method_id'],
       $data['vendor_id'] ?? null,
+      $data['payer'] ?? null,
       $data['occurred_at'],
       $data['note'] ?? null,
       $data['status'] ?? 'approved',
@@ -101,11 +102,74 @@ class Transaction {
     if ($where) {
       $sql .= " WHERE " . implode(' AND ', $where);
     }
-    $sql .= " ORDER BY t.occurred_at DESC LIMIT " . ($filters['limit'] ?? 200);
+    $sql .= " ORDER BY t.occurred_at DESC";
+    
+    // 支持分页
+    if (isset($filters['limit'])) {
+      $sql .= " LIMIT " . intval($filters['limit']);
+      if (isset($filters['offset'])) {
+        $sql .= " OFFSET " . intval($filters['offset']);
+      }
+    }
 
     $stmt = DB::conn()->prepare($sql);
     $stmt->execute($params);
     return $stmt->fetchAll();
+  }
+
+  public static function count($filters = []) {
+    $where = ['status != ?'];
+    $params = ['void'];
+
+    if (!empty($filters['type'])) {
+      $where[] = 't.`type`=?';
+      $params[] = $filters['type'];
+    }
+
+    if (!empty($filters['from'])) {
+      $where[] = 't.occurred_at>=?';
+      $params[] = $filters['from'];
+    }
+
+    if (!empty($filters['to'])) {
+      $where[] = 't.occurred_at<=?';
+      $params[] = $filters['to'];
+    }
+
+    if (!empty($filters['category_id'])) {
+      $where[] = 't.category_id=?';
+      $params[] = $filters['category_id'];
+    }
+
+    if (!empty($filters['payment_method_id'])) {
+      $where[] = 't.payment_method_id=?';
+      $params[] = $filters['payment_method_id'];
+    }
+
+    if (!empty($filters['created_by'])) {
+      $where[] = 't.created_by=?';
+      $params[] = $filters['created_by'];
+    }
+
+    if (!empty($filters['search'])) {
+      $where[] = '(t.note LIKE ? OR v.name LIKE ?)';
+      $search = '%' . $filters['search'] . '%';
+      $params[] = $search;
+      $params[] = $search;
+    }
+
+    $sql = "SELECT COUNT(*) as total
+      FROM transactions t
+      LEFT JOIN vendors v ON t.vendor_id = v.id";
+    
+    if ($where) {
+      $sql .= " WHERE " . implode(' AND ', $where);
+    }
+
+    $stmt = DB::conn()->prepare($sql);
+    $stmt->execute($params);
+    $result = $stmt->fetch();
+    return $result ? (int)$result['total'] : 0;
   }
 
   public static function update($id, $data) {
@@ -207,4 +271,3 @@ class Transaction {
     return $stmt->fetchAll();
   }
 }
-

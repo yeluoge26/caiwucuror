@@ -91,7 +91,7 @@ http://localhost/index.php?r=auth/login
 - **支出**: 食材采购、设备维护、房租水电、员工工资、营销推广、其他支出
 
 ### 支付方式
-- 现金、银行转账、VNPAY、ZaloPay、Momo、QR码
+- 现金、POS机刷卡、VNPAY、ZaloPay、Momo
 
 ### 角色
 - 老板 (Owner)
@@ -118,4 +118,3 @@ A: 检查 PHP session 是否正常工作，确保有写入权限
 
 **Q: 中文显示乱码？**
 A: 确保数据库使用 `utf8mb4` 字符集，PHP 文件保存为 UTF-8 编码
-

@@ -1,0 +1,4 @@
+store,subcategory,name,floor,location,price,acquired_at,note
+coffee,吧台设备,意式咖啡机,1F,前台,52000,2024-05-01,示例
+office,办公桌椅,升降桌,2F,办公区,2500,2024-06-10,
+whiskey,酒柜/恒温柜,雪茄柜,Mezzanine,酒吧区,8000,2024-04-20,

@@ -4,12 +4,22 @@ class Router {
     $r = $_GET['r'] ?? 'reports/dashboard';
     [$controller, $action] = array_pad(explode('/', $r), 2, 'index');
 
-    $controller = ucfirst($controller) . 'Controller';
+    // 路由到控制器的映射（处理单数/复数）
+    $controllerMap = [
+      'reports' => 'Report',
+      'transactions' => 'Transaction',
+      'settings' => 'Setting',
+      'auth' => 'Auth'
+    ];
+
+    // 如果路由在映射中，使用映射值，否则使用原值（首字母大写）
+    $controllerName = $controllerMap[$controller] ?? ucfirst($controller);
+    $controller = $controllerName . 'Controller';
     $file = __DIR__ . '/../controllers/' . $controller . '.php';
 
     if (!file_exists($file)) {
       http_response_code(404);
-      die('Controller not found: ' . $controller);
+      die('Controller not found: ' . $controller . ' (file: ' . $file . ')');
     }
 
     require_once $file;
@@ -17,7 +27,7 @@ class Router {
 
     if (!method_exists($obj, $action)) {
       http_response_code(404);
-      die('Action not found: ' . $action);
+      die('Action not found: ' . $action . ' in ' . $controller);
     }
 
     call_user_func([$obj, $action]);

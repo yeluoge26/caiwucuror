@@ -2,9 +2,19 @@
 $title = __('setting.categories');
 include __DIR__ . '/../layout/header.php';
 $lang = I18n::current();
+$current = $_GET['r'] ?? '';
 ?>
 
 <h2 style="margin-bottom: 20px;"><?= __('setting.categories') ?></h2>
+
+<div class="card" style="padding: 12px; margin-bottom: 16px;">
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <a class="btn <?= $current === 'settings/categories' ? 'btn-success' : '' ?>" href="/index.php?r=settings/categories"><?= __('setting.categories') ?></a>
+    <a class="btn <?= $current === 'settings/paymentMethods' ? 'btn-success' : '' ?>" href="/index.php?r=settings/paymentMethods"><?= __('setting.payment_methods') ?></a>
+    <a class="btn <?= $current === 'settings/vendors' ? 'btn-success' : '' ?>" href="/index.php?r=settings/vendors"><?= __('setting.vendors') ?></a>
+    <a class="btn <?= $current === 'settings/users' ? 'btn-success' : '' ?>" href="/index.php?r=settings/users"><?= __('setting.users') ?></a>
+  </div>
+</div>
 
 <div class="card">
   <h3 style="margin-bottom: 16px;"><?= __('setting.categories') ?></h3>
@@ -35,6 +45,12 @@ $lang = I18n::current();
         <button onclick="editCategory(<?= htmlspecialchars(json_encode($cat)) ?>)" class="btn" style="padding: 4px 8px; font-size: 12px;">
           <?= __('btn.edit') ?>
         </button>
+        <form method="post" style="display:inline-block; margin-left:6px;" onsubmit="return confirm('<?= __('btn.delete') ?>?');">
+          <input type="hidden" name="_csrf" value="<?= Csrf::token() ?>">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="id" value="<?= $cat['id'] ?>">
+          <button type="submit" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;"><?= __('btn.delete') ?></button>
+        </form>
       </td>
     </tr>
     <?php endforeach; ?>
@@ -106,4 +122,3 @@ function hideForm() {
 </script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>
-

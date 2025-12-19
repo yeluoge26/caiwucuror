@@ -5,6 +5,7 @@ require_once __DIR__ . '/../models/Category.php';
 require_once __DIR__ . '/../models/PaymentMethod.php';
 require_once __DIR__ . '/../models/Vendor.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../core/DB.php';
 
 class SettingController {
   public function categories() {
@@ -135,5 +136,44 @@ class SettingController {
 
     include __DIR__ . '/../views/settings/vendors.php';
   }
-}
 
+  public function users() {
+    Auth::requireLogin();
+    Auth::requireRole(['owner', 'manager', 'accountant']);
+
+    $roles = DB::conn()->query("SELECT id, `key`, name_zh, name_vi FROM roles ORDER BY id ASC")->fetchAll();
+    $users = User::all();
+    $error = null;
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!Csrf::check($_POST['_csrf'] ?? '')) {
+        $error = __('csrf.invalid');
+      } else {
+        $action = $_POST['action'] ?? '';
+        if ($action === 'create') {
+          User::create([
+            'username' => $_POST['username'],
+            'password' => $_POST['password'],
+            'display_name' => $_POST['display_name'],
+            'role_id' => $_POST['role_id'],
+            'is_active' => isset($_POST['is_active']) ? 1 : 0
+          ]);
+        } elseif ($action === 'update') {
+          $data = [
+            'display_name' => $_POST['display_name'],
+            'role_id' => $_POST['role_id'],
+            'is_active' => isset($_POST['is_active']) ? 1 : 0
+          ];
+          if (!empty($_POST['password'])) {
+            $data['password'] = $_POST['password'];
+          }
+          User::update($_POST['id'], $data);
+        }
+        header('Location: /index.php?r=settings/users');
+        exit;
+      }
+    }
+
+    include __DIR__ . '/../views/settings/users.php';
+  }
+}
