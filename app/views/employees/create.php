@@ -68,9 +68,21 @@ include __DIR__ . '/../layout/header.php';
       </div>
 
       <div class="form-group">
-        <label><?= __('employee.hire_date') ?></label>
-        <input type="date" name="hire_date" value="<?= htmlspecialchars($_POST['hire_date'] ?? '') ?>">
+        <label><?= __('employee.employment_type') ?></label>
+        <select name="employment_type">
+          <option value="full_time" <?= ($_POST['employment_type'] ?? 'full_time') === 'full_time' ? 'selected' : '' ?>>
+            <?= __('employee.employment_type_full_time') ?>
+          </option>
+          <option value="part_time" <?= ($_POST['employment_type'] ?? '') === 'part_time' ? 'selected' : '' ?>>
+            <?= __('employee.employment_type_part_time') ?>
+          </option>
+        </select>
       </div>
+    </div>
+
+    <div class="form-group">
+      <label><?= __('employee.hire_date') ?></label>
+      <input type="date" name="hire_date" value="<?= htmlspecialchars($_POST['hire_date'] ?? '') ?>">
     </div>
 
     <div class="form-group">

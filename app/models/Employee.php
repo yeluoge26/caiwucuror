@@ -18,8 +18,8 @@ class Employee {
 
   public static function create($data) {
     $sql = "INSERT INTO employees
-      (name, role_id, phone, email, address, status, hire_date, resign_date, note, created_by)
-      VALUES (?,?,?,?,?,?,?,?,?,?)";
+      (name, role_id, phone, email, address, status, employment_type, hire_date, resign_date, note, created_by)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     $stmt = DB::conn()->prepare($sql);
     $result = $stmt->execute([
@@ -29,6 +29,7 @@ class Employee {
       $data['email'] ?? null,
       $data['address'] ?? null,
       $data['status'] ?? 'active',
+      $data['employment_type'] ?? 'full_time',
       $data['hire_date'] ?? null,
       $data['resign_date'] ?? null,
       $data['note'] ?? null,

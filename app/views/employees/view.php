@@ -26,6 +26,12 @@ include __DIR__ . '/../layout/header.php';
       <?= htmlspecialchars($roleName) ?>
     </div>
     <div>
+      <strong><?= __('employee.employment_type') ?>:</strong>
+      <span class="badge">
+        <?= ($employee['employment_type'] ?? 'full_time') === 'full_time' ? __('employee.employment_type_full_time') : __('employee.employment_type_part_time') ?>
+      </span>
+    </div>
+    <div>
       <strong><?= __('employee.phone') ?>:</strong>
       <?= htmlspecialchars($employee['phone'] ?? '-') ?>
     </div>

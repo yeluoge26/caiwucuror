@@ -350,6 +350,9 @@ return [
 'employee.status_resigned' => '已辞职',
 'employee.hire_date' => '入职时间',
 'employee.resign_date' => '离职时间',
+'employee.employment_type' => '雇佣类型',
+'employee.employment_type_full_time' => '全职',
+'employee.employment_type_part_time' => '兼职',
 'employee.create_failed' => '创建失败',
 'employee.update_failed' => '更新失败',
 

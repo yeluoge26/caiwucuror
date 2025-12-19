@@ -350,6 +350,9 @@ return [
 'employee.status_resigned' => 'Đã từ chức',
 'employee.hire_date' => 'Ngày vào làm',
 'employee.resign_date' => 'Ngày nghỉ việc',
+'employee.employment_type' => 'Loại việc làm',
+'employee.employment_type_full_time' => 'Toàn thời gian',
+'employee.employment_type_part_time' => 'Bán thời gian',
 'employee.create_failed' => 'Tạo thất bại',
 'employee.update_failed' => 'Cập nhật thất bại',
 

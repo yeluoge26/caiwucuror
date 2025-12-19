@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS employees (
   email VARCHAR(128) NULL COMMENT '邮箱',
   address TEXT NULL COMMENT '地址',
   status ENUM('active','inactive','resigned') NOT NULL DEFAULT 'active' COMMENT '状态：在职/离职/已辞职',
+  employment_type ENUM('full_time','part_time') NOT NULL DEFAULT 'full_time' COMMENT '雇佣类型：全职/兼职',
   hire_date DATE NULL COMMENT '入职时间',
   resign_date DATE NULL COMMENT '离职时间',
   note TEXT NULL COMMENT '备注',

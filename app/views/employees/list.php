@@ -61,6 +61,7 @@ include __DIR__ . '/../layout/header.php';
         <th>ID</th>
         <th><?= __('employee.name') ?></th>
         <th><?= __('employee.role') ?></th>
+        <th><?= __('employee.employment_type') ?></th>
         <th><?= __('employee.phone') ?></th>
         <th><?= __('employee.email') ?></th>
         <th><?= __('employee.status') ?></th>
@@ -69,7 +70,7 @@ include __DIR__ . '/../layout/header.php';
       </tr>
       <?php if (empty($items)): ?>
       <tr>
-        <td colspan="8" style="text-align: center; color: #999; padding: 40px;">
+        <td colspan="9" style="text-align: center; color: #999; padding: 40px;">
           <?= __('list.no_data') ?>
         </td>
       </tr>
@@ -92,6 +93,11 @@ include __DIR__ . '/../layout/header.php';
         <td><?= $row['id'] ?></td>
         <td><?= htmlspecialchars($row['name']) ?></td>
         <td><?= htmlspecialchars($lang === 'zh' ? ($row['role_name_zh'] ?? '') : ($row['role_name_vi'] ?? '')) ?></td>
+        <td>
+          <span class="badge">
+            <?= ($row['employment_type'] ?? 'full_time') === 'full_time' ? __('employee.employment_type_full_time') : __('employee.employment_type_part_time') ?>
+          </span>
+        </td>
         <td><?= htmlspecialchars($row['phone'] ?? '-') ?></td>
         <td><?= htmlspecialchars($row['email'] ?? '-') ?></td>
         <td>
