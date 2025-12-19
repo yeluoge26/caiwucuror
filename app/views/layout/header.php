@@ -112,6 +112,14 @@
         <?= __('nav.consume') ?>
       </a>
       <?php endif; ?>
+      <a href="/index.php?r=tasks/list" class="<?= strpos($_GET['r'] ?? '', 'tasks') === 0 ? 'active' : '' ?>">
+        <?= __('task.list') ?>
+      </a>
+      <?php if (in_array(Auth::user()['role_key'], ['owner', 'manager'])): ?>
+      <a href="/index.php?r=tasks/create" class="<?= ($_GET['r'] ?? '') === 'tasks/create' ? 'active' : '' ?>">
+        <?= __('task.create') ?>
+      </a>
+      <?php endif; ?>
       <?php if (in_array(Auth::user()['role_key'], ['owner', 'manager', 'accountant'])): ?>
       <a href="/index.php?r=settings/categories" class="<?= strpos($_GET['r'] ?? '', 'settings') === 0 ? 'active' : '' ?>">
         <?= __('nav.settings') ?>
