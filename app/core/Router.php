@@ -10,7 +10,9 @@ class Router {
       'transactions' => 'Transaction',
       'settings' => 'Setting',
       'auth' => 'Auth',
-      'tasks' => 'Task'
+      'tasks' => 'Task',
+      'employees' => 'Employee',
+      'shifts' => 'Shift'
     ];
 
     // 如果路由在映射中，使用映射值，否则使用原值（首字母大写）

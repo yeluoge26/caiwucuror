@@ -121,6 +121,12 @@
       </a>
       <?php endif; ?>
       <?php if (in_array(Auth::user()['role_key'], ['owner', 'manager', 'accountant'])): ?>
+      <a href="/index.php?r=employees/list" class="<?= strpos($_GET['r'] ?? '', 'employees') === 0 ? 'active' : '' ?>">
+        <?= __('employee.list') ?>
+      </a>
+      <a href="/index.php?r=shifts/list" class="<?= strpos($_GET['r'] ?? '', 'shifts') === 0 ? 'active' : '' ?>">
+        <?= __('shift.list') ?>
+      </a>
       <a href="/index.php?r=settings/categories" class="<?= strpos($_GET['r'] ?? '', 'settings') === 0 ? 'active' : '' ?>">
         <?= __('nav.settings') ?>
       </a>
