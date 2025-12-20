@@ -8,7 +8,20 @@ require_once __DIR__ . '/../models/InspectionPhoto.php';
 class InspectionsController {
   private function uploadPhotos($files, $userId) {
     $paths = [];
-    if (empty($files) || empty($files['name'])) return $paths;
+    if (empty($files) || empty($files['name'])) {
+      error_log("uploadPhotos: No files provided or files array is empty");
+      return $paths;
+    }
+    
+    // 调试：记录接收到的文件信息
+    error_log("uploadPhotos: Received files - " . json_encode([
+      'has_name' => isset($files['name']),
+      'name_type' => gettype($files['name']),
+      'name_value' => is_array($files['name']) ? count($files['name']) . ' files' : $files['name'],
+      'has_tmp_name' => isset($files['tmp_name']),
+      'has_error' => isset($files['error']),
+      'error_value' => is_array($files['error']) ? json_encode($files['error']) : $files['error']
+    ], JSON_UNESCAPED_UNICODE));
     $allowed = [
       'image/jpeg' => 'jpg',
       'image/png' => 'png',
@@ -56,16 +69,66 @@ class InspectionsController {
     $sizes = is_array($files['size']) ? $files['size'] : [$files['size']];
     $errors = is_array($files['error']) ? $files['error'] : [$files['error']];
     $count = count($names);
+    
+    $uploadErrors = [
+      UPLOAD_ERR_INI_SIZE => '文件大小超过 upload_max_filesize',
+      UPLOAD_ERR_FORM_SIZE => '文件大小超过表单 MAX_FILE_SIZE',
+      UPLOAD_ERR_PARTIAL => '文件只有部分被上传',
+      UPLOAD_ERR_NO_FILE => '没有文件被上传',
+      UPLOAD_ERR_NO_TMP_DIR => '找不到临时文件夹',
+      UPLOAD_ERR_CANT_WRITE => '文件写入失败',
+      UPLOAD_ERR_EXTENSION => 'PHP扩展阻止了文件上传'
+    ];
+    
     for ($i = 0; $i < $count; $i++) {
-      if (empty($names[$i]) || $errors[$i] !== UPLOAD_ERR_OK) continue;
+      if (empty($names[$i])) {
+        error_log("Upload skipped: empty filename at index $i");
+        continue;
+      }
+      
+      if ($errors[$i] !== UPLOAD_ERR_OK) {
+        $errorMsg = $uploadErrors[$errors[$i]] ?? "未知错误 ({$errors[$i]})";
+        error_log("Upload error for file '{$names[$i]}': {$errorMsg}");
+        continue;
+      }
+      
+      if (!is_uploaded_file($tmpNames[$i])) {
+        error_log("Upload skipped: '{$names[$i]}' is not a valid uploaded file");
+        continue;
+      }
+      
+      if ($sizes[$i] > $maxSize) {
+        error_log("Upload skipped: '{$names[$i]}' size ({$sizes[$i]} bytes) exceeds max size ({$maxSize} bytes)");
+        continue;
+      }
+      
       $mime = $detectMime($tmpNames[$i]);
-      if (!isset($allowed[$mime]) || $sizes[$i] > $maxSize || !is_uploaded_file($tmpNames[$i])) continue;
+      if (!$mime) {
+        error_log("Upload skipped: '{$names[$i]}' MIME type could not be detected");
+        continue;
+      }
+      
+      if (!isset($allowed[$mime])) {
+        error_log("Upload skipped: '{$names[$i]}' has unsupported MIME type '{$mime}'");
+        continue;
+      }
+      
       $name = 'inspect_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $allowed[$mime];
       $target = $dir . '/' . $name;
+      
       if (move_uploaded_file($tmpNames[$i], $target)) {
         $paths[] = ['path' => 'uploads/inspections/' . $name, 'mime' => $mime];
+        error_log("Upload success: '{$names[$i]}' saved as '{$name}'");
+      } else {
+        $lastError = error_get_last();
+        error_log("Upload failed: failed to move '{$names[$i]}' to '{$target}'. Error: " . ($lastError['message'] ?? 'unknown'));
       }
     }
+    
+    if (empty($paths) && $count > 0) {
+      error_log("No files were successfully uploaded out of {$count} attempted upload(s)");
+    }
+    
     return $paths;
   }
 
@@ -120,8 +183,23 @@ class InspectionsController {
           $error = __('inspection.no_past_date');
         } else {
           // 照片可选，不强制要求
+          error_log("InspectionsController::create - POST data received");
+          error_log("InspectionsController::create - _FILES keys: " . implode(', ', array_keys($_FILES)));
+          if (isset($_FILES['photos'])) {
+            error_log("InspectionsController::create - _FILES['photos'] exists: " . json_encode([
+              'name' => is_array($_FILES['photos']['name']) ? count($_FILES['photos']['name']) . ' files' : $_FILES['photos']['name'],
+              'error' => is_array($_FILES['photos']['error']) ? $_FILES['photos']['error'] : $_FILES['photos']['error']
+            ], JSON_UNESCAPED_UNICODE));
+          }
+          if (isset($_FILES['photo'])) {
+            error_log("InspectionsController::create - _FILES['photo'] exists: " . json_encode([
+              'name' => $_FILES['photo']['name'],
+              'error' => $_FILES['photo']['error']
+            ], JSON_UNESCAPED_UNICODE));
+          }
           $fileInput = $_FILES['photos'] ?? ($_FILES['photo'] ?? null);
           $photos = $this->uploadPhotos($fileInput, Auth::user()['id']);
+          error_log("InspectionsController::create - uploadPhotos returned " . count($photos) . " photos");
           
           $result = Inspection::create([
             'store' => $_POST['store'] ?? 'coffee',
@@ -192,3 +270,4 @@ class InspectionsController {
     exit;
   }
 }
+
