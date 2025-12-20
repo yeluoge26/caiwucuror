@@ -218,9 +218,13 @@ class InspectionsController {
             $inspId = DB::conn()->lastInsertId();
             // 如果有照片，保存照片
             if (!empty($photos)) {
+              error_log("InspectionsController::create - Saving " . count($photos) . " photos for inspection ID: {$inspId}");
               foreach ($photos as $p) {
-                InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
+                $result = InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
+                error_log("InspectionsController::create - Photo saved: {$p['path']}, result: " . ($result ? 'success' : 'failed'));
               }
+            } else {
+              error_log("InspectionsController::create - No photos to save for inspection ID: {$inspId}");
             }
             // 使用绝对路径重定向，确保包含正确的域名
             $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);

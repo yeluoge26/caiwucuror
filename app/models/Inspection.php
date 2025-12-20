@@ -11,6 +11,7 @@ class Inspection {
     }
     $sql = "SELECT i.*, u.display_name as creator_name, r.display_name as reviewer_name
             , (SELECT file_path FROM inspection_photos p WHERE p.inspection_id = i.id ORDER BY p.id DESC LIMIT 1) as thumb_path
+            , (SELECT COUNT(*) FROM inspection_photos p WHERE p.inspection_id = i.id) as photo_count
             FROM inspections i
             LEFT JOIN users u ON i.created_by = u.id
             LEFT JOIN users r ON i.reviewed_by = r.id";

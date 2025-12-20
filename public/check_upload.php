@@ -108,10 +108,15 @@ echo "</table>";
 echo "<h4>PHP 运行用户信息</h4>";
 echo "<p><strong>当前 PHP 运行用户：</strong> {$phpUser}</p>";
 
-if ($hasWritableIssue) {
+// 检查关键目录（uploads 和 inspections）是否可写
+$uploadsWritable = isset($dirs['uploads']) && is_writable($dirs['uploads']);
+$inspectionsWritable = isset($dirs['inspections']) && is_writable($dirs['inspections']);
+$criticalDirsWritable = $uploadsWritable && $inspectionsWritable;
+
+if ($hasWritableIssue && !$criticalDirsWritable) {
     echo "<div style='background:#fff3cd; border:1px solid #ffc107; padding:15px; margin:10px 0; border-radius:4px;'>";
     echo "<h4 style='margin-top:0; color:#856404;'>⚠️ 权限修复建议</h4>";
-    echo "<p style='color:#856404;'><strong>问题：</strong>目录权限为 {$lastPerms}，但 PHP 用户 '{$phpUser}' 无法写入。</p>";
+    echo "<p style='color:#856404;'><strong>问题：</strong>关键上传目录（uploads/inspections）不可写，PHP 用户 '{$phpUser}' 无法写入文件。</p>";
     echo "<p style='color:#856404;'><strong>解决方案（按优先级）：</strong></p>";
     echo "<ol style='color:#856404;'>";
     echo "<li><strong>修改目录所有者（推荐）：</strong><br>";
@@ -123,6 +128,12 @@ if ($hasWritableIssue) {
     echo "<li><strong>临时测试（不推荐用于生产环境）：</strong><br>";
     echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chmod -R 777 public/uploads</code></li>";
     echo "</ol>";
+    echo "</div>";
+} elseif ($hasWritableIssue && $criticalDirsWritable) {
+    echo "<div style='background:#d1ecf1; border:1px solid #bee5eb; padding:15px; margin:10px 0; border-radius:4px;'>";
+    echo "<h4 style='margin-top:0; color:#0c5460;'>ℹ️ 权限状态说明</h4>";
+    echo "<p style='color:#0c5460;'>虽然 public 目录显示不可写，但关键的上传目录（uploads 和 inspections）已可写，<strong>上传功能应该可以正常工作</strong>。</p>";
+    echo "<p style='color:#0c5460;'>如果需要 public 目录也可写，可以执行：<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chown -R {$phpUser}:{$phpUser} public</code></p>";
     echo "</div>";
 }
 echo "</table>";

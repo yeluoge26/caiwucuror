@@ -46,9 +46,32 @@
           </span>
         </td>
         <td>
-          <?php if (!empty($row['thumb_path'])): ?>
-          <a href="/<?= htmlspecialchars($row['thumb_path']) ?>" target="_blank"><?= __('inspection.view_photo') ?></a>
-          <?php else: ?>-<?php endif; ?>
+          <?php 
+          // 检查是否有照片路径
+          $photoPath = $row['thumb_path'] ?? null;
+          $photoCount = $row['photo_count'] ?? 0;
+          
+          if (!empty($photoPath)): 
+            // 确保路径以 / 开头（如果路径是 uploads/inspections/xxx.jpg，需要加上 /）
+            $photoUrl = (strpos($photoPath, '/') === 0) ? $photoPath : '/' . $photoPath;
+          ?>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <a href="<?= htmlspecialchars($photoUrl) ?>" target="_blank" style="display: inline-block;">
+              <img src="<?= htmlspecialchars($photoUrl) ?>" alt="照片" style="max-width: 50px; max-height: 50px; border-radius: 4px; object-fit: cover; border: 1px solid #ddd;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+              <span style="display: none; color: #e74c3c; font-size: 11px;">图片加载失败</span>
+            </a>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <a href="/index.php?r=inspections/view&id=<?= $row['id'] ?>" style="font-size: 12px; color: #3498db; text-decoration: none;">
+                <?= __('inspection.view_photo', '查看照片') ?>
+              </a>
+              <?php if ($photoCount > 1): ?>
+              <span style="font-size: 11px; color: #666;">共 <?= $photoCount ?> 张</span>
+              <?php endif; ?>
+            </div>
+          </div>
+          <?php else: ?>
+          <span style="color: #999;">-</span>
+          <?php endif; ?>
         </td>
         <td><?= htmlspecialchars($row['note'] ?? '') ?></td>
         <td><?= htmlspecialchars($row['creator_name'] ?? '') ?> @ <?= date('Y-m-d', strtotime($row['spot_date'])) ?></td>
