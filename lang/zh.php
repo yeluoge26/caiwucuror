@@ -275,6 +275,7 @@ return [
 'inspection.title' => 'SOP巡店',
 'inspection.new' => '新增巡店记录',
 'inspection.list' => '巡店列表',
+'inspection.basic_info' => '基本信息',
 'inspection.floor' => '楼层',
 'inspection.status' => '状态',
 'inspection.ok' => 'OK',
