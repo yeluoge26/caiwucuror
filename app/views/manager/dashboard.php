@@ -67,27 +67,17 @@ if (!isset($theoretical)) {
     </div>
   </a>
   
-  <!-- 现金卡 -->
-  <a href="/index.php?r=cash_closings/create" class="status-card" style="text-decoration: none; color: inherit;">
+  <!-- 记一笔卡 -->
+  <a href="/index.php?r=transactions/create" class="status-card" style="text-decoration: none; color: inherit;">
     <div class="status-card-header">
-      <span>💸</span>
-      <span class="status-card-title"><?= __('manager.today_cash', '今日现金') ?></span>
+      <span>✏️</span>
+      <span class="status-card-title"><?= __('nav.add', '记一笔') ?></span>
     </div>
-    <div class="status-card-body status-<?= $cashStatus ?>">
-      <?php
-      $cashEmoji = [
-        'green' => '🟢',
-        'yellow' => '🟡',
-        'orange' => '🟠',
-        'red' => '🔴'
-      ];
-      echo $cashEmoji[$cashStatus];
-      ?>
-      <?= $cashStatusText ?>
+    <div class="status-card-body" style="color: #3498db;">
+      📝 <?= __('nav.add', '记一笔') ?>
     </div>
     <div class="status-card-footer">
-      <?= __('cash_closing.theoretical_balance', '理论现金') ?>: 
-      <?= number_format($theoretical['balance'], 0, ',', '.') ?> ₫
+      <?= __('manager.record_transaction', '记录收支') ?>
     </div>
   </a>
 </div>
