@@ -87,7 +87,7 @@ include __DIR__ . '/../layout/header.php';
 
     <div class="form-group">
       <label><?= __('employee.resign_date') ?></label>
-      <input type="date" name="resign_date" value="<?= htmlspecialchars($_POST['resign_date'] ?? '') ?>">
+      <input type="date" name="resign_date" value="<?= htmlspecialchars($_POST['resign_date'] ?? '2099-09-09') ?>">
     </div>
 
     <div class="form-group">

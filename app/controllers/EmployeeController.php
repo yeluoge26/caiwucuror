@@ -51,7 +51,7 @@ class EmployeeController {
           'status' => $_POST['status'] ?? 'active',
           'employment_type' => $_POST['employment_type'] ?? 'full_time',
           'hire_date' => $_POST['hire_date'] ?? null,
-          'resign_date' => $_POST['resign_date'] ?? null,
+          'resign_date' => $_POST['resign_date'] ?? '2099-09-09',
           'note' => $_POST['note'] ?? null,
           'created_by' => Auth::user()['id'],
         ];
