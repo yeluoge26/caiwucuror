@@ -91,25 +91,37 @@ class InspectionsController {
       if (!Csrf::check($_POST['_csrf'] ?? '')) {
         $error = __('csrf.invalid');
       } else {
-        Inspection::create([
-          'store' => $_POST['store'] ?? 'coffee',
-          'floor' => $_POST['floor'] ?? '1F',
-          'visit_no' => (int)($_POST['visit_no'] ?? 1),
-          'room' => $_POST['room'] ?? 'general',
-          'status' => $_POST['status'] ?? 'ok',
-          'note' => $_POST['note'] ?? null,
-          'created_by' => Auth::user()['id'],
-          'spot_date' => $_POST['spot_date'] ?? date('Y-m-d'),
-        ]);
-        $inspId = DB::conn()->lastInsertId();
-        // 兼容单图字段 photo 与多图 photos[]
-        $fileInput = $_FILES['photos'] ?? ($_FILES['photo'] ?? null);
-        $photos = $this->uploadPhotos($fileInput, Auth::user()['id']);
-        foreach ($photos as $p) {
-          InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
+        $spotDate = $_POST['spot_date'] ?? date('Y-m-d');
+        
+        // 禁止回填历史巡店（spot_date 不能是过去日期）
+        if (strtotime($spotDate) < strtotime(date('Y-m-d'))) {
+          $error = __('inspection.no_past_date');
+        } else {
+          // 照片必填验证
+          $fileInput = $_FILES['photos'] ?? ($_FILES['photo'] ?? null);
+          $photos = $this->uploadPhotos($fileInput, Auth::user()['id']);
+          
+          if (empty($photos)) {
+            $error = __('inspection.photo_required');
+          } else {
+            Inspection::create([
+              'store' => $_POST['store'] ?? 'coffee',
+              'floor' => $_POST['floor'] ?? '1F',
+              'visit_no' => (int)($_POST['visit_no'] ?? 1),
+              'room' => $_POST['room'] ?? 'general',
+              'status' => $_POST['status'] ?? 'ok',
+              'note' => $_POST['note'] ?? null,
+              'created_by' => Auth::user()['id'],
+              'spot_date' => $spotDate,
+            ]);
+            $inspId = DB::conn()->lastInsertId();
+            foreach ($photos as $p) {
+              InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
+            }
+            header('Location: /index.php?r=inspections/list&date=' . urlencode($spotDate));
+            exit;
+          }
         }
-        header('Location: /index.php?r=inspections/list&date=' . urlencode($_POST['spot_date'] ?? $date));
-        exit;
       }
     }
 

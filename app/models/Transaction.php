@@ -203,6 +203,16 @@ class Transaction {
       $params[] = $filters['to'];
     }
 
+    if (!empty($filters['payment_method_id'])) {
+      $where[] = 'payment_method_id=?';
+      $params[] = $filters['payment_method_id'];
+    }
+
+    if (!empty($filters['type'])) {
+      $where[] = '`type`=?';
+      $params[] = $filters['type'];
+    }
+
     $sql = "SELECT 
       SUM(CASE WHEN `type`='income' THEN amount ELSE 0 END) as income,
       SUM(CASE WHEN `type`='expense' THEN amount ELSE 0 END) as expense

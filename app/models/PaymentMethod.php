@@ -8,6 +8,12 @@ class PaymentMethod {
     return $stmt->fetch();
   }
 
+  public static function findByName($nameZh, $nameVi = null) {
+    $stmt = DB::conn()->prepare("SELECT * FROM payment_methods WHERE name_zh = ? OR name_vi = ? LIMIT 1");
+    $stmt->execute([$nameZh, $nameVi ?: $nameZh]);
+    return $stmt->fetch();
+  }
+
   public static function all($filters = []) {
     $where = [];
     $params = [];

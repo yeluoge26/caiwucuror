@@ -77,9 +77,15 @@
   <aside class="sidebar">
     <div class="brand"><?= __('app.name') ?></div>
     <nav class="nav-vertical">
+      <?php if (Auth::user()['role_key'] === 'manager'): ?>
+      <a href="/index.php?r=manager/dashboard" class="<?= ($_GET['r'] ?? '') === 'manager/dashboard' ? 'active' : '' ?>">
+        <?= __('manager.dashboard') ?>
+      </a>
+      <?php else: ?>
       <a href="/index.php?r=reports/dashboard" class="<?= ($_GET['r'] ?? '') === 'reports/dashboard' ? 'active' : '' ?>">
         <?= __('nav.dashboard') ?>
       </a>
+      <?php endif; ?>
       <a href="/index.php?r=transactions/create" class="<?= ($_GET['r'] ?? '') === 'transactions/create' ? 'active' : '' ?>">
         <?= __('nav.add') ?>
       </a>
@@ -87,6 +93,14 @@
         <?= __('nav.list') ?>
       </a>
       <?php if (in_array(Auth::user()['role_key'], ['owner', 'manager', 'accountant'])): ?>
+      <?php if (Auth::user()['role_key'] === 'manager'): ?>
+      <a href="/index.php?r=cash_closings/create" class="<?= strpos($_GET['r'] ?? '', 'cash_closings') === 0 ? 'active' : '' ?>">
+        <?= __('cash_closing.create') ?>
+      </a>
+      <a href="/index.php?r=cash_closings/list" class="<?= ($_GET['r'] ?? '') === 'cash_closings/list' ? 'active' : '' ?>">
+        <?= __('cash_closing.list') ?>
+      </a>
+      <?php endif; ?>
       <a href="/index.php?r=inspections/create" class="<?= ($_GET['r'] ?? '') === 'inspections/create' ? 'active' : '' ?>">
         <?= __('nav.inspections_create') ?>
       </a>

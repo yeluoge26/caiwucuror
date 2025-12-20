@@ -53,13 +53,18 @@
 
     <div class="form-group">
       <label><?= __('field.time') ?></label>
-      <input type="date" name="spot_date" value="<?= htmlspecialchars($date ?? date('Y-m-d')) ?>" required>
+      <input type="date" name="spot_date" value="<?= htmlspecialchars($date ?? date('Y-m-d')) ?>" 
+             max="<?= date('Y-m-d') ?>" required>
+      <small style="color: #e74c3c;"><?= __('inspection.no_past_date_hint') ?></small>
     </div>
 
     <div class="form-group">
-      <label><?= __('inspection.photo') ?></label>
-      <input type="file" name="photos[]" accept="image/*" multiple>
-      <div style="font-size: 12px; color: #666; margin-top: 6px;"><?= __('asset.photo_hint') ?></div>
+      <label><?= __('inspection.photo') ?> *</label>
+      <input type="file" name="photos[]" accept="image/*" multiple required>
+      <div style="font-size: 12px; color: #e74c3c; margin-top: 6px;">
+        <strong><?= __('inspection.photo_required_hint') ?></strong>
+      </div>
+      <div style="font-size: 12px; color: #666; margin-top: 4px;"><?= __('asset.photo_hint') ?></div>
     </div>
 
     <div class="form-group">
