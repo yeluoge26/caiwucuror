@@ -24,7 +24,13 @@ $inspectionCount = count($confirmedInspections);
   </div>
 </div>
 
-<form method="post" enctype="multipart/form-data" id="inspection-form">
+<?php if (!empty($error)): ?>
+<div class="h5-card" style="background: #fee; border: 1px solid #fcc;">
+  <div style="color: #c33;"><?= htmlspecialchars($error) ?></div>
+</div>
+<?php endif; ?>
+
+<form method="post" enctype="multipart/form-data">
   <input type="hidden" name="_csrf" value="<?= Csrf::token() ?>">
 
   <!-- 基本信息 -->
@@ -82,26 +88,19 @@ $inspectionCount = count($confirmedInspections);
     </div>
   </div>
 
-  <!-- 巡店拍照区（核心，必须完成） -->
+  <!-- 巡店拍照区 -->
   <div class="h5-card">
-    <div class="h5-card-title">📷 <?= __('inspection.photo', '巡店现场照片') ?>（<?= __('field.required', '必填') ?>）</div>
-    
-    <div class="photo-upload-area" id="photo-area">
-      <label for="photo-input" style="display: none;"><?= __('inspection.photo', '巡店现场照片') ?></label>
-      <input type="file" name="photos[]" id="photo-input" accept="image/*" capture="environment" multiple required aria-label="<?= __('inspection.photo', '巡店现场照片') ?>" style="position: absolute; width: 0; height: 0; opacity: 0; overflow: hidden;">
-      <button type="button" onclick="document.getElementById('photo-input').click()" class="h5-btn" style="background: #3498db;" aria-label="<?= __('inspection.take_photo', '拍照') ?>">
-        📸 <?= __('inspection.take_photo', '拍照') ?>
-      </button>
-      <div class="h5-hint required" style="margin-top: 8px;">
-        <?= __('inspection.photo_required_hint', '只能调用相机，禁止相册上传。至少 1 张，建议 ≤5 张') ?>
-      </div>
-      <div class="photo-preview" id="photo-preview" role="group" aria-label="<?= __('inspection.photo', '巡店现场照片') ?>"></div>
+    <div class="h5-card-title">📷 <?= __('inspection.photo', '巡店现场照片') ?></div>
+    <div class="h5-form-group">
+      <label for="photos"><?= __('inspection.photo', '巡店现场照片') ?></label>
+      <input type="file" name="photos[]" id="photos" accept="image/*" multiple>
+      <small class="h5-hint"><?= __('asset.photo_hint', '支持 JPG/PNG/WEBP/GIF，单张不超过 5MB，可多选上传') ?></small>
     </div>
   </div>
 
-  <!-- 巡店说明（可选） -->
+  <!-- 巡店说明 -->
   <div class="h5-card">
-    <div class="h5-card-title">✏️ <?= __('inspection.note', '巡店说明') ?>（<?= __('field.optional', '可选') ?>）</div>
+    <div class="h5-card-title">✏️ <?= __('inspection.note', '巡店说明') ?></div>
     <div class="h5-form-group">
       <label for="note"><?= __('inspection.note', '巡店说明') ?></label>
       <textarea name="note" id="note" placeholder="<?= __('inspection.note_hint', '如：吧台正常 / 后厨需注意卫生 / 高峰前检查') ?>"></textarea>
@@ -110,272 +109,10 @@ $inspectionCount = count($confirmedInspections);
 
   <!-- 提交按钮（固定底部） -->
   <div class="fixed-bottom-btn">
-    <button type="submit" class="h5-btn h5-btn-success" id="submit-btn" disabled>
-      ✅ <?= __('inspection.submit', '提交巡店') ?>
+    <button type="submit" class="h5-btn h5-btn-success">
+      ✅ <?= __('btn.save', '保存') ?>
     </button>
   </div>
-  
-  <!-- 隐藏的原生文件输入，用于传统表单提交 -->
-  <input type="file" name="photos[]" id="hidden-photo-input" accept="image/*" multiple style="display: none;">
 </form>
-
-<script>
-// 等待 DOM 加载完成
-document.addEventListener('DOMContentLoaded', function() {
-  const photoInput = document.getElementById('photo-input');
-  const photoPreview = document.getElementById('photo-preview');
-  const submitBtn = document.getElementById('submit-btn');
-  const photoArea = document.getElementById('photo-area');
-  const form = document.getElementById('inspection-form');
-  let selectedFiles = [];
-
-  if (!photoInput || !submitBtn || !form) {
-    console.error('Required elements not found');
-    return;
-  }
-
-  photoInput.addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    
-    // 限制最多5张
-    if (selectedFiles.length + files.length > 5) {
-      alert('<?= __('inspection.max_photos', '最多只能上传5张照片') ?>');
-      photoInput.value = '';
-      return;
-    }
-    
-    // 添加新文件到数组
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        selectedFiles.push(file);
-      }
-    });
-    
-    updatePhotoPreview();
-    updateSubmitButton();
-    
-    // 重置input以便可以再次选择同一文件
-    photoInput.value = '';
-  });
-
-  function updatePhotoPreview() {
-  photoPreview.innerHTML = '';
-  
-  selectedFiles.forEach((file, index) => {
-    const div = document.createElement('div');
-    div.className = 'photo-item';
-    
-    // 创建预览
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      div.innerHTML = `
-        <img src="${e.target.result}" alt="Photo ${index + 1}">
-        <button type="button" class="remove" onclick="removePhoto(${index})">×</button>
-      `;
-    };
-    reader.readAsDataURL(file);
-    
-    photoPreview.appendChild(div);
-  });
-  
-  // 如果还有空间，显示添加按钮
-  if (selectedFiles.length < 5) {
-    const addBtn = document.createElement('div');
-    addBtn.className = 'photo-item';
-    addBtn.style.display = 'flex';
-    addBtn.style.alignItems = 'center';
-    addBtn.style.justifyContent = 'center';
-    addBtn.style.cursor = 'pointer';
-    addBtn.style.border = '2px dashed #d1d5db';
-    addBtn.innerHTML = '<span style="font-size: 24px; color: #9ca3af;">+</span>';
-    addBtn.onclick = () => photoInput.click();
-    photoPreview.appendChild(addBtn);
-  }
-  
-    if (selectedFiles.length > 0) {
-      photoArea.classList.add('has-photos');
-    } else {
-      photoArea.classList.remove('has-photos');
-    }
-  }
-
-  function removePhoto(index) {
-    selectedFiles.splice(index, 1);
-    updatePhotoPreview();
-    updateSubmitButton();
-  }
-
-  function updateSubmitButton() {
-    if (selectedFiles.length > 0) {
-      submitBtn.disabled = false;
-    } else {
-      submitBtn.disabled = true;
-    }
-  }
-
-  // 表单提交 - 使用 FormData 和 fetch 确保文件正确提交
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    console.log('Form submit triggered, selectedFiles:', selectedFiles.length);
-    
-    if (selectedFiles.length === 0) {
-      alert('<?= __('inspection.photo_required', '请至少拍摄1张照片') ?>');
-      return false;
-    }
-    
-    // 创建 FormData
-    const formData = new FormData();
-    
-    // 添加所有表单字段
-    const formFields = form.querySelectorAll('input[type="hidden"]:not([name="photos[]"]), input[type="date"], input[type="radio"]:checked, textarea, select');
-    formFields.forEach(field => {
-      if (field.name && field.name !== 'photos[]' && field.name !== 'has_issue') {
-        console.log('Adding field:', field.name, '=', field.value);
-        formData.append(field.name, field.value);
-      }
-    });
-    
-    // 更新隐藏的文件输入（用于传统表单提交备用）
-    const hiddenInput = document.getElementById('hidden-photo-input');
-    if (hiddenInput && typeof DataTransfer !== 'undefined') {
-      try {
-        const dt = new DataTransfer();
-        selectedFiles.forEach(file => dt.items.add(file));
-        hiddenInput.files = dt.files;
-      } catch (e) {
-        console.warn('DataTransfer not supported, will use fetch only');
-      }
-    }
-    
-    // 添加所有选中的文件到 FormData
-    selectedFiles.forEach((file, index) => {
-      console.log('Adding file', index + 1, ':', file.name, file.size);
-      formData.append('photos[]', file);
-    });
-    
-    console.log('Submitting form with', selectedFiles.length, 'files');
-    
-    // 显示加载状态
-    submitBtn.disabled = true;
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = '<?= __('btn.submitting', '提交中...') ?>';
-    
-    // 使用 fetch 提交
-    const submitUrl = form.action || window.location.href;
-    console.log('Submitting to:', submitUrl);
-    
-    // 设置超时
-    const timeoutId = setTimeout(() => {
-      console.warn('Request timeout, trying fallback method');
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-      // 如果 fetch 超时，尝试传统表单提交
-      if (hiddenInput && hiddenInput.files && hiddenInput.files.length > 0) {
-        console.log('Falling back to traditional form submit');
-        form.submit();
-      }
-    }, 30000); // 30秒超时
-    
-    fetch(submitUrl, {
-      method: 'POST',
-      body: formData,
-      credentials: 'same-origin',
-      redirect: 'follow' // 自动跟随重定向
-    })
-    .then(response => {
-      clearTimeout(timeoutId);
-      console.log('Response received, status:', response.status, 'redirected:', response.redirected, 'url:', response.url);
-      
-      // 从表单中获取提交的日期（在检查响应之前获取，避免后续无法访问）
-      const spotDateInput = form.querySelector('input[name="spot_date"]');
-      const spotDate = spotDateInput ? spotDateInput.value : '<?= date('Y-m-d') ?>';
-      console.log('Form submitted date:', spotDate);
-      
-      // 检查响应URL，如果与提交URL不同，说明发生了重定向
-      if (response.url && response.url !== submitUrl && response.url !== window.location.href) {
-        console.log('Redirect detected in response.url, redirecting to:', response.url);
-        // 如果重定向URL中没有日期参数，添加日期参数
-        if (response.url.includes('inspections/list') && !response.url.includes('date=')) {
-          const separator = response.url.includes('?') ? '&' : '?';
-          window.location.href = response.url + separator + 'date=' + encodeURIComponent(spotDate);
-        } else {
-          window.location.href = response.url;
-        }
-        return;
-      }
-      
-      // 如果状态码是2xx或3xx，认为提交成功
-      if (response.ok || (response.status >= 200 && response.status < 400)) {
-        // 直接跳转到列表页，使用提交的日期
-        const redirectPath = '/index.php?r=inspections/list&date=' + encodeURIComponent(spotDate);
-        const fullUrl = window.location.origin + redirectPath;
-        console.log('Success, redirecting to:', fullUrl, 'with date:', spotDate);
-        window.location.href = fullUrl;
-        return;
-      }
-      
-      // 处理错误响应
-      return response.text().then(html => {
-        console.error('Response error, status:', response.status);
-        console.error('Response HTML preview:', html.substring(0, 500));
-        
-        // 检查是否是错误页面
-        if (html.includes('error') || html.includes('Error') || html.includes('Warning') || html.includes('Fatal')) {
-          document.open();
-          document.write(html);
-          document.close();
-        } else {
-          throw new Error('提交失败: HTTP ' + response.status);
-        }
-      });
-    })
-    .catch(error => {
-      clearTimeout(timeoutId);
-      console.error('Fetch error:', error);
-      
-      // 如果 fetch 失败，尝试传统表单提交
-      if (hiddenInput && hiddenInput.files && hiddenInput.files.length > 0) {
-        console.log('Fetch failed, falling back to traditional form submit');
-        alert('使用备用方式提交...');
-        form.submit();
-        return;
-      }
-      
-      alert('<?= __('error.submit_failed', '提交失败，请重试') ?>: ' + (error.message || error));
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-    });
-    
-    return false;
-  });
-
-  // 按钮点击事件 - 直接触发表单提交
-  submitBtn.addEventListener('click', function(e) {
-    console.log('Submit button clicked, disabled:', submitBtn.disabled);
-    
-    if (submitBtn.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-    
-    // 检查是否有照片
-    if (selectedFiles.length === 0) {
-      e.preventDefault();
-      e.stopPropagation();
-      alert('<?= __('inspection.photo_required', '请至少拍摄1张照片') ?>');
-      return false;
-    }
-    
-    // 触发表单提交事件
-    console.log('Dispatching submit event');
-    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-    form.dispatchEvent(submitEvent);
-  });
-});
-</script>
 
 <?php include __DIR__ . '/../layout/h5_footer.php'; ?>

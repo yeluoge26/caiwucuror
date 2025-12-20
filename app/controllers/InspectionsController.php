@@ -119,36 +119,35 @@ class InspectionsController {
         if (strtotime($spotDate) < strtotime(date('Y-m-d'))) {
           $error = __('inspection.no_past_date');
         } else {
-          // 照片必填验证
+          // 照片可选，不强制要求
           $fileInput = $_FILES['photos'] ?? ($_FILES['photo'] ?? null);
           $photos = $this->uploadPhotos($fileInput, Auth::user()['id']);
           
-          if (empty($photos)) {
-            $error = __('inspection.photo_required');
+          $result = Inspection::create([
+            'store' => $_POST['store'] ?? 'coffee',
+            'floor' => $_POST['floor'] ?? '1F',
+            'visit_no' => (int)($_POST['visit_no'] ?? 1),
+            'room' => $_POST['room'] ?? 'general',
+            'status' => $_POST['status'] ?? 'ok',
+            'note' => $_POST['note'] ?? null,
+            'created_by' => Auth::user()['id'],
+            'spot_date' => $spotDate,
+          ]);
+          
+          if (!$result) {
+            $error = __('inspection.create_failed', '创建失败');
           } else {
-            $result = Inspection::create([
-              'store' => $_POST['store'] ?? 'coffee',
-              'floor' => $_POST['floor'] ?? '1F',
-              'visit_no' => (int)($_POST['visit_no'] ?? 1),
-              'room' => $_POST['room'] ?? 'general',
-              'status' => $_POST['status'] ?? 'ok',
-              'note' => $_POST['note'] ?? null,
-              'created_by' => Auth::user()['id'],
-              'spot_date' => $spotDate,
-            ]);
-            
-            if (!$result) {
-              $error = __('inspection.create_failed', '创建失败');
-            } else {
-              $inspId = DB::conn()->lastInsertId();
+            $inspId = DB::conn()->lastInsertId();
+            // 如果有照片，保存照片
+            if (!empty($photos)) {
               foreach ($photos as $p) {
                 InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
               }
-              // 使用绝对路径重定向，确保包含正确的域名
-              $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);
-              header('Location: ' . $redirectUrl);
-              exit;
             }
+            // 使用绝对路径重定向，确保包含正确的域名
+            $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);
+            header('Location: ' . $redirectUrl);
+            exit;
           }
         }
       }
