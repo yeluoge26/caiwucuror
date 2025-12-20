@@ -432,6 +432,11 @@ return [
 'inspection.upload_failed' => 'Tải lên thất bại',
 'inspection.upload_error' => 'Lỗi tải lên, vui lòng thử lại',
 'inspection.no_photo_confirm' => 'Chưa chọn ảnh, bạn có chắc muốn gửi không?',
+'inspection.confirm_upload' => 'Xác nhận tải lên',
+'inspection.photos_confirmed' => 'Ảnh đã xác nhận',
+'inspection.no_photos_selected' => 'Vui lòng chọn ảnh trước',
+'inspection.please_confirm_photos' => 'Vui lòng nhấp vào nút "Xác nhận tải lên" để xác nhận ảnh',
+'inspection.submit_success' => 'Gửi thành công! Bạn có thể tiếp tục thêm bản kiểm tra mới',
 
 'cash_closing.create' => 'Kết toán tiền mặt',
 'cash_closing.list' => 'Danh sách kết toán tiền mặt',

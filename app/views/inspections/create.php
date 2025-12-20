@@ -101,7 +101,10 @@ $inspectionCount = count($todayInspections);
         <div style="font-weight: 600; margin-bottom: 10px; color: #2c3e50;">
           <?= __('inspection.selected_photos', '已选择的照片') ?> (<span id="photoCount">0</span>)
         </div>
-        <div id="photoList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"></div>
+        <div id="photoList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;"></div>
+        <button type="button" id="confirmUploadBtn" class="h5-btn" style="width: 100%; background: #27ae60; color: white; display: none;">
+          ✅ <?= __('inspection.confirm_upload', '确认上传') ?>
+        </button>
       </div>
       
       <!-- 上传进度 -->
@@ -167,12 +170,19 @@ document.addEventListener('DOMContentLoaded', function() {
   function updatePhotoPreview() {
     if (selectedFiles.length === 0) {
       photoPreview.style.display = 'none';
+      confirmUploadBtn.style.display = 'none';
+      photosConfirmed = false;
       return;
     }
     
     photoPreview.style.display = 'block';
     photoCount.textContent = selectedFiles.length;
     photoList.innerHTML = '';
+    
+    // 如果有照片且未确认，显示确认上传按钮
+    if (!photosConfirmed) {
+      confirmUploadBtn.style.display = 'block';
+    }
     
     selectedFiles.forEach((file, index) => {
       const item = document.createElement('div');
@@ -196,6 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
       removeBtn.textContent = '×';
       removeBtn.onclick = function() {
         selectedFiles.splice(index, 1);
+        photosConfirmed = false;
         updateFileInput();
         updatePhotoPreview();
       };
@@ -224,9 +235,27 @@ document.addEventListener('DOMContentLoaded', function() {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
   
+  // 确认上传按钮点击
+  confirmUploadBtn.addEventListener('click', function() {
+    if (selectedFiles.length === 0) {
+      alert('<?= __('inspection.no_photos_selected', '请先选择照片') ?>');
+      return;
+    }
+    photosConfirmed = true;
+    confirmUploadBtn.textContent = '✅ <?= __('inspection.photos_confirmed', '照片已确认') ?>';
+    confirmUploadBtn.style.background = '#95a5a6';
+    confirmUploadBtn.disabled = true;
+  });
+  
   // 表单提交
   form.addEventListener('submit', function(e) {
     e.preventDefault();
+    
+    // 如果有照片但未确认，提示用户
+    if (selectedFiles.length > 0 && !photosConfirmed) {
+      alert('<?= __('inspection.please_confirm_photos', '请先点击"确认上传"按钮确认照片') ?>');
+      return;
+    }
     
     if (selectedFiles.length === 0) {
       if (!confirm('<?= __('inspection.no_photo_confirm', '未选择照片，确定要提交吗？') ?>')) {
@@ -276,18 +305,31 @@ document.addEventListener('DOMContentLoaded', function() {
         progressText.textContent = '100%';
         uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?></div>';
         
-        // 延迟跳转，让用户看到成功提示
+        // 重置表单，但不跳转
         setTimeout(function() {
-          // 检查响应头中的 Location
-          const location = xhr.getResponseHeader('Location');
-          if (location) {
-            window.location.href = location;
-          } else {
-            // 如果没有 Location，尝试从响应中获取或使用默认路径
-            const spotDate = document.getElementById('spot_date').value || '<?= date('Y-m-d') ?>';
-            window.location.href = '/index.php?r=inspections/list&date=' + encodeURIComponent(spotDate);
-          }
-        }, 1000);
+          // 重置表单
+          form.reset();
+          selectedFiles = [];
+          photosConfirmed = false;
+          photoPreview.style.display = 'none';
+          uploadProgress.style.display = 'none';
+          confirmUploadBtn.style.display = 'none';
+          confirmUploadBtn.disabled = false;
+          confirmUploadBtn.textContent = '✅ <?= __('inspection.confirm_upload', '确认上传') ?>';
+          confirmUploadBtn.style.background = '#27ae60';
+          
+          // 重置提交按钮
+          submitBtn.disabled = false;
+          submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+          
+          // 显示成功提示
+          uploadStatus.innerHTML = '<div style="color: #27ae60; padding: 10px; background: #d4edda; border-radius: 6px; margin-top: 10px;">✅ <?= __('inspection.submit_success', '提交成功！可以继续添加新的巡店记录') ?></div>';
+          
+          // 3秒后隐藏成功提示
+          setTimeout(function() {
+            uploadStatus.innerHTML = '';
+          }, 3000);
+        }, 500);
       } else {
         uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + xhr.statusText + '</div>';
         submitBtn.disabled = false;

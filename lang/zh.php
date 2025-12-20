@@ -443,6 +443,11 @@ return [
 'inspection.upload_failed' => '上传失败',
 'inspection.upload_error' => '上传出错，请重试',
 'inspection.no_photo_confirm' => '未选择照片，确定要提交吗？',
+'inspection.confirm_upload' => '确认上传',
+'inspection.photos_confirmed' => '照片已确认',
+'inspection.no_photos_selected' => '请先选择照片',
+'inspection.please_confirm_photos' => '请先点击"确认上传"按钮确认照片',
+'inspection.submit_success' => '提交成功！可以继续添加新的巡店记录',
 
 'cash_closing.create' => '现金日结',
 'cash_closing.list' => '现金日结列表',
