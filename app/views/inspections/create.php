@@ -283,21 +283,38 @@ document.addEventListener('DOMContentLoaded', function() {
     progressText.textContent = '0%';
     
     // 创建 FormData
-    const formData = new FormData(form);
+    const formData = new FormData();
     
-    // 移除可能存在的空文件字段
-    formData.delete('photos[]');
-    
-    // 添加文件（必须使用 photos[] 作为字段名，PHP才能正确解析为数组）
-    selectedFiles.forEach((file, index) => {
-      formData.append('photos[]', file);
+    // 添加表单字段（除了文件）
+    const formFields = ['store', 'floor', 'visit_no', 'room', 'status', 'note', 'spot_date', '_csrf'];
+    formFields.forEach(function(fieldName) {
+      const field = form.querySelector('[name="' + fieldName + '"]');
+      if (field) {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+          if (field.checked) {
+            formData.append(fieldName, field.value);
+          }
+        } else {
+          formData.append(fieldName, field.value);
+        }
+      }
     });
     
-    // 调试：检查FormData中的文件
-    console.log('FormData files:', selectedFiles.length);
+    // 添加文件（必须使用 photos[] 作为字段名，PHP才能正确解析为数组）
+    if (selectedFiles.length > 0) {
+      selectedFiles.forEach((file, index) => {
+        formData.append('photos[]', file);
+        console.log('Added file to FormData:', file.name, file.size, 'bytes');
+      });
+    }
+    
+    // 调试：检查FormData中的内容
+    console.log('FormData entries:');
     for (let pair of formData.entries()) {
       if (pair[0] === 'photos[]') {
-        console.log('File in FormData:', pair[1].name, pair[1].size);
+        console.log('  File:', pair[1].name, pair[1].size, 'bytes');
+      } else {
+        console.log('  ' + pair[0] + ':', pair[1]);
       }
     }
     
