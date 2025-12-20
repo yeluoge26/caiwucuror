@@ -13,6 +13,10 @@
     <span class="icon">💸</span>
     <span><?= __('nav.cash_closing', '日结现金') ?></span>
   </a>
+  <a href="/index.php?r=employees/today" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'employees') === 0 ? 'active' : '' ?>">
+    <span class="icon">👥</span>
+    <span><?= __('nav.employees', '员工') ?></span>
+  </a>
   <a href="/index.php?r=auth/profile" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'auth/profile') === 0 ? 'active' : '' ?>">
     <span class="icon">👤</span>
     <span><?= __('nav.profile') ?></span>

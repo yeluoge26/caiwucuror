@@ -135,5 +135,48 @@ class EmployeeController {
 
     include __DIR__ . '/../views/employees/view.php';
   }
+
+  public function today() {
+    Auth::requireLogin();
+    
+    require_once __DIR__ . '/../models/Shift.php';
+    
+    $today = date('Y-m-d');
+    
+    // 获取今日所有班次
+    $todayShifts = Shift::list([
+      'shift_date' => $today
+    ]);
+    
+    // 按员工分组，统计每个员工的班次信息
+    $employeesOnDuty = [];
+    foreach ($todayShifts as $shift) {
+      $employeeId = $shift['employee_id'];
+      if (!isset($employeesOnDuty[$employeeId])) {
+        $employee = Employee::find($employeeId);
+        if ($employee) {
+          $employeesOnDuty[$employeeId] = [
+            'employee' => $employee,
+            'shifts' => [],
+            'confirmed_count' => 0,
+            'total_count' => 0
+          ];
+        }
+      }
+      
+      if (isset($employeesOnDuty[$employeeId])) {
+        $employeesOnDuty[$employeeId]['shifts'][] = $shift;
+        $employeesOnDuty[$employeeId]['total_count']++;
+        if ($shift['is_confirmed']) {
+          $employeesOnDuty[$employeeId]['confirmed_count']++;
+        }
+      }
+    }
+    
+    // 转换为数组并排序
+    $employeesOnDuty = array_values($employeesOnDuty);
+    
+    include __DIR__ . '/../views/employees/today.php';
+  }
 }
 
