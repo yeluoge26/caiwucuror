@@ -126,6 +126,9 @@ $inspectionCount = count($confirmedInspections);
       ✅ <?= __('inspection.submit', '提交巡店') ?>
     </button>
   </div>
+  
+  <!-- 隐藏的原生文件输入，用于传统表单提交 -->
+  <input type="file" name="photos[]" id="hidden-photo-input" accept="image/*" multiple style="display: none;">
 </form>
 
 <script>
@@ -226,6 +229,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // 表单提交 - 使用 FormData 和 fetch 确保文件正确提交
   form.addEventListener('submit', function(e) {
     e.preventDefault();
+    e.stopPropagation();
+    
     console.log('Form submit triggered, selectedFiles:', selectedFiles.length);
     
     if (selectedFiles.length === 0) {
@@ -245,8 +250,21 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // 添加所有选中的文件
-    selectedFiles.forEach(file => {
+    // 更新隐藏的文件输入（用于传统表单提交备用）
+    const hiddenInput = document.getElementById('hidden-photo-input');
+    if (hiddenInput && typeof DataTransfer !== 'undefined') {
+      try {
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        hiddenInput.files = dt.files;
+      } catch (e) {
+        console.warn('DataTransfer not supported, will use fetch only');
+      }
+    }
+    
+    // 添加所有选中的文件到 FormData
+    selectedFiles.forEach((file, index) => {
+      console.log('Adding file', index + 1, ':', file.name, file.size);
       formData.append('photos[]', file);
     });
     
@@ -258,32 +276,78 @@ document.addEventListener('DOMContentLoaded', function() {
     submitBtn.textContent = '<?= __('btn.submitting', '提交中...') ?>';
     
     // 使用 fetch 提交
-    fetch(form.action || window.location.href, {
+    const submitUrl = form.action || window.location.href;
+    console.log('Submitting to:', submitUrl);
+    
+    // 设置超时
+    const timeoutId = setTimeout(() => {
+      console.warn('Request timeout, trying fallback method');
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      // 如果 fetch 超时，尝试传统表单提交
+      if (hiddenInput && hiddenInput.files && hiddenInput.files.length > 0) {
+        console.log('Falling back to traditional form submit');
+        form.submit();
+      }
+    }, 30000); // 30秒超时
+    
+    fetch(submitUrl, {
       method: 'POST',
-      body: formData
+      body: formData,
+      credentials: 'same-origin'
     })
     .then(response => {
-      console.log('Response status:', response.status);
+      clearTimeout(timeoutId);
+      console.log('Response received, status:', response.status, 'redirected:', response.redirected);
+      
       if (response.redirected) {
+        console.log('Redirecting to:', response.url);
         window.location.href = response.url;
-      } else if (response.ok) {
+        return;
+      }
+      
+      if (response.ok) {
         return response.text().then(html => {
-          // 如果返回的是 HTML，可能是错误页面
-          if (html.includes('error') || html.includes('Error')) {
+          console.log('Response HTML length:', html.length);
+          // 检查是否是重定向响应
+          if (html.includes('Location:') || html.includes('window.location')) {
+            // 尝试提取重定向 URL
+            const match = html.match(/Location:\s*([^\s]+)/i) || html.match(/window\.location\s*=\s*['"]([^'"]+)['"]/i);
+            if (match) {
+              window.location.href = match[1];
+            } else {
+              window.location.href = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
+            }
+          } else if (html.includes('error') || html.includes('Error') || html.includes('Warning')) {
+            // 显示错误页面
             document.open();
             document.write(html);
             document.close();
           } else {
+            // 成功，跳转到列表页
             window.location.href = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
           }
         });
       } else {
-        throw new Error('提交失败: ' + response.status);
+        return response.text().then(html => {
+          console.error('Response error HTML:', html.substring(0, 500));
+          throw new Error('提交失败: HTTP ' + response.status);
+        });
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      alert('<?= __('error.submit_failed', '提交失败，请重试') ?>: ' + error.message);
+      clearTimeout(timeoutId);
+      console.error('Fetch error:', error);
+      
+      // 如果 fetch 失败，尝试传统表单提交
+      if (hiddenInput && hiddenInput.files && hiddenInput.files.length > 0) {
+        console.log('Fetch failed, falling back to traditional form submit');
+        alert('使用备用方式提交...');
+        form.submit();
+        return;
+      }
+      
+      alert('<?= __('error.submit_failed', '提交失败，请重试') ?>: ' + (error.message || error));
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
     });
@@ -291,14 +355,28 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   });
 
-  // 也监听按钮点击事件作为备用
+  // 按钮点击事件 - 直接触发表单提交
   submitBtn.addEventListener('click', function(e) {
+    console.log('Submit button clicked, disabled:', submitBtn.disabled);
+    
     if (submitBtn.disabled) {
       e.preventDefault();
+      e.stopPropagation();
       return false;
     }
-    // 触发表单提交
-    form.dispatchEvent(new Event('submit'));
+    
+    // 检查是否有照片
+    if (selectedFiles.length === 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      alert('<?= __('inspection.photo_required', '请至少拍摄1张照片') ?>');
+      return false;
+    }
+    
+    // 触发表单提交事件
+    console.log('Dispatching submit event');
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    form.dispatchEvent(submitEvent);
   });
 });
 </script>
