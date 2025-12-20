@@ -1,37 +1,51 @@
 <?php
+require_once __DIR__ . '/../../models/Inspection.php';
+require_once __DIR__ . '/../../models/CashClosing.php';
+
 $title = __('manager.dashboard');
-include __DIR__ . '/../layout/header.php';
+$show_back = false; // 首页不显示返回按钮
+include __DIR__ . '/../layout/h5_header.php';
+
+// 如果控制器没有传递这些变量，则计算它们
+if (!isset($inspectionCount)) {
+  $today = date('Y-m-d');
+  $todayInspections = Inspection::list(['date' => $today]);
+  $confirmedInspections = array_filter($todayInspections, function($item) {
+    return $item['reviewed_status'] === 'confirmed';
+  });
+  $inspectionCount = count($confirmedInspections);
+  $inspectionStatus = 'red';
+  if ($inspectionCount >= 2) {
+    $inspectionStatus = 'green';
+  } elseif ($inspectionCount == 1) {
+    $inspectionStatus = 'yellow';
+  }
+}
+
+if (!isset($theoretical)) {
+  $previousClosing = CashClosing::getPreviousClosing(date('Y-m-d'));
+  $openingCash = $previousClosing ? floatval($previousClosing['cash_counted']) : 0;
+  $theoretical = CashClosing::calculateTheoreticalBalance(date('Y-m-d'), $openingCash);
+}
 ?>
 
-<h2 style="margin-bottom: 20px;"><?= __('manager.dashboard') ?></h2>
-
-<!-- 今日信息卡片 -->
-<div class="card" style="margin-bottom: 20px;">
-  <h3 style="margin-bottom: 12px;">📅 <?= __('manager.today_info') ?></h3>
-  <p style="font-size: 1.1em; color: #666;">
-    <?= date('Y年m月d日', strtotime(date('Y-m-d'))) ?> 
-    (<?= ['日', '一', '二', '三', '四', '五', '六'][date('w')] ?>)
-  </p>
+<!-- 顶部信息区 -->
+<div class="top-info">
+  <div class="greeting">👋 <?= __('manager.greeting', '早安，店长') ?></div>
+  <div class="date">📅 <?= date('Y-m-d', strtotime('now')) ?>（<?= ['日', '一', '二', '三', '四', '五', '六'][date('w')] ?>）</div>
 </div>
 
-<!-- 管理清单卡片 -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px;">
+<!-- 今日核心待办（第一优先级） -->
+<div class="h5-card" style="margin-bottom: 16px;">
+  <div class="h5-card-title">⭐ <?= __('manager.core_tasks', '今日核心待办') ?></div>
   
-  <!-- 今日任务卡片 -->
-  <div class="card" style="cursor: pointer;" onclick="window.location='/index.php?r=tasks/list'">
-    <h3 style="margin-bottom: 12px;">✅ <?= __('manager.today_tasks') ?></h3>
-    <div style="font-size: 2em; font-weight: bold; color: #3498db;">
-      <?= count($todayTasks) ?>
+  <!-- 巡店卡 -->
+  <a href="/index.php?r=inspections/create" class="status-card" style="text-decoration: none; color: inherit; margin-bottom: 12px;">
+    <div class="status-card-header">
+      <span>🔍</span>
+      <span class="status-card-title"><?= __('manager.today_inspections', '今日巡店') ?></span>
     </div>
-    <p style="color: #666; margin-top: 8px;">
-      <?= __('manager.tasks_pending') ?>
-    </p>
-  </div>
-
-  <!-- 今日巡店卡片 -->
-  <a href="/index.php?r=inspections/create" class="card" style="text-decoration: none; color: inherit; cursor: pointer;">
-    <h3 style="margin-bottom: 12px;">🔍 <?= __('manager.today_inspections') ?></h3>
-    <div style="font-size: 2em; font-weight: bold; color: <?= $inspectionStatus === 'green' ? '#27ae60' : ($inspectionStatus === 'yellow' ? '#f39c12' : '#e74c3c'); ?>;">
+    <div class="status-card-body status-<?= $inspectionStatus ?>">
       <?php
       $statusEmoji = [
         'green' => '🟢',
@@ -42,23 +56,26 @@ include __DIR__ . '/../layout/header.php';
       ?>
       <?= $inspectionCount ?> / 2
     </div>
-    <p style="color: #666; margin-top: 8px;">
+    <div class="status-card-footer">
       <?php
       if ($inspectionCount >= 2) {
-        echo __('manager.inspections_complete');
+        echo __('manager.inspections_complete', '已完成');
       } elseif ($inspectionCount == 1) {
-        echo __('manager.inspections_partial');
+        echo __('manager.inspections_partial', '还需 1 次巡店');
       } else {
-        echo __('manager.inspections_none');
+        echo __('manager.inspections_none', '未巡店');
       }
       ?>
-    </p>
+    </div>
   </a>
-
-  <!-- 今日现金日结卡片 -->
-  <a href="/index.php?r=cash_closings/create" class="card" style="text-decoration: none; color: inherit; cursor: pointer;">
-    <h3 style="margin-bottom: 12px;">💸 <?= __('manager.today_cash') ?></h3>
-    <div style="font-size: 1.5em; font-weight: bold; color: <?= $cashStatus === 'green' ? '#27ae60' : ($cashStatus === 'yellow' ? '#f39c12' : ($cashStatus === 'orange' ? '#ff9800' : '#e74c3c')); ?>;">
+  
+  <!-- 现金卡 -->
+  <a href="/index.php?r=cash_closings/create" class="status-card" style="text-decoration: none; color: inherit;">
+    <div class="status-card-header">
+      <span>💸</span>
+      <span class="status-card-title"><?= __('manager.today_cash', '今日现金') ?></span>
+    </div>
+    <div class="status-card-body status-<?= $cashStatus ?>">
       <?php
       $cashEmoji = [
         'green' => '🟢',
@@ -70,112 +87,71 @@ include __DIR__ . '/../layout/header.php';
       ?>
       <?= $cashStatusText ?>
     </div>
-    <?php if ($todayClosing): ?>
-    <p style="color: #666; margin-top: 8px;">
-      <?= __('cash_closing.cash_counted') ?>: 
-      <?= number_format($todayClosing['cash_counted'], 0, ',', '.') ?> ₫
-    </p>
-    <?php endif; ?>
-  </a>
-
-  <!-- 本周排班卡片 -->
-  <a href="/index.php?r=shifts/schedule" class="card" style="text-decoration: none; color: inherit; cursor: pointer;">
-    <h3 style="margin-bottom: 12px;">👥 <?= __('manager.week_schedule') ?></h3>
-    <div style="font-size: 1.2em;">
-      <?= count($weekShifts) ?> <?= __('manager.shifts_scheduled') ?>
+    <div class="status-card-footer">
+      <?= __('cash_closing.theoretical_balance', '理论现金') ?>: 
+      <?= number_format($theoretical['balance'], 0, ',', '.') ?> ₫
     </div>
-    <p style="color: #666; margin-top: 8px;">
-      <?= date('m/d', strtotime($weekStart)) ?> - <?= date('m/d', strtotime($weekEnd)) ?>
-    </p>
   </a>
-
 </div>
 
-<!-- 本周排班预览 -->
-<?php if (!empty($shiftsByDate)): ?>
-<div class="card">
-  <h3 style="margin-bottom: 16px;">👥 <?= __('manager.week_schedule_preview') ?></h3>
-  <div style="overflow-x: auto;">
-    <table style="min-width: 600px;">
-      <tr>
-        <th><?= __('field.date') ?></th>
-        <th><?= __('shift.morning') ?></th>
-        <th><?= __('shift.afternoon') ?></th>
-        <th><?= __('shift.evening') ?></th>
-      </tr>
+<!-- 今日执行 & 异常（第二优先级） -->
+<div class="h5-card" style="margin-bottom: 16px;">
+  <div class="h5-card-title">📋 <?= __('manager.today_tasks', '今日执行') ?></div>
+  
+  <!-- 今日执行卡 -->
+  <a href="/index.php?r=tasks/list" class="status-card" style="text-decoration: none; color: inherit; margin-bottom: 12px;">
+    <div class="status-card-header">
+      <span>✅</span>
+      <span class="status-card-title"><?= __('manager.today_tasks', '今日执行') ?></span>
+    </div>
+    <div class="status-card-body" style="color: #3498db;">
+      <?= count($todayTasks) ?> <?= __('manager.tasks_pending', '项') ?>
+    </div>
+    <div class="status-card-footer">
+      <?= __('manager.today_in_office', '今日在岗') ?>: 
       <?php
-      $days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-      $currentDate = $weekStart;
-      for ($i = 0; $i < 7; $i++):
-        $dateStr = date('Y-m-d', strtotime($currentDate . ' +' . $i . ' days'));
-        $dayShifts = $shiftsByDate[$dateStr] ?? [];
-        $morning = array_filter($dayShifts, fn($s) => $s['shift_type'] === 'morning');
-        $afternoon = array_filter($dayShifts, fn($s) => $s['shift_type'] === 'afternoon');
-        $evening = array_filter($dayShifts, fn($s) => $s['shift_type'] === 'evening');
-      ?>
-      <tr>
-        <td>
-          <?= $days[$i] ?><br>
-          <small style="color: #999;"><?= date('m/d', strtotime($dateStr)) ?></small>
-        </td>
-        <td>
-          <?php foreach ($morning as $s): ?>
-            <div><?= htmlspecialchars($s['employee_name'] ?? '') ?></div>
-          <?php endforeach; ?>
-        </td>
-        <td>
-          <?php foreach ($afternoon as $s): ?>
-            <div><?= htmlspecialchars($s['employee_name'] ?? '') ?></div>
-          <?php endforeach; ?>
-        </td>
-        <td>
-          <?php foreach ($evening as $s): ?>
-            <div><?= htmlspecialchars($s['employee_name'] ?? '') ?></div>
-          <?php endforeach; ?>
-        </td>
-      </tr>
-      <?php endfor; ?>
-    </table>
+      // 计算今日在岗员工数
+      $todayOnDuty = 0;
+      foreach ($weekShifts as $shift) {
+        if ($shift['shift_date'] === date('Y-m-d')) {
+          $todayOnDuty++;
+        }
+      }
+      echo $todayOnDuty > 0 ? $todayOnDuty : '0';
+      ?> <?= __('manager.people', '人') ?>
+    </div>
+  </a>
+  
+  <!-- 今日问题卡 -->
+  <a href="/index.php?r=tasks/create?type=issue" class="status-card" style="text-decoration: none; color: inherit;">
+    <div class="status-card-header">
+      <span>⚠</span>
+      <span class="status-card-title"><?= __('manager.today_issues', '今日问题') ?></span>
+    </div>
+    <div class="status-card-body" style="color: #e74c3c;">
+      0 <?= __('manager.issues_recorded', '条') ?>
+    </div>
+    <div class="status-card-footer">
+      <?= __('manager.record_issue', '记录问题') ?>
+    </div>
+  </a>
+</div>
+
+<!-- 本周排班状态（只读） -->
+<?php if (!empty($weekShifts)): ?>
+<div class="h5-card">
+  <div class="status-card-header">
+    <span>👥</span>
+    <span class="status-card-title"><?= __('manager.week_schedule', '本周排班') ?></span>
   </div>
-  <div style="margin-top: 12px;">
-    <a href="/index.php?r=shifts/schedule" class="btn"><?= __('manager.view_full_schedule') ?></a>
+  <div class="status-card-body" style="color: #27ae60; font-size: 18px;">
+    🟢 <?= __('manager.schedule_published', '已发布') ?>
   </div>
+  <div class="status-card-footer">
+    <?= __('manager.period', '周期') ?>: <?= date('m/d', strtotime($weekStart)) ?> - <?= date('m/d', strtotime($weekEnd)) ?>
+  </div>
+  <a href="/index.php?r=shifts/schedule" class="h5-btn" style="margin-top: 12px;"><?= __('manager.view_schedule', '查看排班') ?></a>
 </div>
 <?php endif; ?>
 
-<!-- 今日任务列表 -->
-<?php if (!empty($todayTasks)): ?>
-<div class="card">
-  <h3 style="margin-bottom: 16px;">✅ <?= __('manager.today_tasks_list') ?></h3>
-  <table>
-    <tr>
-      <th><?= __('task.title') ?></th>
-      <th><?= __('task.due_date') ?></th>
-      <th><?= __('task.status') ?></th>
-      <th><?= __('field.actions') ?></th>
-    </tr>
-    <?php foreach (array_slice($todayTasks, 0, 5) as $task): ?>
-    <tr>
-      <td><?= htmlspecialchars($task['title']) ?></td>
-      <td><?= $task['due_date'] ? date('Y-m-d H:i', strtotime($task['due_date'])) : '-' ?></td>
-      <td>
-        <span class="badge badge-<?= $task['status'] === 'pending' ? 'warning' : 'info' ?>">
-          <?= __('task.status_' . $task['status']) ?>
-        </span>
-      </td>
-      <td>
-        <a href="/index.php?r=tasks/view&id=<?= $task['id'] ?>" class="btn btn-sm"><?= __('btn.view') ?></a>
-      </td>
-    </tr>
-    <?php endforeach; ?>
-  </table>
-  <?php if (count($todayTasks) > 5): ?>
-  <div style="margin-top: 12px;">
-    <a href="/index.php?r=tasks/list" class="btn"><?= __('manager.view_all_tasks') ?></a>
-  </div>
-  <?php endif; ?>
-</div>
-<?php endif; ?>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>
-
+<?php include __DIR__ . '/../layout/h5_footer.php'; ?>
