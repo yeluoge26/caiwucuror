@@ -320,13 +320,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 上传完成
     xhr.addEventListener('load', function() {
-      if (xhr.status === 200 || xhr.status === 302) {
-        progressBar.style.width = '100%';
-        progressText.textContent = '100%';
-        uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?></div>';
+      if (xhr.status === 200) {
+        // 尝试解析 JSON 响应
+        let response;
+        try {
+          response = JSON.parse(xhr.responseText);
+        } catch (e) {
+          // 如果不是 JSON，当作普通响应处理
+          response = { success: true };
+        }
         
-        // 重置表单，但不跳转
-        setTimeout(function() {
+        if (response.success) {
+          progressBar.style.width = '100%';
+          progressText.textContent = '100%';
+          uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?>' + 
+            (response.photo_count > 0 ? ' (' + response.photo_count + ' 张照片)' : '') + '</div>';
+          
+          // 重置表单，但不跳转
+          setTimeout(function() {
           // 重置表单
           form.reset();
           selectedFiles = [];
@@ -350,8 +361,19 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadStatus.innerHTML = '';
           }, 3000);
         }, 500);
+        } else {
+          uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + (response.message || xhr.statusText) + '</div>';
+          submitBtn.disabled = false;
+          submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+        }
+      } else if (xhr.status === 302) {
+        // 处理重定向（普通表单提交的情况）
+        const location = xhr.getResponseHeader('Location');
+        if (location) {
+          window.location.href = location;
+        }
       } else {
-        uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + xhr.statusText + '</div>';
+        uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + xhr.statusText + ' (HTTP ' + xhr.status + ')</div>';
         submitBtn.disabled = false;
         submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
       }
@@ -366,6 +388,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 发送请求
     xhr.open('POST', form.action || window.location.href);
+    
+    // 设置 AJAX 请求头，让后端知道这是 AJAX 请求
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     
     // 重要：不要设置 Content-Type，让浏览器自动设置（包含 boundary）
     // xhr.setRequestHeader('Content-Type', 'multipart/form-data'); // 不要设置！

@@ -448,6 +448,7 @@ return [
 'inspection.no_photos_selected' => '请先选择照片',
 'inspection.please_confirm_photos' => '请先点击"确认上传"按钮确认照片',
 'inspection.submit_success' => '提交成功！可以继续添加新的巡店记录',
+'inspection.create_success' => '创建成功',
 
 'cash_closing.create' => '现金日结',
 'cash_closing.list' => '现金日结列表',

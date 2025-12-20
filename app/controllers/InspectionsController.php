@@ -245,10 +245,26 @@ class InspectionsController {
             } else {
               error_log("InspectionsController::create - No photos to save for inspection ID: {$inspId}");
             }
-            // 使用绝对路径重定向，确保包含正确的域名
-            $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);
-            header('Location: ' . $redirectUrl);
-            exit;
+            
+            // 检查是否是 AJAX 请求
+            $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+            
+            if ($isAjax) {
+              // AJAX 请求：返回 JSON 响应
+              header('Content-Type: application/json; charset=utf-8');
+              echo json_encode([
+                'success' => true,
+                'message' => __('inspection.create_success', '创建成功'),
+                'inspection_id' => $inspId,
+                'photo_count' => count($photos)
+              ], JSON_UNESCAPED_UNICODE);
+              exit;
+            } else {
+              // 普通表单提交：重定向
+              $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);
+              header('Location: ' . $redirectUrl);
+              exit;
+            }
           }
         }
       }

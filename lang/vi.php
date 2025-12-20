@@ -437,6 +437,7 @@ return [
 'inspection.no_photos_selected' => 'Vui lòng chọn ảnh trước',
 'inspection.please_confirm_photos' => 'Vui lòng nhấp vào nút "Xác nhận tải lên" để xác nhận ảnh',
 'inspection.submit_success' => 'Gửi thành công! Bạn có thể tiếp tục thêm bản kiểm tra mới',
+'inspection.create_success' => 'Tạo thành công',
 
 'cash_closing.create' => 'Kết toán tiền mặt',
 'cash_closing.list' => 'Danh sách kết toán tiền mặt',
