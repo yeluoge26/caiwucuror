@@ -151,8 +151,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const progressText = document.getElementById('progressText');
   const form = document.querySelector('form');
   const submitBtn = document.getElementById('submitBtn');
+  const confirmUploadBtn = document.getElementById('confirmUploadBtn');
   
   let selectedFiles = [];
+  let photosConfirmed = false;
   
   // 点击按钮触发文件选择
   selectBtn.addEventListener('click', function() {
@@ -179,9 +181,16 @@ document.addEventListener('DOMContentLoaded', function() {
     photoCount.textContent = selectedFiles.length;
     photoList.innerHTML = '';
     
-    // 如果有照片且未确认，显示确认上传按钮
-    if (!photosConfirmed) {
-      confirmUploadBtn.style.display = 'block';
+    // 显示确认上传按钮（如果已确认则显示为已确认状态）
+    confirmUploadBtn.style.display = 'block';
+    if (photosConfirmed) {
+      confirmUploadBtn.textContent = '✅ <?= __('inspection.photos_confirmed', '照片已确认') ?>';
+      confirmUploadBtn.style.background = '#95a5a6';
+      confirmUploadBtn.disabled = true;
+    } else {
+      confirmUploadBtn.textContent = '✅ <?= __('inspection.confirm_upload', '确认上传') ?>';
+      confirmUploadBtn.style.background = '#27ae60';
+      confirmUploadBtn.disabled = false;
     }
     
     selectedFiles.forEach((file, index) => {
