@@ -116,18 +116,32 @@ include __DIR__ . '/../layout/header.php';
           <?php endif; ?>
         </td>
         <td>
-          <?php if (!$row['is_confirmed']): ?>
-          <a href="/index.php?r=shifts/quickConfirm&id=<?= $row['id'] ?>&confirmed=1" 
-             class="btn btn-success" style="padding: 4px 8px; font-size: 12px;"
-             onclick="return confirm('<?= __('shift.confirm_confirm') ?>')">
-            <?= __('shift.confirm') ?>
-          </a>
-          <?php else: ?>
-          <a href="/index.php?r=shifts/quickConfirm&id=<?= $row['id'] ?>&confirmed=0" 
-             class="btn" style="padding: 4px 8px; font-size: 12px;">
-            <?= __('shift.cancel_confirm') ?>
-          </a>
-          <?php endif; ?>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            <a href="/index.php?r=shifts/edit&id=<?= $row['id'] ?>" 
+               class="btn" style="padding: 4px 8px; font-size: 12px;">
+              <?= __('btn.edit') ?>
+            </a>
+            <?php if (!$row['is_confirmed']): ?>
+            <a href="/index.php?r=shifts/quickConfirm&id=<?= $row['id'] ?>&confirmed=1" 
+               class="btn btn-success" style="padding: 4px 8px; font-size: 12px;"
+               onclick="return confirm('<?= __('shift.confirm_confirm') ?>')">
+              <?= __('shift.confirm') ?>
+            </a>
+            <?php else: ?>
+            <a href="/index.php?r=shifts/quickConfirm&id=<?= $row['id'] ?>&confirmed=0" 
+               class="btn" style="padding: 4px 8px; font-size: 12px;">
+              <?= __('shift.cancel_confirm') ?>
+            </a>
+            <?php endif; ?>
+            <?php if ($row['manager_id']): ?>
+            <a href="/index.php?r=shifts/removeManager&id=<?= $row['id'] ?>" 
+               class="btn" style="padding: 4px 8px; font-size: 12px; background: #95a5a6;"
+               onclick="return confirm('<?= __('shift.remove_manager_confirm') ?>')"
+               title="<?= __('shift.remove_manager') ?>">
+              <?= __('shift.remove_manager') ?>
+            </a>
+            <?php endif; ?>
+          </div>
         </td>
       </tr>
       <?php endforeach; ?>

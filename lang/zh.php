@@ -382,6 +382,13 @@ return [
 'shift.morning' => '早班',
 'shift.afternoon' => '中班',
 'shift.evening' => '晚班',
+'shift.edit' => '编辑班次',
+'shift.update_failed' => '更新失败',
+'shift.no_manager' => '无负责人',
+'shift.cancel_manager' => '取消负责人',
+'shift.remove_manager' => '取消负责人',
+'shift.remove_manager_confirm' => '确定要取消该班次的负责人吗？',
+'shift.manager_hint' => '选择"无负责人"可以取消已设置的负责人',
 
 'inspection.no_past_date' => '不允许回填历史巡店',
 'inspection.no_past_date_hint' => '⚠️ 只能选择今天或未来的日期',

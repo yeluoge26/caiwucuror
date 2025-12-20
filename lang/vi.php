@@ -382,6 +382,13 @@ return [
 'shift.morning' => 'Ca sáng',
 'shift.afternoon' => 'Ca chiều',
 'shift.evening' => 'Ca tối',
+'shift.edit' => 'Chỉnh sửa ca',
+'shift.update_failed' => 'Cập nhật thất bại',
+'shift.no_manager' => 'Không có người phụ trách',
+'shift.cancel_manager' => 'Hủy người phụ trách',
+'shift.remove_manager' => 'Hủy người phụ trách',
+'shift.remove_manager_confirm' => 'Bạn có chắc muốn hủy người phụ trách ca này không?',
+'shift.manager_hint' => 'Chọn "Không có người phụ trách" để hủy người phụ trách đã đặt',
 
 'inspection.no_past_date' => 'Không cho phép điền lại lịch sử kiểm tra',
 'inspection.no_past_date_hint' => '⚠️ Chỉ có thể chọn ngày hôm nay hoặc tương lai',

@@ -55,7 +55,7 @@ include __DIR__ . '/../layout/header.php';
           <?php endforeach; ?>
         </select>
         <select name="shifts[<?= $shiftIndex ?>][manager_id]">
-          <option value=""><?= __('list.filter') ?></option>
+          <option value=""><?= __('shift.no_manager') ?></option>
           <?php foreach ($managers as $mgr): ?>
           <option value="<?= $mgr['id'] ?>" <?= ($shift['manager_id'] ?? '') == $mgr['id'] ? 'selected' : '' ?>>
             <?= htmlspecialchars($mgr['name']) ?>
@@ -105,7 +105,7 @@ function addShiftRow() {
   });
   empSelect += '</select>';
   
-  let mgrSelect = '<select name="shifts[' + shiftIndex + '][manager_id]"><option value=""><?= __('list.filter') ?></option>';
+  let mgrSelect = '<select name="shifts[' + shiftIndex + '][manager_id]"><option value=""><?= __('shift.no_manager') ?></option>';
   managers.forEach(mgr => {
     mgrSelect += '<option value="' + mgr.id + '">' + mgr.name + '</option>';
   });
