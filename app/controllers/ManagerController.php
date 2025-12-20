@@ -52,18 +52,17 @@ class ManagerController {
       }
     }
 
-    // 今日任务 - 获取分配给当前用户或当前用户角色的任务
+    // 今日任务 - 获取分配给当前用户或当前用户角色的待处理任务
     // 包括：1. 直接分配给当前用户的任务 (assign_user_id)
     //      2. 分配给当前用户角色的任务 (assign_role_id)
+    // 显示所有待处理（pending/in_progress）的任务
     $allTasks = Task::list([
       'assigned_to_user_id' => $user['id'],
       'assigned_to_role_id' => $user['role_id']
     ]);
-    // 过滤出今日到期的任务
-    $todayTasks = array_filter($allTasks, function($task) use ($today) {
-      if (empty($task['due_date'])) return false;
-      $dueDate = date('Y-m-d', strtotime($task['due_date']));
-      return $dueDate === $today && in_array($task['status'], ['pending', 'in_progress']);
+    // 过滤出待处理的任务（pending 或 in_progress）
+    $todayTasks = array_filter($allTasks, function($task) {
+      return in_array($task['status'], ['pending', 'in_progress']);
     });
 
     // 本周排班（周一到周日）
