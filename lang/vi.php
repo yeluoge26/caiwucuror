@@ -292,6 +292,7 @@ return [
 'inspection.review_reject' => 'Từ chối',
 'inspection.review_note' => 'Ý kiến duyệt',
 'inspection.review_by' => 'Người duyệt',
+'inspection.inspector' => 'Người tuần tra',
 'inspection.review' => 'Duyệt quản lý',
 'inspection.detail' => 'Chi tiết kiểm tra',
 'inspection.visit_no' => 'Lượt kiểm tra',

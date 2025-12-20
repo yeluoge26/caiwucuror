@@ -89,7 +89,7 @@ include __DIR__ . '/../layout/header.php';
 
     <div class="form-group" id="payer-group" style="display: none;">
       <label><?= __('field.payer') ?></label>
-      <input type="text" name="payer" value="<?= htmlspecialchars($_POST['payer'] ?? '') ?>">
+      <input type="text" name="payer" id="payer-input" value="<?= htmlspecialchars($_POST['payer'] ?? Auth::user()['display_name'] ?? '') ?>">
     </div>
     
     <div class="form-group">
@@ -123,6 +123,11 @@ document.getElementById('type-select').addEventListener('change', function() {
   if (type === 'expense') {
     vendorGroup.style.display = 'block';
     payerGroup.style.display = 'block';
+    // 如果付款人字段为空，设置为当前登录用户
+    const payerInput = payerGroup.querySelector('input[name="payer"]');
+    if (payerInput && !payerInput.value.trim()) {
+      payerInput.value = '<?= htmlspecialchars(Auth::user()["display_name"] ?? "", ENT_QUOTES) ?>';
+    }
   } else {
     vendorGroup.style.display = 'none';
     payerGroup.style.display = 'none';

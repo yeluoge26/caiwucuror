@@ -294,6 +294,7 @@ return [
 'inspection.review_reject' => '复查拒绝',
 'inspection.review_note' => '复查意见',
 'inspection.review_by' => '复查人',
+'inspection.inspector' => '巡店人',
 'inspection.review' => '管理复查',
 'inspection.detail' => '巡店详情',
 'inspection.visit_no' => '巡店次数',

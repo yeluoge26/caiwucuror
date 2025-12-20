@@ -8,9 +8,14 @@ include __DIR__ . '/../layout/h5_header.php';
 
 // 如果控制器没有传递这些变量，则计算它们
 if (!isset($inspectionCount)) {
+  require_once __DIR__ . '/../../core/Auth.php';
   $today = date('Y-m-d');
-  $todayInspections = Inspection::list(['date' => $today]);
-  // 统计所有今日的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
+  $user = Auth::user();
+  // 统计当前用户今日创建的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
+  $todayInspections = Inspection::list([
+    'date' => $today,
+    'created_by' => $user['id'] // 只统计当前用户创建的巡店记录
+  ]);
   $inspectionCount = count($todayInspections);
   $inspectionStatus = 'red';
   if ($inspectionCount >= 24) {

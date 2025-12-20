@@ -14,8 +14,11 @@ class ManagerController {
     $today = date('Y-m-d');
     $user = Auth::user();
 
-    // 今日巡店状态 - 统计所有今日的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
-    $todayInspections = Inspection::list(['date' => $today]);
+    // 今日巡店状态 - 统计当前用户今日创建的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
+    $todayInspections = Inspection::list([
+      'date' => $today,
+      'created_by' => $user['id'] // 只统计当前用户创建的巡店记录
+    ]);
     $inspectionCount = count($todayInspections);
     $inspectionStatus = 'red';
     if ($inspectionCount >= 24) {

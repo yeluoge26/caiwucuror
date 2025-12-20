@@ -139,7 +139,7 @@ class SettingController {
 
   public function users() {
     Auth::requireLogin();
-    Auth::requireRole(['owner', 'manager', 'accountant']);
+    Auth::requireRole(['owner']); // 只有老板可以管理用户
 
     $roles = DB::conn()->query("SELECT id, `key`, name_zh, name_vi FROM roles ORDER BY id ASC")->fetchAll();
     $users = User::all();

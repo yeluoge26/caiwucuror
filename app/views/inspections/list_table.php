@@ -17,12 +17,13 @@
         <th><?= __('inspection.status') ?></th>
         <th><?= __('inspection.photo') ?></th>
         <th><?= __('field.note') ?></th>
+        <th><?= __('inspection.inspector', '巡店人') ?></th>
         <th><?= __('inspection.manage') ?></th>
         <th><?= __('inspection.review_status') ?></th>
         <th><?= __('list.actions') ?></th>
       </tr>
       <?php if (empty($items)): ?>
-      <tr><td colspan="11" style="text-align:center; color:#888;"><?= __('list.no_data') ?></td></tr>
+      <tr><td colspan="12" style="text-align:center; color:#888;"><?= __('list.no_data') ?></td></tr>
       <?php else: ?>
       <?php foreach ($items as $row): ?>
       <tr>
@@ -83,6 +84,7 @@
           <?php endif; ?>
         </td>
         <td><?= htmlspecialchars($row['note'] ?? '') ?></td>
+        <td><?= htmlspecialchars($row['creator_name'] ?? '-') ?></td>
         <td><?= htmlspecialchars($row['creator_name'] ?? '') ?> @ <?= date('Y-m-d', strtotime($row['spot_date'])) ?></td>
         <td>
           <span class="badge">

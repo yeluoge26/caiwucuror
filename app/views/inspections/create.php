@@ -5,9 +5,14 @@ $title = __('nav.inspections_create', '巡店记录');
 $show_back = true;
 include __DIR__ . '/../layout/h5_header.php';
 
-// 获取今日巡店次数 - 统计所有今日的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
+// 获取今日巡店次数 - 统计当前用户今日创建的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
+require_once __DIR__ . '/../../core/Auth.php';
 $today = date('Y-m-d');
-$todayInspections = Inspection::list(['date' => $today]);
+$user = Auth::user();
+$todayInspections = Inspection::list([
+  'date' => $today,
+  'created_by' => $user['id'] // 只统计当前用户创建的巡店记录
+]);
 $inspectionCount = count($todayInspections);
 ?>
 
