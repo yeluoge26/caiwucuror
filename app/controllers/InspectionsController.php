@@ -126,7 +126,7 @@ class InspectionsController {
           if (empty($photos)) {
             $error = __('inspection.photo_required');
           } else {
-            Inspection::create([
+            $result = Inspection::create([
               'store' => $_POST['store'] ?? 'coffee',
               'floor' => $_POST['floor'] ?? '1F',
               'visit_no' => (int)($_POST['visit_no'] ?? 1),
@@ -136,12 +136,19 @@ class InspectionsController {
               'created_by' => Auth::user()['id'],
               'spot_date' => $spotDate,
             ]);
-            $inspId = DB::conn()->lastInsertId();
-            foreach ($photos as $p) {
-              InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
+            
+            if (!$result) {
+              $error = __('inspection.create_failed', '创建失败');
+            } else {
+              $inspId = DB::conn()->lastInsertId();
+              foreach ($photos as $p) {
+                InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
+              }
+              // 使用绝对路径重定向，确保包含正确的域名
+              $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);
+              header('Location: ' . $redirectUrl);
+              exit;
             }
-            header('Location: /index.php?r=inspections/list&date=' . urlencode($spotDate));
-            exit;
           }
         }
       }

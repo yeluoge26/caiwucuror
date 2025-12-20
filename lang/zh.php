@@ -399,6 +399,8 @@ return [
 'inspection.no_past_date_hint' => '⚠️ 只能选择今天或未来的日期',
 'inspection.photo_required' => '照片为必填项',
 'inspection.photo_required_hint' => '⚠️ 每次巡店必须上传至少1张照片',
+'inspection.create_failed' => '创建巡店记录失败',
+'inspection.no_past_date' => '不能选择过去的日期',
 'inspection.today_inspection' => '今日巡店',
 'inspection.completed' => '已完成',
 'inspection.times' => '次',

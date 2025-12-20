@@ -287,19 +287,30 @@ document.addEventListener('DOMContentLoaded', function() {
       clearTimeout(timeoutId);
       console.log('Response received, status:', response.status, 'redirected:', response.redirected, 'url:', response.url);
       
+      // 从表单中获取提交的日期（在检查响应之前获取，避免后续无法访问）
+      const spotDateInput = form.querySelector('input[name="spot_date"]');
+      const spotDate = spotDateInput ? spotDateInput.value : '<?= date('Y-m-d') ?>';
+      console.log('Form submitted date:', spotDate);
+      
       // 检查响应URL，如果与提交URL不同，说明发生了重定向
-      if (response.url && response.url !== submitUrl) {
-        console.log('Redirect detected, redirecting to:', response.url);
-        window.location.href = response.url;
+      if (response.url && response.url !== submitUrl && response.url !== window.location.href) {
+        console.log('Redirect detected in response.url, redirecting to:', response.url);
+        // 如果重定向URL中没有日期参数，添加日期参数
+        if (response.url.includes('inspections/list') && !response.url.includes('date=')) {
+          const separator = response.url.includes('?') ? '&' : '?';
+          window.location.href = response.url + separator + 'date=' + encodeURIComponent(spotDate);
+        } else {
+          window.location.href = response.url;
+        }
         return;
       }
       
       // 如果状态码是2xx或3xx，认为提交成功
       if (response.ok || (response.status >= 200 && response.status < 400)) {
-        // 直接跳转到列表页
-        const redirectPath = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
+        // 直接跳转到列表页，使用提交的日期
+        const redirectPath = '/index.php?r=inspections/list&date=' + encodeURIComponent(spotDate);
         const fullUrl = window.location.origin + redirectPath;
-        console.log('Success, redirecting to:', fullUrl);
+        console.log('Success, redirecting to:', fullUrl, 'with date:', spotDate);
         window.location.href = fullUrl;
         return;
       }
