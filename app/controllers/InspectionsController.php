@@ -249,15 +249,22 @@ class InspectionsController {
             // 检查是否是 AJAX 请求
             $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
             
+            error_log("InspectionsController::create - isAjax: " . ($isAjax ? 'yes' : 'no'));
+            error_log("InspectionsController::create - photos count: " . count($photos));
+            error_log("InspectionsController::create - inspection_id: {$inspId}");
+            
             if ($isAjax) {
               // AJAX 请求：返回 JSON 响应
               header('Content-Type: application/json; charset=utf-8');
-              echo json_encode([
+              $response = [
                 'success' => true,
                 'message' => __('inspection.create_success', '创建成功'),
                 'inspection_id' => $inspId,
-                'photo_count' => count($photos)
-              ], JSON_UNESCAPED_UNICODE);
+                'photo_count' => count($photos),
+                'photos' => $photos
+              ];
+              error_log("InspectionsController::create - JSON response: " . json_encode($response, JSON_UNESCAPED_UNICODE));
+              echo json_encode($response, JSON_UNESCAPED_UNICODE);
               exit;
             } else {
               // 普通表单提交：重定向

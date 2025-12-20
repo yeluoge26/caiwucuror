@@ -350,8 +350,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (response.success) {
           progressBar.style.width = '100%';
           progressText.textContent = '100%';
+          console.log('Upload successful! Response:', response);
+          console.log('Photo count:', response.photo_count);
+          console.log('Photos:', response.photos);
           uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?>' + 
-            (response.photo_count > 0 ? ' (' + response.photo_count + ' 张照片)' : '') + '</div>';
+            (response.photo_count > 0 ? ' (' + response.photo_count + ' 张照片)' : ' (0 张照片)') + '</div>';
           
           // 重置表单，但不跳转
           setTimeout(function() {
@@ -398,9 +401,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 上传错误
     xhr.addEventListener('error', function() {
-      uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_error', '上传出错，请重试') ?></div>';
+      console.error('Upload error:', xhr.status, xhr.statusText);
+      console.error('Response:', xhr.responseText);
+      uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_error', '上传出错，请重试') ?>: ' + xhr.statusText + '</div>';
       submitBtn.disabled = false;
       submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+    });
+    
+    // 监听响应
+    xhr.addEventListener('loadend', function() {
+      console.log('Request completed. Status:', xhr.status);
+      console.log('Response:', xhr.responseText);
     });
     
     // 发送请求
