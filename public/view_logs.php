@@ -26,6 +26,13 @@ $possibleLogs = [
     __DIR__ . '/error.log' => __DIR__ . '/error.log',
 ];
 
+// 添加项目日志文件（优先检查）
+$projectLog = __DIR__ . '/../logs/error.log';
+if (file_exists($projectLog)) {
+    // 将项目日志移到最前面
+    $possibleLogs = array_merge(['Project log (logs/error.log)' => $projectLog], $possibleLogs);
+}
+
 echo "<table border='1' cellpadding='5' style='border-collapse: collapse;'>";
 echo "<tr><th>日志位置</th><th>存在</th><th>可读</th><th>大小</th><th>最后修改</th><th>操作</th></tr>";
 
