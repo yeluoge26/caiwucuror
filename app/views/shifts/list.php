@@ -159,6 +159,8 @@ include __DIR__ . '/../layout/header.php';
         <td>
           <div style="display: flex; gap: 4px; flex-wrap: wrap; align-items: center;">
             <select 
+              id="shift-status-<?= $row['id'] ?>"
+              name="shift_status_<?= $row['id'] ?>"
               class="shift-status-select" 
               data-shift-id="<?= $row['id'] ?>"
               data-original-status="<?= $currentStatus ?>"
@@ -172,8 +174,10 @@ include __DIR__ . '/../layout/header.php';
             </select>
             <button 
               type="button" 
+              id="shift-submit-<?= $row['id'] ?>"
               class="shift-submit-btn" 
               data-shift-id="<?= $row['id'] ?>"
+              aria-label="<?= __('shift.confirm_attendance', '确认到岗状态') ?>"
               style="padding: 4px 8px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; background: #3498db; color: white;">
               <?= __('btn.submit', '提交') ?>
             </button>

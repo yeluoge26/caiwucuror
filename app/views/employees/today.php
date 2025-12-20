@@ -120,9 +120,12 @@ $currentLang = I18n::current();
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
             <select 
+              id="shift-status-<?= $shiftId ?>"
+              name="shift_status_<?= $shiftId ?>"
               class="shift-status-select" 
               data-shift-id="<?= $shiftId ?>"
               data-original-status="<?= $currentStatus ?>"
+              aria-label="<?= __('shift.status', '在岗状态') ?>"
               style="padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; min-width: 100px;">
               <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending', '未确认') ?></option>
               <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed', '已到岗') ?></option>
@@ -133,8 +136,10 @@ $currentLang = I18n::current();
             </select>
             <button 
               type="button" 
+              id="shift-submit-<?= $shiftId ?>"
               class="shift-submit-btn" 
               data-shift-id="<?= $shiftId ?>"
+              aria-label="<?= __('shift.confirm_attendance', '确认到岗状态') ?>"
               style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; background: #3498db; color: white; white-space: nowrap;">
               <?= __('btn.submit', '提交') ?>
             </button>
