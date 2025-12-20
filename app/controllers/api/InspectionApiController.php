@@ -28,7 +28,29 @@ class InspectionApiController {
       return null;
     };
     $dir = __DIR__ . '/../../../public/uploads/inspections';
-    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    if (!is_dir($dir)) {
+      // 确保父目录存在
+      $parentDir = dirname($dir);
+      if (!is_dir($parentDir)) {
+        if (!@mkdir($parentDir, 0755, true) && !is_dir($parentDir)) {
+          error_log("Failed to create parent directory: $parentDir");
+          return $paths;
+        }
+      }
+      // 尝试创建目录
+      if (!@mkdir($dir, 0755, true) && !is_dir($dir)) {
+        error_log("Failed to create directory: $dir. Please create it manually with proper permissions.");
+        // 尝试使用 0777 权限
+        if (!@mkdir($dir, 0777, true) && !is_dir($dir)) {
+          return $paths;
+        }
+      }
+    }
+    // 检查目录是否可写
+    if (!is_writable($dir)) {
+      error_log("Directory is not writable: $dir");
+      return $paths;
+    }
     $names = is_array($files['name']) ? $files['name'] : [$files['name']];
     $tmpNames = is_array($files['tmp_name']) ? $files['tmp_name'] : [$files['tmp_name']];
     $sizes = is_array($files['size']) ? $files['size'] : [$files['size']];
