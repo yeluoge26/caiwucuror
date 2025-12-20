@@ -1,7 +1,16 @@
--- 财务管理系统数据库结构
+-- ============================================
+-- 财务管理系统数据库结构（完整版）
+-- 最后更新：2024年12月
+-- 包含所有功能模块的数据表
+-- ============================================
+
 -- 创建数据库（如果不存在）
 CREATE DATABASE IF NOT EXISTS coffee_finance DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 USE coffee_finance;
+
+-- ============================================
+-- 1. 基础系统表
+-- ============================================
 
 -- 角色表
 CREATE TABLE IF NOT EXISTS roles (
@@ -26,6 +35,10 @@ CREATE TABLE IF NOT EXISTS users (
   INDEX idx_username (username),
   INDEX idx_role (role_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
+
+-- ============================================
+-- 2. 财务交易相关表
+-- ============================================
 
 -- 分类表
 CREATE TABLE IF NOT EXISTS categories (
@@ -86,7 +99,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   INDEX idx_tx_created_by (created_by)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='交易表';
 
--- 附件表（可选）
+-- 交易附件表
 CREATE TABLE IF NOT EXISTS attachments (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   transaction_id BIGINT NOT NULL COMMENT '交易ID',
@@ -97,7 +110,7 @@ CREATE TABLE IF NOT EXISTS attachments (
   CONSTRAINT fk_att_tx FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
   CONSTRAINT fk_att_user FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE RESTRICT,
   INDEX idx_att_tx (transaction_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='附件表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='交易附件表';
 
 -- 作废申请记录
 CREATE TABLE IF NOT EXISTS void_requests (
@@ -113,6 +126,35 @@ CREATE TABLE IF NOT EXISTS void_requests (
   INDEX idx_vr_user (requested_by),
   INDEX idx_vr_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='作废申请';
+
+-- ============================================
+-- 3. 现金日结表（店长管理系统新增）
+-- ============================================
+
+-- 现金日结表
+CREATE TABLE IF NOT EXISTS cash_closings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  date DATE NOT NULL COMMENT '交账日期',
+  created_by INT NOT NULL COMMENT '店长ID',
+  cash_counted DECIMAL(12,2) NOT NULL COMMENT '实盘现金',
+  cash_note TEXT NULL COMMENT '差额说明',
+  status ENUM('draft','submitted','approved','rejected') NOT NULL DEFAULT 'draft' COMMENT '状态',
+  submitted_at DATETIME NULL COMMENT '提交时间',
+  reviewed_by INT NULL COMMENT '审核人ID',
+  reviewed_at DATETIME NULL COMMENT '审核时间',
+  review_note TEXT NULL COMMENT '审核备注',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  CONSTRAINT fk_cash_closing_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_cash_closing_reviewer FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
+  UNIQUE KEY uk_cash_closing_date (date),
+  INDEX idx_cash_closing_status (status),
+  INDEX idx_cash_closing_date (date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='现金日结表';
+
+-- ============================================
+-- 4. 资产管理相关表
+-- ============================================
 
 -- 固定资产表
 CREATE TABLE IF NOT EXISTS assets (
@@ -148,7 +190,11 @@ CREATE TABLE IF NOT EXISTS asset_attachments (
   INDEX idx_asset_att_asset (asset_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='固定资产图片';
 
--- 原料库存
+-- ============================================
+-- 5. 材料库存相关表
+-- ============================================
+
+-- 原料库存表
 CREATE TABLE IF NOT EXISTS materials (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(128) NOT NULL COMMENT '原料名称',
@@ -165,6 +211,7 @@ CREATE TABLE IF NOT EXISTS materials (
   INDEX idx_materials_category (category)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='原料库存';
 
+-- 原料附件表
 CREATE TABLE IF NOT EXISTS material_attachments (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   material_id INT NOT NULL,
@@ -177,6 +224,10 @@ CREATE TABLE IF NOT EXISTS material_attachments (
   INDEX idx_mat_att (material_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='原料附件';
 
+-- ============================================
+-- 6. 饮品管理相关表
+-- ============================================
+
 -- 饮品表
 CREATE TABLE IF NOT EXISTS drinks (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -185,7 +236,7 @@ CREATE TABLE IF NOT EXISTS drinks (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='饮品';
 
--- 饮品配方
+-- 饮品配方表
 CREATE TABLE IF NOT EXISTS drink_recipes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   drink_id INT NOT NULL,
@@ -196,7 +247,7 @@ CREATE TABLE IF NOT EXISTS drink_recipes (
   UNIQUE KEY uk_drink_material (drink_id, material_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='饮品配方';
 
--- 耗材消耗记录
+-- 耗材消耗记录表
 CREATE TABLE IF NOT EXISTS consumption_logs (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   drink_id INT NOT NULL,
@@ -210,7 +261,11 @@ CREATE TABLE IF NOT EXISTS consumption_logs (
   INDEX idx_consume_date (occurred_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='耗材消耗记录';
 
--- 巡店记录
+-- ============================================
+-- 7. 巡店检查相关表
+-- ============================================
+
+-- 巡店记录表
 CREATE TABLE IF NOT EXISTS inspections (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   store VARCHAR(32) NOT NULL DEFAULT 'coffee',
@@ -219,13 +274,13 @@ CREATE TABLE IF NOT EXISTS inspections (
   room VARCHAR(64) NOT NULL DEFAULT 'general' COMMENT '卫生间/店面/楼梯等',
   status ENUM('ok','issue') NOT NULL DEFAULT 'ok',
   note VARCHAR(255) NULL,
-  reviewed_status ENUM('pending','confirmed','rejected') NOT NULL DEFAULT 'pending',
-  review_note VARCHAR(255) NULL,
-  reviewed_by INT NULL,
-  reviewed_at DATETIME NULL,
-  created_by INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  spot_date DATE NOT NULL,
+  reviewed_status ENUM('pending','confirmed','rejected') NOT NULL DEFAULT 'pending' COMMENT '审核状态',
+  review_note VARCHAR(255) NULL COMMENT '审核意见',
+  reviewed_by INT NULL COMMENT '审核人ID',
+  reviewed_at DATETIME NULL COMMENT '审核时间',
+  created_by INT NOT NULL COMMENT '创建人ID',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  spot_date DATE NOT NULL COMMENT '巡店日期',
   CONSTRAINT fk_inspect_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
   CONSTRAINT fk_inspect_reviewer FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
   INDEX idx_inspect_date (spot_date),
@@ -234,6 +289,7 @@ CREATE TABLE IF NOT EXISTS inspections (
   INDEX idx_inspect_visit (visit_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='巡店检查';
 
+-- 巡店照片表
 CREATE TABLE IF NOT EXISTS inspection_photos (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   inspection_id BIGINT NOT NULL,
@@ -246,54 +302,9 @@ CREATE TABLE IF NOT EXISTS inspection_photos (
   INDEX idx_insp_photo (inspection_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='巡店照片';
 
--- 初始化角色数据
-INSERT INTO roles(`key`, name_zh, name_vi) VALUES
-('owner','老板','Chủ quán'),
-('manager','店长','Quản lý'),
-('accountant','财务','Kế toán'),
-('staff','员工','Nhân viên')
-ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
-
--- 初始化默认用户（密码：admin123）
--- 注意：实际使用时请修改密码
--- 使用正确的 password_hash 生成：password_hash('admin123', PASSWORD_DEFAULT)
-INSERT INTO users(username, password_hash, display_name, role_id) VALUES
-('admin', '$2y$12$cKipuCZmfNWohh5ZSFdWCuQhs/5tzzjbVL.g/lFeicgEn8tYEhHHS', '管理员', 1)
-ON DUPLICATE KEY UPDATE display_name=VALUES(display_name);
-
--- 初始化分类数据
-INSERT INTO categories(`type`, name_zh, name_vi) VALUES
--- 收入分类
-('income', '堂食收入', 'Doanh thu tại chỗ'),
-('income', '外卖收入', 'Doanh thu giao hàng'),
-('income', '团购收入', 'Doanh thu nhóm'),
-('income', '其他收入', 'Thu nhập khác'),
--- 支出分类
-('expense', '食材采购', 'Mua nguyên liệu'),
-('expense', '设备维护', 'Bảo trì thiết bị'),
-('expense', '房租水电', 'Tiền thuê nhà và điện nước'),
-('expense', '员工工资', 'Lương nhân viên'),
-('expense', '营销推广', 'Marketing và quảng cáo'),
-('expense', '其他支出', 'Chi phí khác')
-ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
-
--- 初始化支付方式
-INSERT INTO payment_methods(name_zh, name_vi) VALUES
-('现金', 'Tiền mặt'),
-('POS机刷卡', 'Quẹt thẻ POS'),
-('VNPAY', 'VNPAY'),
-('ZaloPay', 'ZaloPay'),
-('Momo', 'Momo')
-ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
-
--- 初始化默认供应商
-INSERT INTO vendors(name, phone, note, is_active) VALUES
-('食材供应商A', '0123456789', '主要食材供应商', 1),
-('设备维修公司', '0987654321', '设备维护和维修', 1),
-('水电公司', '0111222333', '水电费缴纳', 1),
-('广告公司', '0444555666', '营销推广服务', 1),
-('其他供应商', NULL, '其他支出供应商', 1)
-ON DUPLICATE KEY UPDATE name=VALUES(name), phone=VALUES(phone), note=VALUES(note);
+-- ============================================
+-- 8. 任务管理相关表
+-- ============================================
 
 -- 任务表
 CREATE TABLE IF NOT EXISTS tasks (
@@ -347,6 +358,10 @@ CREATE TABLE IF NOT EXISTS task_attachments (
   INDEX idx_task_att_task (task_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='任务附件表';
 
+-- ============================================
+-- 9. 员工和班次管理相关表
+-- ============================================
+
 -- 员工表
 CREATE TABLE IF NOT EXISTS employees (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -376,7 +391,7 @@ CREATE TABLE IF NOT EXISTS shifts (
   shift_date DATE NOT NULL COMMENT '日期',
   shift_type ENUM('morning','afternoon','evening') NOT NULL COMMENT '班次类型：早/中/晚',
   employee_id INT NOT NULL COMMENT '员工ID',
-  manager_id INT NULL COMMENT '负责人ID（班次负责人）',
+  manager_id INT NULL COMMENT '负责人ID（班次负责人，可为空）',
   is_confirmed TINYINT(1) NOT NULL DEFAULT 0 COMMENT '实际到岗确认：0=未确认，1=已到岗',
   confirmed_at DATETIME NULL COMMENT '确认时间',
   confirmed_by INT NULL COMMENT '确认人ID',
@@ -394,3 +409,74 @@ CREATE TABLE IF NOT EXISTS shifts (
   INDEX idx_shifts_confirmed (is_confirmed),
   UNIQUE KEY uk_shifts_date_employee_type (shift_date, employee_id, shift_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='班次表';
+
+-- ============================================
+-- 10. 初始化数据
+-- ============================================
+
+-- 初始化角色数据
+INSERT INTO roles(`key`, name_zh, name_vi) VALUES
+('owner','老板','Chủ quán'),
+('manager','店长','Quản lý'),
+('accountant','财务','Kế toán'),
+('staff','员工','Nhân viên')
+ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
+
+-- 初始化默认用户（密码：admin123）
+-- 注意：实际使用时请修改密码
+-- 使用正确的 password_hash 生成：password_hash('admin123', PASSWORD_DEFAULT)
+INSERT INTO users(username, password_hash, display_name, role_id) VALUES
+('admin', '$2y$12$cKipuCZmfNWohh5ZSFdWCuQhs/5tzzjbVL.g/lFeicgEn8tYEhHHS', '管理员', 1)
+ON DUPLICATE KEY UPDATE display_name=VALUES(display_name);
+
+-- 初始化分类数据
+INSERT INTO categories(`type`, name_zh, name_vi) VALUES
+-- 收入分类
+('income', '堂食收入', 'Doanh thu tại chỗ'),
+('income', '外卖收入', 'Doanh thu giao hàng'),
+('income', '团购收入', 'Doanh thu nhóm'),
+('income', '其他收入', 'Thu nhập khác'),
+-- 支出分类
+('expense', '食材采购', 'Mua nguyên liệu'),
+('expense', '设备维护', 'Bảo trì thiết bị'),
+('expense', '房租水电', 'Tiền thuê nhà và điện nước'),
+('expense', '员工工资', 'Lương nhân viên'),
+('expense', '营销推广', 'Marketing và quảng cáo'),
+('expense', '其他支出', 'Chi phí khác')
+ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
+
+-- 初始化支付方式
+INSERT INTO payment_methods(name_zh, name_vi) VALUES
+('现金', 'Tiền mặt'),
+('POS机刷卡', 'Quẹt thẻ POS'),
+('VNPAY', 'VNPAY'),
+('ZaloPay', 'ZaloPay'),
+('Momo', 'Momo')
+ON DUPLICATE KEY UPDATE name_zh=VALUES(name_zh), name_vi=VALUES(name_vi);
+
+-- 初始化默认供应商
+INSERT INTO vendors(name, phone, note, is_active) VALUES
+('食材供应商A', '0123456789', '主要食材供应商', 1),
+('设备维修公司', '0987654321', '设备维护和维修', 1),
+('水电公司', '0111222333', '水电费缴纳', 1),
+('广告公司', '0444555666', '营销推广服务', 1),
+('其他供应商', NULL, '其他支出供应商', 1)
+ON DUPLICATE KEY UPDATE name=VALUES(name), phone=VALUES(phone), note=VALUES(note);
+
+-- ============================================
+-- 数据库结构创建完成
+-- ============================================
+-- 
+-- 包含的表：
+-- 1. 基础系统：roles, users
+-- 2. 财务交易：categories, payment_methods, vendors, transactions, attachments, void_requests
+-- 3. 现金日结：cash_closings
+-- 4. 资产管理：assets, asset_attachments
+-- 5. 材料库存：materials, material_attachments
+-- 6. 饮品管理：drinks, drink_recipes, consumption_logs
+-- 7. 巡店检查：inspections, inspection_photos
+-- 8. 任务管理：tasks, task_attachments
+-- 9. 员工班次：employees, shifts
+-- 
+-- 总计：20个数据表
+-- ============================================
