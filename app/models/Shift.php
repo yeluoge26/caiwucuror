@@ -179,11 +179,23 @@ class Shift {
       return false;
     }
     
+    // 记录确认状态：只有 confirmed 状态才标记为已确认
+    // 但所有非 pending 状态都应该记录确认时间和确认人（表示已处理）
+    $isConfirmed = ($status === 'confirmed') ? 1 : 0;
+    $confirmedAt = ($status !== 'pending') ? date('Y-m-d H:i:s') : null;
+    $confirmedBy = ($status !== 'pending') ? $userId : null;
+    
+    // 如果从非 pending 状态改回 pending，清除确认信息
+    if ($status === 'pending') {
+      $confirmedAt = null;
+      $confirmedBy = null;
+    }
+    
     $data = [
       'status' => $status,
-      'is_confirmed' => ($status === 'confirmed') ? 1 : 0,
-      'confirmed_at' => ($status !== 'pending') ? date('Y-m-d H:i:s') : null,
-      'confirmed_by' => ($status !== 'pending') ? $userId : null
+      'is_confirmed' => $isConfirmed,
+      'confirmed_at' => $confirmedAt,
+      'confirmed_by' => $confirmedBy
     ];
     return self::update($id, $data);
   }

@@ -385,6 +385,7 @@ return [
   'shift.morning' => 'Ca sáng',
   'shift.afternoon' => 'Ca chiều',
   'shift.evening' => 'Ca tối',
+  'shift.status' => 'Trạng thái tại chỗ',
   'shift.status_pending' => 'Chưa xác nhận',
   'shift.status_confirmed' => 'Đã có mặt',
   'shift.status_late' => 'Đi muộn',

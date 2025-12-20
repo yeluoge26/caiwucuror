@@ -387,6 +387,7 @@ return [
   'shift.morning' => '早班',
   'shift.afternoon' => '中班',
   'shift.evening' => '晚班',
+  'shift.status' => '在岗状态',
   'shift.status_pending' => '未确认',
   'shift.status_confirmed' => '已到岗',
   'shift.status_late' => '迟到',

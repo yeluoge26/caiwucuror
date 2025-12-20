@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../core/Csrf.php';
+
 $title = __('shift.list');
 include __DIR__ . '/../layout/header.php';
 ?>
@@ -84,11 +86,12 @@ include __DIR__ . '/../layout/header.php';
         <th><?= __('shift.employee') ?></th>
         <th><?= __('shift.manager') ?></th>
         <th><?= __('shift.is_confirmed') ?></th>
+        <th><?= __('shift.status', '在岗状态') ?></th>
         <th><?= __('list.actions') ?></th>
       </tr>
       <?php if (empty($items)): ?>
       <tr>
-        <td colspan="7" style="text-align: center; color: #999; padding: 40px;">
+        <td colspan="8" style="text-align: center; color: #999; padding: 40px;">
           <?= __('list.no_data') ?>
         </td>
       </tr>
@@ -116,23 +119,68 @@ include __DIR__ . '/../layout/header.php';
           <?php endif; ?>
         </td>
         <td>
-          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <?php
+          $currentStatus = $row['status'] ?? 'pending';
+          $statusIcons = [
+            'pending' => '⏳',
+            'confirmed' => '✅',
+            'late' => '⏰',
+            'leave' => '📝',
+            'off' => '🏖️',
+            'abnormal' => '⚠️'
+          ];
+          $statusColors = [
+            'pending' => '#e74c3c',
+            'confirmed' => '#27ae60',
+            'late' => '#f39c12',
+            'leave' => '#3498db',
+            'off' => '#9b59b6',
+            'abnormal' => '#e67e22'
+          ];
+          $statusTexts = [
+            'pending' => __('shift.status_pending', '未确认'),
+            'confirmed' => __('shift.status_confirmed', '已到岗'),
+            'late' => __('shift.status_late', '迟到'),
+            'leave' => __('shift.status_leave', '请假'),
+            'off' => __('shift.status_off', '调休'),
+            'abnormal' => __('shift.status_abnormal', '打卡异常')
+          ];
+          $statusIcon = $statusIcons[$currentStatus] ?? '⏳';
+          $statusColor = $statusColors[$currentStatus] ?? '#666';
+          $statusText = $statusTexts[$currentStatus] ?? $currentStatus;
+          ?>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 16px;"><?= $statusIcon ?></span>
+            <span class="shift-status-<?= $row['id'] ?>" style="color: <?= $statusColor ?>; font-weight: 600;">
+              <?= htmlspecialchars($statusText) ?>
+            </span>
+          </div>
+        </td>
+        <td>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap; align-items: center;">
+            <select 
+              class="shift-status-select" 
+              data-shift-id="<?= $row['id'] ?>"
+              data-original-status="<?= $currentStatus ?>"
+              style="padding: 4px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd; background: white; cursor: pointer; min-width: 100px;">
+              <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending', '未确认') ?></option>
+              <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed', '已到岗') ?></option>
+              <option value="late" <?= $currentStatus === 'late' ? 'selected' : '' ?>><?= __('shift.status_late', '迟到') ?></option>
+              <option value="leave" <?= $currentStatus === 'leave' ? 'selected' : '' ?>><?= __('shift.status_leave', '请假') ?></option>
+              <option value="off" <?= $currentStatus === 'off' ? 'selected' : '' ?>><?= __('shift.status_off', '调休') ?></option>
+              <option value="abnormal" <?= $currentStatus === 'abnormal' ? 'selected' : '' ?>><?= __('shift.status_abnormal', '打卡异常') ?></option>
+            </select>
+            <button 
+              type="button" 
+              class="shift-submit-btn" 
+              data-shift-id="<?= $row['id'] ?>"
+              style="padding: 4px 8px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; background: #3498db; color: white;">
+              <?= __('btn.submit', '提交') ?>
+            </button>
             <a href="/index.php?r=shifts/edit&id=<?= $row['id'] ?>" 
                class="btn" style="padding: 4px 8px; font-size: 12px;">
               <?= __('btn.edit') ?>
             </a>
-            <?php if (!$row['is_confirmed']): ?>
-            <a href="/index.php?r=shifts/quickConfirm&id=<?= $row['id'] ?>&confirmed=1" 
-               class="btn btn-success" style="padding: 4px 8px; font-size: 12px;"
-               onclick="return confirm('<?= __('shift.confirm_confirm') ?>')">
-              <?= __('shift.confirm') ?>
-            </a>
-            <?php else: ?>
-            <a href="/index.php?r=shifts/quickConfirm&id=<?= $row['id'] ?>&confirmed=0" 
-               class="btn" style="padding: 4px 8px; font-size: 12px;">
-              <?= __('shift.cancel_confirm') ?>
-            </a>
-            <?php endif; ?>
             <?php if ($row['manager_id']): ?>
             <a href="/index.php?r=shifts/removeManager&id=<?= $row['id'] ?>" 
                class="btn" style="padding: 4px 8px; font-size: 12px; background: #95a5a6;"
@@ -194,6 +242,129 @@ include __DIR__ . '/../layout/header.php';
   </div>
   <?php endif; ?>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const statusSelects = document.querySelectorAll('.shift-status-select');
+  const submitButtons = document.querySelectorAll('.shift-submit-btn');
+  
+  const statusIcons = {
+    'pending': '⏳',
+    'confirmed': '✅',
+    'late': '⏰',
+    'leave': '📝',
+    'off': '🏖️',
+    'abnormal': '⚠️'
+  };
+  
+  const statusColors = {
+    'pending': '#e74c3c',
+    'confirmed': '#27ae60',
+    'late': '#f39c12',
+    'leave': '#3498db',
+    'off': '#9b59b6',
+    'abnormal': '#e67e22'
+  };
+  
+  const statusTexts = {
+    'pending': '<?= __('shift.status_pending', '未确认') ?>',
+    'confirmed': '<?= __('shift.status_confirmed', '已到岗') ?>',
+    'late': '<?= __('shift.status_late', '迟到') ?>',
+    'leave': '<?= __('shift.status_leave', '请假') ?>',
+    'off': '<?= __('shift.status_off', '调休') ?>',
+    'abnormal': '<?= __('shift.status_abnormal', '打卡异常') ?>'
+  };
+  
+  // 提交按钮点击事件
+  submitButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const shiftId = this.getAttribute('data-shift-id');
+      const select = document.querySelector('.shift-status-select[data-shift-id="' + shiftId + '"]');
+      
+      if (!select) {
+        alert('<?= __('error.operation_failed', '操作失败') ?>');
+        return;
+      }
+      
+      const newStatus = select.value;
+      const originalStatus = select.getAttribute('data-original-status') || select.value;
+      
+      // 如果状态没有变化，不需要提交
+      if (newStatus === originalStatus) {
+        return;
+      }
+      
+      // 禁用按钮和选择框，防止重复提交
+      this.disabled = true;
+      select.disabled = true;
+      const originalText = this.textContent;
+      this.textContent = '<?= __('btn.processing', '处理中...') ?>';
+      
+      // 创建 FormData
+      const formData = new FormData();
+      formData.append('_csrf', '<?= Csrf::token() ?>');
+      formData.append('shift_id', shiftId);
+      formData.append('status', newStatus);
+      
+      // 发送请求
+      fetch('/index.php?r=employees/confirmShift', {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // 更新状态显示
+          const statusSpan = document.querySelector('.shift-status-' + shiftId);
+          if (statusSpan) {
+            statusSpan.textContent = statusTexts[newStatus] || newStatus;
+            statusSpan.style.color = statusColors[newStatus] || '#666';
+            
+            // 更新图标（如果存在）
+            const iconSpan = statusSpan.previousElementSibling;
+            if (iconSpan && iconSpan.tagName === 'SPAN') {
+              iconSpan.textContent = statusIcons[newStatus] || '⏳';
+            }
+          }
+          
+          // 更新原始状态
+          select.setAttribute('data-original-status', newStatus);
+          
+          // 恢复按钮状态
+          this.disabled = false;
+          select.disabled = false;
+          this.textContent = originalText;
+          
+          // 刷新页面以更新统计
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        } else {
+          alert('<?= __('error.operation_failed', '操作失败') ?>');
+          select.value = originalStatus;
+          this.disabled = false;
+          select.disabled = false;
+          this.textContent = originalText;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('<?= __('error.operation_failed', '操作失败') ?>: ' + error.message);
+        select.value = originalStatus;
+        this.disabled = false;
+        select.disabled = false;
+        this.textContent = originalText;
+      });
+    });
+  });
+  
+  // 保存原始状态
+  statusSelects.forEach(select => {
+    select.setAttribute('data-original-status', select.value);
+  });
+});
+</script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>
 

@@ -118,17 +118,27 @@ $currentLang = I18n::current();
               ?>
             </span>
           </div>
-          <select 
-            class="shift-status-select" 
-            data-shift-id="<?= $shiftId ?>"
-            style="padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; min-width: 100px;">
-            <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending', '未确认') ?></option>
-            <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed', '已到岗') ?></option>
-            <option value="late" <?= $currentStatus === 'late' ? 'selected' : '' ?>><?= __('shift.status_late', '迟到') ?></option>
-            <option value="leave" <?= $currentStatus === 'leave' ? 'selected' : '' ?>><?= __('shift.status_leave', '请假') ?></option>
-            <option value="off" <?= $currentStatus === 'off' ? 'selected' : '' ?>><?= __('shift.status_off', '调休') ?></option>
-            <option value="abnormal" <?= $currentStatus === 'abnormal' ? 'selected' : '' ?>><?= __('shift.status_abnormal', '打卡异常') ?></option>
-          </select>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <select 
+              class="shift-status-select" 
+              data-shift-id="<?= $shiftId ?>"
+              data-original-status="<?= $currentStatus ?>"
+              style="padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; min-width: 100px;">
+              <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending', '未确认') ?></option>
+              <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed', '已到岗') ?></option>
+              <option value="late" <?= $currentStatus === 'late' ? 'selected' : '' ?>><?= __('shift.status_late', '迟到') ?></option>
+              <option value="leave" <?= $currentStatus === 'leave' ? 'selected' : '' ?>><?= __('shift.status_leave', '请假') ?></option>
+              <option value="off" <?= $currentStatus === 'off' ? 'selected' : '' ?>><?= __('shift.status_off', '调休') ?></option>
+              <option value="abnormal" <?= $currentStatus === 'abnormal' ? 'selected' : '' ?>><?= __('shift.status_abnormal', '打卡异常') ?></option>
+            </select>
+            <button 
+              type="button" 
+              class="shift-submit-btn" 
+              data-shift-id="<?= $shiftId ?>"
+              style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; background: #3498db; color: white; white-space: nowrap;">
+              <?= __('btn.submit', '提交') ?>
+            </button>
+          </div>
         </div>
         <?php endforeach; ?>
       </div>
@@ -170,6 +180,7 @@ $currentLang = I18n::current();
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const statusSelects = document.querySelectorAll('.shift-status-select');
+  const submitButtons = document.querySelectorAll('.shift-submit-btn');
   
   const statusIcons = {
     'pending': '⏳',
@@ -198,15 +209,30 @@ document.addEventListener('DOMContentLoaded', function() {
     'abnormal': '<?= __('shift.status_abnormal', '打卡异常') ?>'
   };
   
-  statusSelects.forEach(select => {
-    select.addEventListener('change', function() {
+  // 提交按钮点击事件
+  submitButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
       const shiftId = this.getAttribute('data-shift-id');
-      const newStatus = this.value;
-      const originalValue = this.getAttribute('data-original-status') || this.value;
+      const select = document.querySelector('.shift-status-select[data-shift-id="' + shiftId + '"]');
       
-      // 禁用选择框，防止重复提交
+      if (!select) {
+        alert('<?= __('error.operation_failed', '操作失败') ?>');
+        return;
+      }
+      
+      const newStatus = select.value;
+      const originalStatus = select.getAttribute('data-original-status') || select.value;
+      
+      // 如果状态没有变化，不需要提交
+      if (newStatus === originalStatus) {
+        return;
+      }
+      
+      // 禁用按钮和选择框，防止重复提交
       this.disabled = true;
-      const originalText = this.options[this.selectedIndex].text;
+      select.disabled = true;
+      const originalText = this.textContent;
+      this.textContent = '<?= __('btn.processing', '处理中...') ?>';
       
       // 创建 FormData
       const formData = new FormData();
@@ -237,7 +263,12 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           // 更新原始状态
-          this.setAttribute('data-original-status', newStatus);
+          select.setAttribute('data-original-status', newStatus);
+          
+          // 恢复按钮状态
+          this.disabled = false;
+          select.disabled = false;
+          this.textContent = originalText;
           
           // 刷新页面以更新统计
           setTimeout(() => {
@@ -245,19 +276,25 @@ document.addEventListener('DOMContentLoaded', function() {
           }, 500);
         } else {
           alert('<?= __('error.operation_failed', '操作失败') ?>');
-          this.value = originalValue;
+          select.value = originalStatus;
           this.disabled = false;
+          select.disabled = false;
+          this.textContent = originalText;
         }
       })
       .catch(error => {
         console.error('Error:', error);
         alert('<?= __('error.operation_failed', '操作失败') ?>: ' + error.message);
-        this.value = originalValue;
+        select.value = originalStatus;
         this.disabled = false;
+        select.disabled = false;
+        this.textContent = originalText;
       });
     });
-    
-    // 保存原始状态
+  });
+  
+  // 保存原始状态
+  statusSelects.forEach(select => {
     select.setAttribute('data-original-status', select.value);
   });
 });
