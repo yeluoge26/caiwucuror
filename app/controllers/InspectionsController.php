@@ -185,7 +185,25 @@ class InspectionsController {
         } else {
           // 照片可选，不强制要求
           error_log("InspectionsController::create - POST data received");
+          error_log("InspectionsController::create - _POST keys: " . implode(', ', array_keys($_POST)));
           error_log("InspectionsController::create - _FILES keys: " . implode(', ', array_keys($_FILES)));
+          
+          // 详细记录 _FILES 内容
+          if (!empty($_FILES)) {
+            error_log("InspectionsController::create - _FILES content: " . json_encode([
+              'keys' => array_keys($_FILES),
+              'photos_exists' => isset($_FILES['photos']),
+              'photos_content' => isset($_FILES['photos']) ? [
+                'name' => $_FILES['photos']['name'] ?? 'not set',
+                'tmp_name' => isset($_FILES['photos']['tmp_name']) ? (is_array($_FILES['photos']['tmp_name']) ? count($_FILES['photos']['tmp_name']) . ' files' : 'single file') : 'not set',
+                'error' => $_FILES['photos']['error'] ?? 'not set',
+                'size' => $_FILES['photos']['size'] ?? 'not set'
+              ] : 'not set'
+            ], JSON_UNESCAPED_UNICODE));
+          } else {
+            error_log("InspectionsController::create - _FILES is empty!");
+          }
+          
           if (isset($_FILES['photos'])) {
             error_log("InspectionsController::create - _FILES['photos'] exists: " . json_encode([
               'name' => is_array($_FILES['photos']['name']) ? count($_FILES['photos']['name']) . ' files' : $_FILES['photos']['name'],

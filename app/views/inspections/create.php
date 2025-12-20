@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
       removeBtn.onclick = function() {
         selectedFiles.splice(index, 1);
         photosConfirmed = false;
-        updateFileInput();
+        // updateFileInput(); // 不需要更新文件输入框
         updatePhotoPreview();
       };
       
@@ -285,10 +285,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // 创建 FormData
     const formData = new FormData(form);
     
-    // 添加文件
+    // 移除可能存在的空文件字段
+    formData.delete('photos[]');
+    
+    // 添加文件（必须使用 photos[] 作为字段名，PHP才能正确解析为数组）
     selectedFiles.forEach((file, index) => {
       formData.append('photos[]', file);
     });
+    
+    // 调试：检查FormData中的文件
+    console.log('FormData files:', selectedFiles.length);
+    for (let pair of formData.entries()) {
+      if (pair[0] === 'photos[]') {
+        console.log('File in FormData:', pair[1].name, pair[1].size);
+      }
+    }
     
     // 创建 XMLHttpRequest 以显示进度
     const xhr = new XMLHttpRequest();
@@ -355,6 +366,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 发送请求
     xhr.open('POST', form.action || window.location.href);
+    
+    // 重要：不要设置 Content-Type，让浏览器自动设置（包含 boundary）
+    // xhr.setRequestHeader('Content-Type', 'multipart/form-data'); // 不要设置！
+    
     xhr.send(formData);
   });
 });
