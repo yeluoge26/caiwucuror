@@ -112,7 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['test_file'])) {
             @unlink($target); // 删除测试文件
         } else {
             echo "<p style='color:red;'><strong>❌ 移动文件失败</strong></p>";
-            echo "<p>错误信息：" . error_get_last()['message'] ?? '未知错误' . "</p>";
+            $lastError = error_get_last();
+            echo "<p>错误信息：" . ($lastError['message'] ?? '未知错误') . "</p>";
+            echo "<p style='color:orange;'><strong>💡 提示：</strong> 这通常是目录权限问题。请检查目录权限，确保 PHP 进程有写入权限。</p>";
+            echo "<p>当前 PHP 运行用户：" . (function_exists('posix_getpwuid') ? posix_getpwuid(posix_geteuid())['name'] : get_current_user()) . "</p>";
+            echo "<p>建议执行：<code>chmod -R 755 public/uploads</code> 或 <code>chmod -R 775 public/uploads</code></p>";
         }
     }
 } else {
