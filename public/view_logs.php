@@ -308,28 +308,87 @@ if (isset($_GET['test_log'])) {
     $testLogFile = __DIR__ . '/../logs/error.log';
     $testLogDir = __DIR__ . '/../logs';
     
+    // 获取 PHP 运行用户信息
+    $phpUser = function_exists('posix_getpwuid') ? posix_getpwuid(posix_geteuid())['name'] : get_current_user();
+    
+    // 尝试创建目录
+    $dirCreated = false;
     if (!is_dir($testLogDir)) {
-        @mkdir($testLogDir, 0755, true);
+        $dirCreated = @mkdir($testLogDir, 0777, true);
+        if ($dirCreated) {
+            @chmod($testLogDir, 0777);
+        }
+    } else {
+        $dirCreated = true;
+        // 尝试修改目录权限
+        @chmod($testLogDir, 0777);
     }
     
+    // 尝试创建文件
+    $fileCreated = false;
     if (!file_exists($testLogFile)) {
-        @touch($testLogFile);
-        @chmod($testLogFile, 0664);
+        $fileCreated = @touch($testLogFile);
+        if ($fileCreated) {
+            @chmod($testLogFile, 0666);
+        }
+    } else {
+        $fileCreated = true;
+        // 尝试修改文件权限
+        @chmod($testLogFile, 0666);
     }
+    
+    // 检查权限
+    $dirWritable = is_dir($testLogDir) && is_writable($testLogDir);
+    $fileWritable = file_exists($testLogFile) && is_writable($testLogFile);
+    
+    // 获取权限信息
+    $dirPerms = is_dir($testLogDir) ? substr(sprintf('%o', fileperms($testLogDir)), -4) : 'N/A';
+    $filePerms = file_exists($testLogFile) ? substr(sprintf('%o', fileperms($testLogFile)), -4) : 'N/A';
     
     $testMessage = "=== Test log entry at " . date('Y-m-d H:i:s') . " ===\n";
-    if (is_writable($testLogFile)) {
-        @file_put_contents($testLogFile, $testMessage, FILE_APPEND);
-        echo "<div style='background:#d4edda; border:1px solid #28a745; padding:15px; margin:10px 0; border-radius:4px;'>";
-        echo "<h4 style='margin-top:0; color:#155724;'>✅ 测试日志写入成功</h4>";
-        echo "<p style='color:#155724;'>已写入测试日志到: <code>{$testLogFile}</code></p>";
-        echo "<p style='color:#155724;'><a href='?view=Project log (logs/error.log)'>查看日志</a></p>";
-        echo "</div>";
+    if ($fileWritable) {
+        $writeResult = @file_put_contents($testLogFile, $testMessage, FILE_APPEND);
+        if ($writeResult !== false) {
+            echo "<div style='background:#d4edda; border:1px solid #28a745; padding:15px; margin:10px 0; border-radius:4px;'>";
+            echo "<h4 style='margin-top:0; color:#155724;'>✅ 测试日志写入成功</h4>";
+            echo "<p style='color:#155724;'>已写入测试日志到: <code>{$testLogFile}</code></p>";
+            echo "<p style='color:#155724;'><a href='?view=Project log (logs/error.log)'>查看日志</a></p>";
+            echo "</div>";
+        } else {
+            echo "<div style='background:#f8d7da; border:1px solid #dc3545; padding:15px; margin:10px 0; border-radius:4px;'>";
+            echo "<h4 style='margin-top:0; color:#721c24;'>❌ 测试日志写入失败</h4>";
+            echo "<p style='color:#721c24;'>文件存在但无法写入: <code>{$testLogFile}</code></p>";
+            echo "<p style='color:#721c24;'>文件权限: {$filePerms}</p>";
+            echo "<p style='color:#721c24;'>PHP 运行用户: {$phpUser}</p>";
+            echo "</div>";
+        }
     } else {
         echo "<div style='background:#f8d7da; border:1px solid #dc3545; padding:15px; margin:10px 0; border-radius:4px;'>";
         echo "<h4 style='margin-top:0; color:#721c24;'>❌ 测试日志写入失败</h4>";
-        echo "<p style='color:#721c24;'>日志文件不可写: <code>{$testLogFile}</code></p>";
-        echo "<p style='color:#721c24;'>请检查文件权限或联系服务器管理员。</p>";
+        echo "<p style='color:#721c24;'><strong>问题诊断：</strong></p>";
+        echo "<ul style='color:#721c24;'>";
+        echo "<li>日志目录: <code>{$testLogDir}</code></li>";
+        echo "<li>目录存在: " . (is_dir($testLogDir) ? '✅' : '❌') . "</li>";
+        echo "<li>目录可写: " . ($dirWritable ? '✅' : '❌') . "</li>";
+        echo "<li>目录权限: {$dirPerms}</li>";
+        echo "<li>日志文件: <code>{$testLogFile}</code></li>";
+        echo "<li>文件存在: " . (file_exists($testLogFile) ? '✅' : '❌') . "</li>";
+        echo "<li>文件可写: " . ($fileWritable ? '✅' : '❌') . "</li>";
+        echo "<li>文件权限: {$filePerms}</li>";
+        echo "<li>PHP 运行用户: {$phpUser}</li>";
+        echo "</ul>";
+        echo "<p style='color:#721c24;'><strong>解决方案：</strong></p>";
+        echo "<ol style='color:#721c24;'>";
+        echo "<li><strong>通过 SSH 修复权限（推荐）：</strong><br>";
+        echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chmod -R 777 " . dirname($testLogDir) . "/logs</code><br>";
+        echo "或<br>";
+        echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chown -R {$phpUser}:{$phpUser} " . dirname($testLogDir) . "/logs</code><br>";
+        echo "然后：<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chmod -R 755 " . dirname($testLogDir) . "/logs</code></li>";
+        echo "<li><strong>使用文件管理器：</strong><br>";
+        echo "在服务器文件管理器中，找到 <code>logs</code> 目录，设置权限为 777 或 755</li>";
+        echo "<li><strong>联系服务器管理员：</strong><br>";
+        echo "如果以上方法都不行，请联系服务器管理员修复权限问题</li>";
+        echo "</ol>";
         echo "</div>";
     }
 } else {
