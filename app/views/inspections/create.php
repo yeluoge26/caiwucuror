@@ -280,67 +280,44 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch(submitUrl, {
       method: 'POST',
       body: formData,
-      credentials: 'same-origin'
+      credentials: 'same-origin',
+      redirect: 'follow' // 自动跟随重定向
     })
     .then(response => {
       clearTimeout(timeoutId);
-      console.log('Response received, status:', response.status, 'redirected:', response.redirected);
+      console.log('Response received, status:', response.status, 'redirected:', response.redirected, 'url:', response.url);
       
-      if (response.redirected) {
-        console.log('Response redirected to:', response.url);
-        // 确保使用完整的URL
-        let redirectUrl = response.url;
-        if (!redirectUrl.startsWith('http')) {
-          redirectUrl = window.location.origin + redirectUrl;
-        }
-        console.log('Redirecting to:', redirectUrl);
-        window.location.href = redirectUrl;
+      // 检查响应URL，如果与提交URL不同，说明发生了重定向
+      if (response.url && response.url !== submitUrl) {
+        console.log('Redirect detected, redirecting to:', response.url);
+        window.location.href = response.url;
         return;
       }
       
-      if (response.ok) {
-        return response.text().then(html => {
-          console.log('Response HTML length:', html.length);
-          
-          // 检查是否是重定向响应（PHP header Location）
-          const locationMatch = html.match(/Location:\s*([^\s\n\r]+)/i);
-          if (locationMatch) {
-            let redirectUrl = locationMatch[1].trim();
-            // 移除可能的引号
-            redirectUrl = redirectUrl.replace(/^['"]|['"]$/g, '');
-            // 如果是相对路径，转换为绝对路径
-            if (redirectUrl.startsWith('/')) {
-              redirectUrl = window.location.origin + redirectUrl;
-            } else if (!redirectUrl.startsWith('http')) {
-              redirectUrl = window.location.origin + '/' + redirectUrl;
-            }
-            console.log('Redirecting to:', redirectUrl);
-            window.location.href = redirectUrl;
-            return;
-          }
-          
-          // 检查是否有错误
-          if (html.includes('error') || html.includes('Error') || html.includes('Warning') || html.includes('Fatal')) {
-            console.error('Error detected in response');
-            // 显示错误页面
-            document.open();
-            document.write(html);
-            document.close();
-            return;
-          }
-          
-          // 成功，跳转到列表页（使用绝对路径）
-          const redirectPath = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
-          const fullUrl = window.location.origin + redirectPath;
-          console.log('Success, redirecting to:', fullUrl);
-          window.location.href = fullUrl;
-        });
-      } else {
-        return response.text().then(html => {
-          console.error('Response error HTML:', html.substring(0, 500));
-          throw new Error('提交失败: HTTP ' + response.status);
-        });
+      // 如果状态码是2xx或3xx，认为提交成功
+      if (response.ok || (response.status >= 200 && response.status < 400)) {
+        // 直接跳转到列表页
+        const redirectPath = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
+        const fullUrl = window.location.origin + redirectPath;
+        console.log('Success, redirecting to:', fullUrl);
+        window.location.href = fullUrl;
+        return;
       }
+      
+      // 处理错误响应
+      return response.text().then(html => {
+        console.error('Response error, status:', response.status);
+        console.error('Response HTML preview:', html.substring(0, 500));
+        
+        // 检查是否是错误页面
+        if (html.includes('error') || html.includes('Error') || html.includes('Warning') || html.includes('Fatal')) {
+          document.open();
+          document.write(html);
+          document.close();
+        } else {
+          throw new Error('提交失败: HTTP ' + response.status);
+        }
+      });
     })
     .catch(error => {
       clearTimeout(timeoutId);
