@@ -28,10 +28,21 @@ $possibleLogs = [
 
 // 添加项目日志文件（优先检查）
 $projectLog = __DIR__ . '/../logs/error.log';
-if (file_exists($projectLog)) {
-    // 将项目日志移到最前面
-    $possibleLogs = array_merge(['Project log (logs/error.log)' => $projectLog], $possibleLogs);
+$projectLogDir = __DIR__ . '/../logs';
+
+// 如果日志目录不存在，尝试创建
+if (!is_dir($projectLogDir)) {
+    @mkdir($projectLogDir, 0755, true);
 }
+
+// 如果日志文件不存在，尝试创建
+if (!file_exists($projectLog) && is_writable($projectLogDir)) {
+    @touch($projectLog);
+    @chmod($projectLog, 0664);
+}
+
+// 将项目日志移到最前面（无论是否存在）
+$possibleLogs = array_merge(['Project log (logs/error.log)' => $projectLog], $possibleLogs);
 
 echo "<table border='1' cellpadding='5' style='border-collapse: collapse;'>";
 echo "<tr><th>日志位置</th><th>存在</th><th>可读</th><th>大小</th><th>最后修改</th><th>操作</th></tr>";
@@ -292,5 +303,42 @@ echo "<input type='text' name='search' placeholder='输入搜索关键词（如�
 echo "<button type='submit' style='padding:8px 15px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;'>搜索</button>";
 echo "</form>";
 
+// 测试日志写入
+if (isset($_GET['test_log'])) {
+    $testLogFile = __DIR__ . '/../logs/error.log';
+    $testLogDir = __DIR__ . '/../logs';
+    
+    if (!is_dir($testLogDir)) {
+        @mkdir($testLogDir, 0755, true);
+    }
+    
+    if (!file_exists($testLogFile)) {
+        @touch($testLogFile);
+        @chmod($testLogFile, 0664);
+    }
+    
+    $testMessage = "=== Test log entry at " . date('Y-m-d H:i:s') . " ===\n";
+    if (is_writable($testLogFile)) {
+        @file_put_contents($testLogFile, $testMessage, FILE_APPEND);
+        echo "<div style='background:#d4edda; border:1px solid #28a745; padding:15px; margin:10px 0; border-radius:4px;'>";
+        echo "<h4 style='margin-top:0; color:#155724;'>✅ 测试日志写入成功</h4>";
+        echo "<p style='color:#155724;'>已写入测试日志到: <code>{$testLogFile}</code></p>";
+        echo "<p style='color:#155724;'><a href='?view=Project log (logs/error.log)'>查看日志</a></p>";
+        echo "</div>";
+    } else {
+        echo "<div style='background:#f8d7da; border:1px solid #dc3545; padding:15px; margin:10px 0; border-radius:4px;'>";
+        echo "<h4 style='margin-top:0; color:#721c24;'>❌ 测试日志写入失败</h4>";
+        echo "<p style='color:#721c24;'>日志文件不可写: <code>{$testLogFile}</code></p>";
+        echo "<p style='color:#721c24;'>请检查文件权限或联系服务器管理员。</p>";
+        echo "</div>";
+    }
+} else {
+    echo "<div style='background:#e7f3ff; border:1px solid #0066cc; padding:15px; margin:10px 0; border-radius:4px;'>";
+    echo "<h4 style='margin-top:0; color:#004085;'>💡 提示</h4>";
+    echo "<p style='color:#004085;'>如果日志文件不存在，可以 <a href='?test_log=1' style='color:#0066cc;'>点击这里测试创建日志文件</a></p>";
+    echo "</div>";
+}
+
 ?>
+
 
