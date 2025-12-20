@@ -9,9 +9,9 @@
     <span class="icon">🔍</span>
     <span><?= __('nav.inspections') ?></span>
   </a>
-  <a href="/index.php?r=cash_closings/create" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'cash_closings') === 0 ? 'active' : '' ?>">
-    <span class="icon">💸</span>
-    <span><?= __('nav.cash') ?></span>
+  <a href="/index.php?r=transactions/create" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'transactions') === 0 ? 'active' : '' ?>">
+    <span class="icon">✏️</span>
+    <span><?= __('nav.add') ?></span>
   </a>
   <a href="/index.php?r=auth/profile" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'auth/profile') === 0 ? 'active' : '' ?>">
     <span class="icon">👤</span>
