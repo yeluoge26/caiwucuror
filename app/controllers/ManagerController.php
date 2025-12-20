@@ -52,9 +52,12 @@ class ManagerController {
       }
     }
 
-    // 今日任务 - 获取分配给当前用户的任务
+    // 今日任务 - 获取分配给当前用户或当前用户角色的任务
+    // 包括：1. 直接分配给当前用户的任务 (assign_user_id)
+    //      2. 分配给当前用户角色的任务 (assign_role_id)
     $allTasks = Task::list([
-      'assign_user_id' => $user['id']
+      'assigned_to_user_id' => $user['id'],
+      'assigned_to_role_id' => $user['role_id']
     ]);
     // 过滤出今日到期的任务
     $todayTasks = array_filter($allTasks, function($task) use ($today) {

@@ -26,9 +26,10 @@ class TaskController {
 
     $user = Auth::user();
     
-    // 如果不是老板，只显示分配给自己的任务
+    // 如果不是老板，只显示分配给自己的任务（包括分配给用户和分配给角色的任务）
     if ($user['role_key'] !== 'owner') {
-      $filters['assign_user_id'] = $user['id'];
+      $filters['assigned_to_user_id'] = $user['id'];
+      $filters['assigned_to_role_id'] = $user['role_id'];
     }
 
     $items = Task::list($filters);

@@ -76,7 +76,12 @@ class Task {
       $params[] = $filters['store'];
     }
 
-    if (!empty($filters['assign_user_id'])) {
+    // 支持查询分配给指定用户或角色的任务（用于今日任务等场景）
+    if (isset($filters['assigned_to_user_id']) && isset($filters['assigned_to_role_id'])) {
+      $where[] = '(t.assign_user_id = ? OR t.assign_role_id = ?)';
+      $params[] = $filters['assigned_to_user_id'];
+      $params[] = $filters['assigned_to_role_id'];
+    } elseif (!empty($filters['assign_user_id'])) {
       $where[] = 't.assign_user_id = ?';
       $params[] = $filters['assign_user_id'];
     }
@@ -145,7 +150,12 @@ class Task {
       $params[] = $filters['store'];
     }
 
-    if (!empty($filters['assign_user_id'])) {
+    // 支持查询分配给指定用户或角色的任务（用于今日任务等场景）
+    if (isset($filters['assigned_to_user_id']) && isset($filters['assigned_to_role_id'])) {
+      $where[] = '(assign_user_id = ? OR assign_role_id = ?)';
+      $params[] = $filters['assigned_to_user_id'];
+      $params[] = $filters['assigned_to_role_id'];
+    } elseif (!empty($filters['assign_user_id'])) {
       $where[] = 'assign_user_id = ?';
       $params[] = $filters['assign_user_id'];
     }
