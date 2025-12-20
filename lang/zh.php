@@ -106,6 +106,7 @@ return [
   'btn.void' => '作废',
   'btn.submit' => '提交',
   'btn.search' => '搜索',
+  'btn.processing' => '处理中...',
   'btn.filter' => '筛选',
   'btn.export' => '导出',
   'btn.import' => '导入',
@@ -171,6 +172,7 @@ return [
   'setting.vendor_deleted' => '供应商删除成功',
   
   'csrf.invalid' => '安全验证失败，请重试',
+  'error.operation_failed' => '操作失败',
   
   'role.owner' => '老板',
   'role.manager' => '店长',

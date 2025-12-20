@@ -178,5 +178,34 @@ class EmployeeController {
     
     include __DIR__ . '/../views/employees/today.php';
   }
+
+  public function confirmShift() {
+    Auth::requireLogin();
+    Auth::requireRole(['owner', 'manager']);
+
+    require_once __DIR__ . '/../core/Csrf.php';
+    require_once __DIR__ . '/../models/Shift.php';
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!Csrf::check($_POST['_csrf'] ?? '')) {
+        http_response_code(403);
+        die('CSRF invalid');
+      }
+
+      $shiftId = $_POST['shift_id'] ?? null;
+      $confirmed = isset($_POST['confirmed']) && $_POST['confirmed'] === '1';
+
+      if ($shiftId) {
+        Shift::confirm($shiftId, Auth::user()['id'], $confirmed);
+        // 返回 JSON 响应
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
+      }
+    }
+
+    http_response_code(400);
+    die('Invalid request');
+  }
 }
 

@@ -105,6 +105,7 @@ return [
   'btn.void' => 'Hủy',
   'btn.submit' => 'Gửi',
   'btn.search' => 'Tìm kiếm',
+  'btn.processing' => 'Đang xử lý...',
   'btn.filter' => 'Lọc',
   'btn.export' => 'Xuất',
   'btn.import' => 'Nhập',
@@ -170,6 +171,7 @@ return [
   'setting.vendor_deleted' => 'Xóa nhà cung cấp thành công',
   
   'csrf.invalid' => 'Xác thực bảo mật thất bại, vui lòng thử lại',
+  'error.operation_failed' => 'Thao tác thất bại',
   
   'role.owner' => 'Chủ quán',
   'role.manager' => 'Quản lý',
