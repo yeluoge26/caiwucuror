@@ -287,32 +287,53 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Response received, status:', response.status, 'redirected:', response.redirected);
       
       if (response.redirected) {
-        console.log('Redirecting to:', response.url);
-        window.location.href = response.url;
+        console.log('Response redirected to:', response.url);
+        // 确保使用完整的URL
+        let redirectUrl = response.url;
+        if (!redirectUrl.startsWith('http')) {
+          redirectUrl = window.location.origin + redirectUrl;
+        }
+        console.log('Redirecting to:', redirectUrl);
+        window.location.href = redirectUrl;
         return;
       }
       
       if (response.ok) {
         return response.text().then(html => {
           console.log('Response HTML length:', html.length);
-          // 检查是否是重定向响应
-          if (html.includes('Location:') || html.includes('window.location')) {
-            // 尝试提取重定向 URL
-            const match = html.match(/Location:\s*([^\s]+)/i) || html.match(/window\.location\s*=\s*['"]([^'"]+)['"]/i);
-            if (match) {
-              window.location.href = match[1];
-            } else {
-              window.location.href = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
+          
+          // 检查是否是重定向响应（PHP header Location）
+          const locationMatch = html.match(/Location:\s*([^\s\n\r]+)/i);
+          if (locationMatch) {
+            let redirectUrl = locationMatch[1].trim();
+            // 移除可能的引号
+            redirectUrl = redirectUrl.replace(/^['"]|['"]$/g, '');
+            // 如果是相对路径，转换为绝对路径
+            if (redirectUrl.startsWith('/')) {
+              redirectUrl = window.location.origin + redirectUrl;
+            } else if (!redirectUrl.startsWith('http')) {
+              redirectUrl = window.location.origin + '/' + redirectUrl;
             }
-          } else if (html.includes('error') || html.includes('Error') || html.includes('Warning')) {
+            console.log('Redirecting to:', redirectUrl);
+            window.location.href = redirectUrl;
+            return;
+          }
+          
+          // 检查是否有错误
+          if (html.includes('error') || html.includes('Error') || html.includes('Warning') || html.includes('Fatal')) {
+            console.error('Error detected in response');
             // 显示错误页面
             document.open();
             document.write(html);
             document.close();
-          } else {
-            // 成功，跳转到列表页
-            window.location.href = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
+            return;
           }
+          
+          // 成功，跳转到列表页（使用绝对路径）
+          const redirectPath = '/index.php?r=inspections/list&date=<?= date('Y-m-d') ?>';
+          const fullUrl = window.location.origin + redirectPath;
+          console.log('Success, redirecting to:', fullUrl);
+          window.location.href = fullUrl;
         });
       } else {
         return response.text().then(html => {
