@@ -102,10 +102,27 @@ class InspectionsController {
         continue;
       }
       
+      // 检测 MIME 类型
       $mime = $detectMime($tmpNames[$i]);
+      
+      // 如果无法检测 MIME 类型，尝试从文件扩展名推断
       if (!$mime) {
-        error_log("Upload skipped: '{$names[$i]}' MIME type could not be detected");
-        continue;
+        error_log("MIME type detection failed for '{$names[$i]}', trying file extension");
+        $ext = strtolower(pathinfo($names[$i], PATHINFO_EXTENSION));
+        $extToMime = [
+          'jpg' => 'image/jpeg',
+          'jpeg' => 'image/jpeg',
+          'png' => 'image/png',
+          'gif' => 'image/gif',
+          'webp' => 'image/webp'
+        ];
+        if (isset($extToMime[$ext])) {
+          $mime = $extToMime[$ext];
+          error_log("Using MIME type from extension: {$mime}");
+        } else {
+          error_log("Upload skipped: '{$names[$i]}' MIME type could not be detected and extension '{$ext}' is not recognized");
+          continue;
+        }
       }
       
       if (!isset($allowed[$mime])) {
@@ -116,12 +133,23 @@ class InspectionsController {
       $name = 'inspect_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $allowed[$mime];
       $target = $dir . '/' . $name;
       
+      error_log("Attempting to move file: tmp='{$tmpNames[$i]}', target='{$target}', tmp_exists=" . (file_exists($tmpNames[$i]) ? 'yes' : 'no') . ", tmp_readable=" . (is_readable($tmpNames[$i]) ? 'yes' : 'no'));
+      
       if (move_uploaded_file($tmpNames[$i], $target)) {
         $paths[] = ['path' => 'uploads/inspections/' . $name, 'mime' => $mime];
-        error_log("Upload success: '{$names[$i]}' saved as '{$name}'");
+        error_log("Upload success: '{$names[$i]}' saved as '{$name}' at '{$target}'");
+        
+        // 验证文件是否真的存在
+        if (file_exists($target)) {
+          error_log("File verified: '{$target}' exists, size: " . filesize($target) . " bytes");
+        } else {
+          error_log("WARNING: File '{$target}' does not exist after move_uploaded_file!");
+        }
       } else {
         $lastError = error_get_last();
         error_log("Upload failed: failed to move '{$names[$i]}' to '{$target}'. Error: " . ($lastError['message'] ?? 'unknown'));
+        error_log("Directory writable: " . (is_writable($dir) ? 'yes' : 'no'));
+        error_log("Target directory exists: " . (is_dir($dir) ? 'yes' : 'no'));
       }
     }
     
