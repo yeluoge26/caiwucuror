@@ -66,8 +66,14 @@ class ManagerController {
     });
 
     // 今日问题 - 统计今日创建的问题任务（通过标题或描述中包含"问题"关键词来识别）
+    // 只统计待处理状态的问题（pending 或 in_progress），已完成和已审批的不计入
     $today = date('Y-m-d');
     $todayIssues = array_filter($allTasks, function($task) use ($today) {
+      // 检查任务状态，只统计待处理的问题
+      if (!in_array($task['status'], ['pending', 'in_progress'])) {
+        return false;
+      }
+      
       // 检查任务标题或描述中是否包含"问题"关键词
       $title = mb_strtolower($task['title'] ?? '', 'UTF-8');
       $description = mb_strtolower($task['description'] ?? '', 'UTF-8');
