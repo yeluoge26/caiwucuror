@@ -10,10 +10,8 @@ include __DIR__ . '/../layout/h5_header.php';
 if (!isset($inspectionCount)) {
   $today = date('Y-m-d');
   $todayInspections = Inspection::list(['date' => $today]);
-  $confirmedInspections = array_filter($todayInspections, function($item) {
-    return $item['reviewed_status'] === 'confirmed';
-  });
-  $inspectionCount = count($confirmedInspections);
+  // 统计所有今日的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
+  $inspectionCount = count($todayInspections);
   $inspectionStatus = 'red';
   if ($inspectionCount >= 2) {
     $inspectionStatus = 'green';
