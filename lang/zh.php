@@ -449,6 +449,12 @@ return [
 'inspection.please_confirm_photos' => '请先点击"确认上传"按钮确认照片',
 'inspection.submit_success' => '提交成功！可以继续添加新的巡店记录',
 'inspection.create_success' => '创建成功',
+'inspection.batch_approve_title' => '一键审批',
+'inspection.batch_approve_hint' => '批量审批通过所有状态为"OK"且待审批的巡店任务',
+'inspection.batch_approve_btn' => '一键审批通过',
+'inspection.batch_approve_confirm' => '确定要批量审批通过所有状态为"OK"的巡店任务吗？',
+'inspection.batch_approve_success' => '成功审批通过 {count} 条巡店记录',
+'inspection.batch_approve_failed' => '批量审批失败',
 
 'cash_closing.create' => '现金日结',
 'cash_closing.list' => '现金日结列表',

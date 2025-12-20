@@ -69,4 +69,27 @@ class Inspection {
     ");
     return $stmt->execute([$status, $note, $userId, $id]);
   }
+
+  /**
+   * 批量审批通过所有状态为ok且待审批的巡店任务
+   * @param int $userId 审批人ID
+   * @return array ['success' => bool, 'count' => int, 'message' => string]
+   */
+  public static function batchApproveOk($userId) {
+    $stmt = DB::conn()->prepare("
+      UPDATE inspections
+      SET reviewed_status = 'confirmed', 
+          reviewed_by = ?, 
+          reviewed_at = NOW()
+      WHERE status = 'ok' 
+        AND reviewed_status = 'pending'
+    ");
+    $result = $stmt->execute([$userId]);
+    $count = $stmt->rowCount();
+    return [
+      'success' => $result,
+      'count' => $count,
+      'message' => $result ? "成功审批通过 {$count} 条巡店记录" : "批量审批失败"
+    ];
+  }
 }

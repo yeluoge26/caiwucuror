@@ -438,6 +438,12 @@ return [
 'inspection.please_confirm_photos' => 'Vui lòng nhấp vào nút "Xác nhận tải lên" để xác nhận ảnh',
 'inspection.submit_success' => 'Gửi thành công! Bạn có thể tiếp tục thêm bản kiểm tra mới',
 'inspection.create_success' => 'Tạo thành công',
+'inspection.batch_approve_title' => 'Phê duyệt hàng loạt',
+'inspection.batch_approve_hint' => 'Phê duyệt hàng loạt tất cả các nhiệm vụ kiểm tra có trạng thái "OK" và đang chờ phê duyệt',
+'inspection.batch_approve_btn' => 'Phê duyệt hàng loạt',
+'inspection.batch_approve_confirm' => 'Bạn có chắc chắn muốn phê duyệt hàng loạt tất cả các nhiệm vụ kiểm tra có trạng thái "OK" không?',
+'inspection.batch_approve_success' => 'Đã phê duyệt thành công {count} bản ghi kiểm tra',
+'inspection.batch_approve_failed' => 'Phê duyệt hàng loạt thất bại',
 
 'cash_closing.create' => 'Kết toán tiền mặt',
 'cash_closing.list' => 'Danh sách kết toán tiền mặt',

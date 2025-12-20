@@ -343,5 +343,53 @@ class InspectionsController {
     header('Location: /index.php?r=inspections/view&id=' . $id);
     exit;
   }
+
+  /**
+   * 批量审批通过所有状态为ok的巡店任务（仅老板可用）
+   */
+  public function batchApprove() {
+    Auth::requireLogin();
+    Auth::requireRole(['owner']);
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!Csrf::check($_POST['_csrf'] ?? '')) {
+        die('CSRF invalid');
+      }
+      
+      $result = Inspection::batchApproveOk(Auth::user()['id']);
+      
+      // 检查是否是 AJAX 请求
+      $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+      
+      if ($isAjax) {
+        header('Content-Type: application/json; charset=utf-8');
+        $message = $result['success'] 
+          ? str_replace('{count}', $result['count'], __('inspection.batch_approve_success', '成功审批通过 {count} 条巡店记录'))
+          : __('inspection.batch_approve_failed', '批量审批失败');
+        echo json_encode([
+          'success' => $result['success'],
+          'count' => $result['count'],
+          'message' => $message
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+      } else {
+        // 普通表单提交：重定向并显示消息
+        $date = $_GET['date'] ?? date('Y-m-d');
+        $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($date);
+        if ($result['success']) {
+          $redirectUrl .= '&msg=' . urlencode($result['message']);
+        } else {
+          $redirectUrl .= '&error=' . urlencode($result['message']);
+        }
+        header('Location: ' . $redirectUrl);
+        exit;
+      }
+    }
+    
+    // GET 请求：重定向到列表页
+    header('Location: /index.php?r=inspections/list');
+    exit;
+  }
 }
 
