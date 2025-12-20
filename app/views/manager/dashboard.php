@@ -121,13 +121,13 @@ if (!isset($theoretical)) {
   </a>
   
   <!-- 今日问题卡 -->
-  <a href="/index.php?r=tasks/create?type=issue" class="status-card" style="text-decoration: none; color: inherit;">
+  <a href="/index.php?r=tasks/create&type=issue" class="status-card" style="text-decoration: none; color: inherit;">
     <div class="status-card-header">
       <span>⚠</span>
       <span class="status-card-title"><?= __('manager.today_issues', '今日问题') ?></span>
     </div>
     <div class="status-card-body" style="color: #e74c3c;">
-      0 <?= __('manager.issues_recorded', '条') ?>
+      <?= isset($todayIssuesCount) ? $todayIssuesCount : 0 ?> <?= __('manager.issues_recorded', '条') ?>
     </div>
     <div class="status-card-footer">
       <?= __('manager.record_issue', '记录问题') ?>

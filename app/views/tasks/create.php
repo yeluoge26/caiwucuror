@@ -13,18 +13,25 @@ include __DIR__ . '/../layout/header.php';
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<?= Csrf::token() ?>">
     
+    <?php
+    // 检查是否是创建问题任务
+    $isIssue = isset($_GET['type']) && $_GET['type'] === 'issue';
+    $defaultTitle = $isIssue ? __('task.issue_title', '问题记录') : '';
+    $defaultType = $isIssue ? 'temporary' : ($_POST['type'] ?? 'temporary');
+    ?>
+    
     <div class="form-group">
       <label><?= __('task.title_label') ?> *</label>
-      <input type="text" name="title" value="<?= htmlspecialchars($_POST['title'] ?? '') ?>" required>
+      <input type="text" name="title" value="<?= htmlspecialchars($_POST['title'] ?? $defaultTitle) ?>" required>
     </div>
 
     <div class="form-group">
       <label><?= __('task.type') ?></label>
       <select name="type">
-        <option value="temporary" <?= ($_POST['type'] ?? 'temporary') === 'temporary' ? 'selected' : '' ?>>
+        <option value="temporary" <?= $defaultType === 'temporary' ? 'selected' : '' ?>>
           <?= __('task.type_temporary') ?>
         </option>
-        <option value="fixed" <?= ($_POST['type'] ?? '') === 'fixed' ? 'selected' : '' ?>>
+        <option value="fixed" <?= $defaultType === 'fixed' ? 'selected' : '' ?>>
           <?= __('task.type_fixed') ?>
         </option>
       </select>

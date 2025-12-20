@@ -65,6 +65,26 @@ class ManagerController {
       return in_array($task['status'], ['pending', 'in_progress']);
     });
 
+    // 今日问题 - 统计今日创建的问题任务（通过标题或描述中包含"问题"关键词来识别）
+    $today = date('Y-m-d');
+    $todayIssues = array_filter($allTasks, function($task) use ($today) {
+      // 检查任务标题或描述中是否包含"问题"关键词
+      $title = mb_strtolower($task['title'] ?? '', 'UTF-8');
+      $description = mb_strtolower($task['description'] ?? '', 'UTF-8');
+      $hasIssueKeyword = (
+        mb_strpos($title, '问题') !== false || 
+        mb_strpos($title, 'issue') !== false ||
+        mb_strpos($description, '问题') !== false || 
+        mb_strpos($description, 'issue') !== false
+      );
+      
+      // 检查是否是今天创建的
+      $createdDate = date('Y-m-d', strtotime($task['created_at'] ?? ''));
+      
+      return $hasIssueKeyword && $createdDate === $today;
+    });
+    $todayIssuesCount = count($todayIssues);
+
     // 本周排班（周一到周日）
     $weekStart = date('Y-m-d', strtotime('monday this week'));
     $weekEnd = date('Y-m-d', strtotime('sunday this week'));

@@ -304,6 +304,7 @@ return [
 'task.create' => '创建任务',
 'task.list' => '任务列表',
 'task.title_label' => '任务标题',
+'task.issue_title' => '问题记录',
 'task.type' => '任务类型',
 'task.type_fixed' => '固定',
 'task.type_temporary' => '临时',

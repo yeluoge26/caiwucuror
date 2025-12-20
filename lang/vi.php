@@ -299,6 +299,7 @@ return [
 'task.create' => 'Tạo nhiệm vụ',
 'task.list' => 'Danh sách nhiệm vụ',
 'task.title_label' => 'Tiêu đề nhiệm vụ',
+'task.issue_title' => 'Ghi nhận vấn đề',
 'task.type' => 'Loại nhiệm vụ',
 'task.type_fixed' => 'Cố định',
 'task.type_temporary' => 'Tạm thời',
