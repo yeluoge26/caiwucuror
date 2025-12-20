@@ -41,7 +41,33 @@ class Attachment {
     $maxSize = 5 * 1024 * 1024; // 5MB
     $errors = [];
     $fileCount = is_array($files['name']) ? count($files['name']) : 0;
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    
+    // MIME 类型检测函数（带回退机制）
+    $detectMime = function($filePath) use ($allowed) {
+      // 方法1: 尝试使用 finfo 类
+      if (class_exists('finfo')) {
+        try {
+          $finfo = new finfo(FILEINFO_MIME_TYPE);
+          $mime = $finfo->file($filePath);
+          if ($mime && isset($allowed[$mime])) {
+            return $mime;
+          }
+        } catch (Exception $e) {
+          error_log("finfo detection failed: " . $e->getMessage());
+        }
+      }
+      
+      // 方法2: 尝试使用 mime_content_type 函数
+      if (function_exists('mime_content_type')) {
+        $mime = @mime_content_type($filePath);
+        if ($mime && isset($allowed[$mime])) {
+          return $mime;
+        }
+      }
+      
+      // 方法3: 从文件扩展名推断（回退方案）
+      return null; // 返回 null，让调用者从文件名推断
+    };
 
     for ($i = 0; $i < $fileCount; $i++) {
       if (empty($files['name'][$i])) {
@@ -60,7 +86,27 @@ class Attachment {
         continue;
       }
 
-      $mime = $finfo->file($files['tmp_name'][$i]);
+      // 检测 MIME 类型
+      $mime = $detectMime($files['tmp_name'][$i]);
+      
+      // 如果无法检测 MIME 类型，尝试从文件扩展名推断
+      if (!$mime) {
+        $ext = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
+        $extToMime = [
+          'jpg' => 'image/jpeg',
+          'jpeg' => 'image/jpeg',
+          'png' => 'image/png',
+          'gif' => 'image/gif',
+          'webp' => 'image/webp'
+        ];
+        if (isset($extToMime[$ext])) {
+          $mime = $extToMime[$ext];
+        } else {
+          $errors[] = 'Unsupported file type: ' . $files['name'][$i] . ' (extension: ' . $ext . ')';
+          continue;
+        }
+      }
+      
       if (!isset($allowed[$mime])) {
         $errors[] = 'Unsupported file type: ' . $mime;
         continue;
