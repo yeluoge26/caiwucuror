@@ -13,9 +13,9 @@ if (!isset($inspectionCount)) {
   // 统计所有今日的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
   $inspectionCount = count($todayInspections);
   $inspectionStatus = 'red';
-  if ($inspectionCount >= 2) {
+  if ($inspectionCount >= 24) {
     $inspectionStatus = 'green';
-  } elseif ($inspectionCount == 1) {
+  } elseif ($inspectionCount >= 12) {
     $inspectionStatus = 'yellow';
   }
 }
@@ -52,14 +52,14 @@ if (!isset($theoretical)) {
       ];
       echo $statusEmoji[$inspectionStatus];
       ?>
-      <?= $inspectionCount ?> / 2
+      <?= $inspectionCount ?> / 24
     </div>
     <div class="status-card-footer">
       <?php
-      if ($inspectionCount >= 2) {
+      if ($inspectionCount >= 24) {
         echo __('manager.inspections_complete', '已完成');
-      } elseif ($inspectionCount == 1) {
-        echo __('manager.inspections_partial', '还需 1 次巡店');
+      } elseif ($inspectionCount > 0) {
+        echo sprintf(__('manager.inspections_partial', '还需 %d 次巡店'), 24 - $inspectionCount);
       } else {
         echo __('manager.inspections_none', '未巡店');
       }

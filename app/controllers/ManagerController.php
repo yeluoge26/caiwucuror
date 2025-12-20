@@ -18,9 +18,9 @@ class ManagerController {
     $todayInspections = Inspection::list(['date' => $today]);
     $inspectionCount = count($todayInspections);
     $inspectionStatus = 'red';
-    if ($inspectionCount >= 2) {
+    if ($inspectionCount >= 24) {
       $inspectionStatus = 'green';
-    } elseif ($inspectionCount == 1) {
+    } elseif ($inspectionCount >= 12) {
       $inspectionStatus = 'yellow';
     }
 
