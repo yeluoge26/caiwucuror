@@ -28,5 +28,24 @@ class AuthController {
   public function logout() {
     Auth::logout();
   }
+
+  public function profile() {
+    Auth::requireLogin();
+    $user = Auth::user();
+    
+    // 处理语言切换
+    if (isset($_GET['lang']) && in_array($_GET['lang'], ['zh', 'vi'])) {
+      $_SESSION['lang'] = $_GET['lang'];
+      // 重定向到当前页面，移除 lang 参数
+      $currentUrl = strtok($_SERVER['REQUEST_URI'], '?');
+      $params = $_GET;
+      unset($params['lang']);
+      $queryString = !empty($params) ? '?' . http_build_query($params) : '';
+      header('Location: ' . $currentUrl . $queryString);
+      exit;
+    }
+    
+    include __DIR__ . '/../views/auth/profile.php';
+  }
 }
 
