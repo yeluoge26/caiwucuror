@@ -27,22 +27,29 @@ chmod 755 public/uploads/inspections
 chmod 775 public/uploads/inspections
 ```
 
-### 方法2：修改目录所有者（如果方法1不行）
+### 方法2：修改目录所有者（推荐，如果方法1不行）
 
-如果修改权限后仍然无法写入，可能需要修改目录所有者：
+如果修改权限后仍然无法写入，说明 PHP 运行用户既不是目录所有者，也不在目录所属组中。需要修改目录所有者：
 
 ```bash
-# 查看当前 PHP 运行用户（通常是 www-data 或 nginx）
-ps aux | grep php-fpm
-# 或
-ps aux | grep nginx
+# 查看当前 PHP 运行用户（诊断脚本会显示，通常是 www、www-data 或 nginx）
+# 根据诊断脚本显示的 PHP 运行用户，执行以下命令
 
-# 假设 PHP 运行用户是 www-data，修改目录所有者
-chown -R www-data:www-data public/uploads
+# 假设 PHP 运行用户是 www（根据你的诊断结果）
+chown -R www:www public/uploads
 
 # 然后设置权限
 chmod -R 755 public/uploads
+
+# 或者如果目录组是 www-data
+chown -R www:www-data public/uploads
+chmod -R 775 public/uploads
 ```
+
+**重要提示：**
+- 如果权限是 0775 但仍然不可写，说明 PHP 用户不在目录所属组中
+- 最佳解决方案是修改目录所有者为 PHP 运行用户
+- 执行命令后，刷新诊断页面验证修复结果
 
 ### 方法3：使用 777 权限（不推荐，仅临时测试）
 

@@ -65,19 +65,65 @@ $dirs = [
     'inspections' => $uploadDir
 ];
 
+$phpUser = function_exists('posix_getpwuid') ? posix_getpwuid(posix_geteuid())['name'] : get_current_user();
+$hasWritableIssue = false;
+$lastPerms = 'N/A';
+
 foreach ($dirs as $name => $path) {
     $exists = is_dir($path);
     $readable = $exists && is_readable($path);
     $writable = $exists && is_writable($path);
     $perms = $exists ? substr(sprintf('%o', fileperms($path)), -4) : 'N/A';
     
+    if (!$writable && $exists) {
+        $hasWritableIssue = true;
+        $lastPerms = $perms;
+    }
+    
+    // 获取目录所有者和组
+    $owner = 'N/A';
+    $group = 'N/A';
+    if ($exists && function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
+        $stat = stat($path);
+        if ($stat) {
+            $ownerInfo = posix_getpwuid($stat['uid']);
+            $groupInfo = posix_getgrgid($stat['gid']);
+            $owner = $ownerInfo ? $ownerInfo['name'] : $stat['uid'];
+            $group = $groupInfo ? $groupInfo['name'] : $stat['gid'];
+        }
+    }
+    
     echo "<tr>";
     echo "<td>{$name} ({$path})</td>";
     echo "<td>" . ($exists ? '✅' : '❌') . "</td>";
     echo "<td>" . ($readable ? '✅' : '❌') . "</td>";
     echo "<td>" . ($writable ? '✅' : '❌') . "</td>";
-    echo "<td>{$perms}</td>";
+    echo "<td>{$perms}<br><small>所有者: {$owner}<br>组: {$group}</small></td>";
     echo "</tr>";
+}
+
+echo "</table>";
+
+// 显示 PHP 运行用户信息和建议
+echo "<h4>PHP 运行用户信息</h4>";
+echo "<p><strong>当前 PHP 运行用户：</strong> {$phpUser}</p>";
+
+if ($hasWritableIssue) {
+    echo "<div style='background:#fff3cd; border:1px solid #ffc107; padding:15px; margin:10px 0; border-radius:4px;'>";
+    echo "<h4 style='margin-top:0; color:#856404;'>⚠️ 权限修复建议</h4>";
+    echo "<p style='color:#856404;'><strong>问题：</strong>目录权限为 {$lastPerms}，但 PHP 用户 '{$phpUser}' 无法写入。</p>";
+    echo "<p style='color:#856404;'><strong>解决方案（按优先级）：</strong></p>";
+    echo "<ol style='color:#856404;'>";
+    echo "<li><strong>修改目录所有者（推荐）：</strong><br>";
+    echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chown -R {$phpUser}:{$phpUser} public/uploads</code><br>";
+    echo "然后：<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chmod -R 755 public/uploads</code></li>";
+    echo "<li><strong>将 PHP 用户添加到目录所属组：</strong><br>";
+    echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>usermod -a -G [目录组名] {$phpUser}</code><br>";
+    echo "然后重启 PHP-FPM 服务</li>";
+    echo "<li><strong>临时测试（不推荐用于生产环境）：</strong><br>";
+    echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>chmod -R 777 public/uploads</code></li>";
+    echo "</ol>";
+    echo "</div>";
 }
 echo "</table>";
 
