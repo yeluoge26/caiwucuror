@@ -24,14 +24,25 @@ $configs = [
     'file_uploads' => 'On'
 ];
 
+// 辅助函数：解析大小字符串
+function parseSize($size) {
+    $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
+    $size = preg_replace('/[^0-9\.]/', '', $size);
+    if ($unit) {
+        return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+    } else {
+        return round($size);
+    }
+}
+
 foreach ($configs as $key => $recommended) {
     $current = ini_get($key);
     $status = '✅';
     if ($key === 'file_uploads' && $current != '1' && strtolower($current) != 'on') {
         $status = '❌';
     } elseif ($key !== 'file_uploads') {
-        $currentBytes = $this->parseSize($current);
-        $recommendedBytes = $this->parseSize($recommended);
+        $currentBytes = parseSize($current);
+        $recommendedBytes = parseSize($recommended);
         if ($currentBytes < $recommendedBytes) {
             $status = '⚠️';
         }
@@ -123,16 +134,5 @@ if ($errorLog && file_exists($errorLog)) {
     echo "</pre>";
 } else {
     echo "<p>错误日志文件：{$errorLog} (不存在或无法访问)</p>";
-}
-
-// 辅助函数：解析大小字符串
-function parseSize($size) {
-    $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
-    $size = preg_replace('/[^0-9\.]/', '', $size);
-    if ($unit) {
-        return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
-    } else {
-        return round($size);
-    }
 }
 
