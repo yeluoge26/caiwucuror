@@ -37,12 +37,40 @@ foreach ($possibleLogs as $name => $path) {
         continue;
     }
     
-    $exists = file_exists($path);
-    $readable = $exists && is_readable($path);
-    $size = $exists ? filesize($path) : 0;
-    $modified = $exists ? date('Y-m-d H:i:s', filemtime($path)) : 'N/A';
+    // 检查 open_basedir 限制
+    $baseDirRestricted = false;
+    $exists = false;
+    $readable = false;
+    $size = 0;
+    $modified = 'N/A';
+    
+    // 检查路径是否在 open_basedir 限制内
+    $openBasedir = ini_get('open_basedir');
+    if (!empty($openBasedir)) {
+        $allowedDirs = explode(':', $openBasedir);
+        $isAllowed = false;
+        foreach ($allowedDirs as $allowedDir) {
+            if (empty($allowedDir)) continue;
+            $allowedDir = rtrim($allowedDir, '/');
+            if (strpos($path, $allowedDir) === 0) {
+                $isAllowed = true;
+                break;
+            }
+        }
+        if (!$isAllowed) {
+            $baseDirRestricted = true;
+        }
+    }
+    
+    // 只有在允许的路径内才检查文件是否存在
+    if (!$baseDirRestricted) {
+        $exists = @file_exists($path);
+    }
     
     if ($exists) {
+        $readable = is_readable($path);
+        $size = filesize($path);
+        $modified = date('Y-m-d H:i:s', filemtime($path));
         $foundLogs[] = $path;
     }
     
@@ -50,16 +78,20 @@ foreach ($possibleLogs as $name => $path) {
     
     echo "<tr>";
     echo "<td><code>{$path}</code></td>";
-    echo "<td>" . ($exists ? '✅' : '❌') . "</td>";
-    echo "<td>" . ($readable ? '✅' : '❌') . "</td>";
-    echo "<td>{$sizeFormatted}</td>";
-    echo "<td>{$modified}</td>";
-    echo "<td>";
-    if ($readable) {
-        echo "<a href='?view={$name}' style='margin-right: 10px;'>查看</a>";
-        echo "<a href='?download={$name}'>下载</a>";
+    if ($baseDirRestricted) {
+        echo "<td colspan='5' style='color:#f39c12;'>⚠️ open_basedir 限制，无法访问</td>";
+    } else {
+        echo "<td>" . ($exists ? '✅' : '❌') . "</td>";
+        echo "<td>" . ($readable ? '✅' : '❌') . "</td>";
+        echo "<td>{$sizeFormatted}</td>";
+        echo "<td>{$modified}</td>";
+        echo "<td>";
+        if ($readable) {
+            echo "<a href='?view={$name}' style='margin-right: 10px;'>查看</a>";
+            echo "<a href='?download={$name}'>下载</a>";
+        }
+        echo "</td>";
     }
-    echo "</td>";
     echo "</tr>";
 }
 
@@ -68,7 +100,13 @@ echo "</table>";
 // 2. 查看或下载日志
 if (isset($_GET['view']) || isset($_GET['download'])) {
     $logName = $_GET['view'] ?? $_GET['download'];
-    $logPath = $possibleLogs[$logName] ?? null;
+    
+    // 支持自定义路径
+    if ($logName === 'custom' && isset($_GET['path'])) {
+        $logPath = $_GET['path'];
+    } else {
+        $logPath = $possibleLogs[$logName] ?? null;
+    }
     
     if ($logPath && file_exists($logPath) && is_readable($logPath)) {
         if (isset($_GET['download'])) {
@@ -118,10 +156,71 @@ if (isset($_GET['view']) || isset($_GET['download'])) {
         echo "<h3>2. 未找到日志文件</h3>";
         echo "<p style='color:orange;'>未找到任何错误日志文件。可能的原因：</p>";
         echo "<ul>";
-        echo "<li>日志文件在其他位置</li>";
+        echo "<li>日志文件在其他位置（受 open_basedir 限制）</li>";
         echo "<li>PHP 配置使用系统日志（syslog）</li>";
         echo "<li>日志文件权限问题</li>";
         echo "</ul>";
+        
+        // 检查 open_basedir 限制
+        $openBasedir = ini_get('open_basedir');
+        if (!empty($openBasedir)) {
+            echo "<div style='background:#fff3cd; border:1px solid #ffc107; padding:15px; margin:10px 0; border-radius:4px;'>";
+            echo "<h4 style='margin-top:0; color:#856404;'>⚠️ open_basedir 限制</h4>";
+            echo "<p style='color:#856404;'><strong>当前限制路径：</strong> <code>{$openBasedir}</code></p>";
+            echo "<p style='color:#856404;'>由于 open_basedir 限制，脚本无法访问系统日志目录（如 /var/log）。</p>";
+            echo "<p style='color:#856404;'><strong>解决方案：</strong></p>";
+            echo "<ol style='color:#856404;'>";
+            echo "<li><strong>在服务器上通过 SSH 查看日志：</strong><br>";
+            echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>tail -n 100 /var/log/php-fpm/error.log</code><br>";
+            echo "或<br>";
+            echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>journalctl -u php-fpm -n 100 --no-pager</code></li>";
+            echo "<li><strong>查找 PHP 错误日志位置：</strong><br>";
+            echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>php -i | grep error_log</code></li>";
+            echo "<li><strong>在项目目录创建日志文件：</strong><br>";
+            echo "在项目根目录创建 <code>logs/error.log</code> 文件，并在应用启动时设置：<br>";
+            echo "<code style='background:#f8f9fa; padding:5px; border-radius:3px;'>ini_set('error_log', __DIR__ . '/logs/error.log');</code></li>";
+            echo "</ol>";
+            echo "</div>";
+            
+            // 尝试在允许的目录中查找日志
+            $allowedDirs = explode(':', $openBasedir);
+            $projectLogs = [];
+            foreach ($allowedDirs as $dir) {
+                if (empty($dir)) continue;
+                $dir = rtrim($dir, '/');
+                $logFile = $dir . '/logs/error.log';
+                if (@file_exists($logFile)) {
+                    $projectLogs[] = $logFile;
+                }
+                $logFile2 = $dir . '/error.log';
+                if (@file_exists($logFile2) && $logFile2 !== $logFile) {
+                    $projectLogs[] = $logFile2;
+                }
+                // 检查项目目录下的 logs 目录
+                $projectLogsDir = $dir . '/logs';
+                if (@is_dir($projectLogsDir)) {
+                    $files = @scandir($projectLogsDir);
+                    if ($files) {
+                        foreach ($files as $file) {
+                            if ($file !== '.' && $file !== '..' && pathinfo($file, PATHINFO_EXTENSION) === 'log') {
+                                $projectLogs[] = $projectLogsDir . '/' . $file;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!empty($projectLogs)) {
+                echo "<h4>在允许目录中找到的日志文件：</h4>";
+                echo "<ul>";
+                foreach ($projectLogs as $log) {
+                    $logName = basename($log);
+                    echo "<li><code>{$log}</code> - <a href='?view=custom&path=" . urlencode($log) . "'>查看</a> | <a href='?download=custom&path=" . urlencode($log) . "'>下载</a></li>";
+                }
+                echo "</ul>";
+            }
+        }
+        
         echo "<p><strong>查找日志的方法：</strong></p>";
         echo "<pre style='background:#f5f5f5; padding:10px; border-radius:4px;'>";
         echo "# 在服务器上执行：\n";
@@ -130,6 +229,8 @@ if (isset($_GET['view']) || isset($_GET['download'])) {
         echo "grep -r 'error_log' /etc/php*/\n";
         echo "# 或查看 PHP-FPM 日志\n";
         echo "tail -f /var/log/php-fpm/error.log\n";
+        echo "# 或查看系统日志（如果使用 syslog）\n";
+        echo "journalctl -u php-fpm -n 100 --no-pager\n";
         echo "</pre>";
     }
 }

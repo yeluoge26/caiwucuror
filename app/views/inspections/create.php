@@ -90,8 +90,31 @@ $inspectionCount = count($todayInspections);
     <div class="h5-card-title">📷 <?= __('inspection.photo', '巡店现场照片') ?></div>
     <div class="h5-form-group">
       <label for="photos"><?= __('inspection.photo', '巡店现场照片') ?></label>
-      <input type="file" name="photos[]" id="photos" accept="image/*" multiple>
+      <input type="file" name="photos[]" id="photos" accept="image/*" multiple style="display: none;">
+      <button type="button" id="selectPhotosBtn" class="h5-btn" style="width: 100%; background: #3498db; color: white; margin-bottom: 10px;">
+        📷 <?= __('inspection.select_photos', '选择照片') ?>
+      </button>
       <small class="h5-hint"><?= __('asset.photo_hint', '支持 JPG/PNG/WEBP/GIF，单张不超过 5MB，可多选上传') ?></small>
+      
+      <!-- 已选择的照片预览 -->
+      <div id="photoPreview" style="margin-top: 15px; display: none;">
+        <div style="font-weight: 600; margin-bottom: 10px; color: #2c3e50;">
+          <?= __('inspection.selected_photos', '已选择的照片') ?> (<span id="photoCount">0</span>)
+        </div>
+        <div id="photoList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"></div>
+      </div>
+      
+      <!-- 上传进度 -->
+      <div id="uploadProgress" style="display: none; margin-top: 15px;">
+        <div style="font-weight: 600; margin-bottom: 10px; color: #2c3e50;">
+          <?= __('inspection.upload_progress', '上传进度') ?>
+        </div>
+        <div id="uploadStatus" style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 10px;"></div>
+        <div style="background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
+          <div id="progressBar" style="background: #3498db; height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <div id="progressText" style="text-align: center; margin-top: 8px; font-size: 12px; color: #666;">0%</div>
+      </div>
     </div>
   </div>
 
@@ -106,10 +129,184 @@ $inspectionCount = count($todayInspections);
 
   <!-- 提交按钮（固定底部） -->
   <div class="fixed-bottom-btn">
-    <button type="submit" class="h5-btn h5-btn-success">
+    <button type="submit" id="submitBtn" class="h5-btn h5-btn-success">
       ✅ <?= __('btn.save', '保存') ?>
     </button>
   </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('photos');
+  const selectBtn = document.getElementById('selectPhotosBtn');
+  const photoPreview = document.getElementById('photoPreview');
+  const photoList = document.getElementById('photoList');
+  const photoCount = document.getElementById('photoCount');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const form = document.querySelector('form');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  let selectedFiles = [];
+  
+  // 点击按钮触发文件选择
+  selectBtn.addEventListener('click', function() {
+    fileInput.click();
+  });
+  
+  // 文件选择变化
+  fileInput.addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    selectedFiles = files;
+    updatePhotoPreview();
+  });
+  
+  // 更新照片预览
+  function updatePhotoPreview() {
+    if (selectedFiles.length === 0) {
+      photoPreview.style.display = 'none';
+      return;
+    }
+    
+    photoPreview.style.display = 'block';
+    photoCount.textContent = selectedFiles.length;
+    photoList.innerHTML = '';
+    
+    selectedFiles.forEach((file, index) => {
+      const item = document.createElement('div');
+      item.style.cssText = 'position: relative; padding: 5px; background: #f5f5f5; border-radius: 6px;';
+      
+      const img = document.createElement('img');
+      img.style.cssText = 'width: 100%; height: 80px; object-fit: cover; border-radius: 4px;';
+      img.src = URL.createObjectURL(file);
+      
+      const name = document.createElement('div');
+      name.style.cssText = 'font-size: 11px; color: #666; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+      name.textContent = file.name;
+      
+      const size = document.createElement('div');
+      size.style.cssText = 'font-size: 10px; color: #999; margin-top: 2px;';
+      size.textContent = formatFileSize(file.size);
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(231, 76, 60, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; cursor: pointer; line-height: 1;';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = function() {
+        selectedFiles.splice(index, 1);
+        updateFileInput();
+        updatePhotoPreview();
+      };
+      
+      item.appendChild(img);
+      item.appendChild(name);
+      item.appendChild(size);
+      item.appendChild(removeBtn);
+      photoList.appendChild(item);
+    });
+  }
+  
+  // 更新文件输入
+  function updateFileInput() {
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
+  }
+  
+  // 格式化文件大小
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+  
+  // 表单提交
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (selectedFiles.length === 0) {
+      if (!confirm('<?= __('inspection.no_photo_confirm', '未选择照片，确定要提交吗？') ?>')) {
+        return;
+      }
+    }
+    
+    // 禁用提交按钮
+    submitBtn.disabled = true;
+    submitBtn.textContent = '<?= __('btn.processing', '处理中...') ?>';
+    
+    // 显示上传进度
+    uploadProgress.style.display = 'block';
+    uploadStatus.innerHTML = '';
+    progressBar.style.width = '0%';
+    progressText.textContent = '0%';
+    
+    // 创建 FormData
+    const formData = new FormData(form);
+    
+    // 添加文件
+    selectedFiles.forEach((file, index) => {
+      formData.append('photos[]', file);
+    });
+    
+    // 创建 XMLHttpRequest 以显示进度
+    const xhr = new XMLHttpRequest();
+    
+    // 上传进度
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable) {
+        const percentComplete = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = percentComplete + '%';
+        progressText.textContent = percentComplete + '%';
+        
+        // 显示当前上传的文件
+        const uploadedSize = formatFileSize(e.loaded);
+        const totalSize = formatFileSize(e.total);
+        uploadStatus.innerHTML = '<div style="color: #3498db;">📤 <?= __('inspection.uploading', '正在上传') ?>: ' + uploadedSize + ' / ' + totalSize + '</div>';
+      }
+    });
+    
+    // 上传完成
+    xhr.addEventListener('load', function() {
+      if (xhr.status === 200 || xhr.status === 302) {
+        progressBar.style.width = '100%';
+        progressText.textContent = '100%';
+        uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?></div>';
+        
+        // 延迟跳转，让用户看到成功提示
+        setTimeout(function() {
+          // 检查响应头中的 Location
+          const location = xhr.getResponseHeader('Location');
+          if (location) {
+            window.location.href = location;
+          } else {
+            // 如果没有 Location，尝试从响应中获取或使用默认路径
+            const spotDate = document.getElementById('spot_date').value || '<?= date('Y-m-d') ?>';
+            window.location.href = '/index.php?r=inspections/list&date=' + encodeURIComponent(spotDate);
+          }
+        }, 1000);
+      } else {
+        uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + xhr.statusText + '</div>';
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+      }
+    });
+    
+    // 上传错误
+    xhr.addEventListener('error', function() {
+      uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_error', '上传出错，请重试') ?></div>';
+      submitBtn.disabled = false;
+      submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+    });
+    
+    // 发送请求
+    xhr.open('POST', form.action || window.location.href);
+    xhr.send(formData);
+  });
+});
+</script>
 
 <?php include __DIR__ . '/../layout/h5_footer.php'; ?>
