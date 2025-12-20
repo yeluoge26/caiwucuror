@@ -32,8 +32,8 @@ $inspectionCount = count($confirmedInspections);
     <div class="h5-card-title">📋 <?= __('inspection.basic_info', '基本信息') ?></div>
     
     <div class="h5-form-group">
-      <label><?= __('material.store', '店面') ?> *</label>
-      <select name="store" required>
+      <label for="store"><?= __('material.store', '店面') ?> *</label>
+      <select name="store" id="store" required>
         <option value="coffee" selected><?= __('asset.category_coffee', '咖啡店') ?></option>
         <option value="office"><?= __('asset.category_office', '办公室') ?></option>
         <option value="whiskey"><?= __('asset.category_whiskey', '威士忌') ?></option>
@@ -41,8 +41,8 @@ $inspectionCount = count($confirmedInspections);
     </div>
 
     <div class="h5-form-group">
-      <label><?= __('inspection.floor', '楼层') ?> *</label>
-      <select name="floor" required>
+      <label for="floor"><?= __('inspection.floor', '楼层') ?> *</label>
+      <select name="floor" id="floor" required>
         <option value="1F" selected>1F</option>
         <option value="2F">2F</option>
         <option value="3F">3F</option>
@@ -51,16 +51,16 @@ $inspectionCount = count($confirmedInspections);
     </div>
 
     <div class="h5-form-group">
-      <label><?= __('inspection.visit_no', '巡店次数') ?> *</label>
-      <select name="visit_no" required>
+      <label for="visit_no"><?= __('inspection.visit_no', '巡店次数') ?> *</label>
+      <select name="visit_no" id="visit_no" required>
         <option value="1" <?= ($inspectionCount + 1) == 1 ? 'selected' : '' ?>><?= __('inspection.visit_first', '首次') ?></option>
         <option value="2" <?= ($inspectionCount + 1) == 2 ? 'selected' : '' ?>><?= __('inspection.visit_second', '二次') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label><?= __('inspection.room', '房间/区域') ?> *</label>
-      <select name="room" required>
+      <label for="room"><?= __('inspection.room', '房间/区域') ?> *</label>
+      <select name="room" id="room" required>
         <option value="store" selected><?= __('inspection.room_store', '店面') ?></option>
         <option value="restroom"><?= __('inspection.room_restroom', '卫生间') ?></option>
         <option value="stair"><?= __('inspection.room_stair', '楼梯') ?></option>
@@ -68,16 +68,16 @@ $inspectionCount = count($confirmedInspections);
     </div>
 
     <div class="h5-form-group">
-      <label><?= __('inspection.status', '状态') ?> *</label>
-      <select name="status" required>
+      <label for="status"><?= __('inspection.status', '状态') ?> *</label>
+      <select name="status" id="status" required>
         <option value="ok" selected><?= __('inspection.ok', 'OK') ?></option>
         <option value="issue"><?= __('inspection.issue', '问题') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label><?= __('field.time', '发生时间') ?> *</label>
-      <input type="date" name="spot_date" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
+      <label for="spot_date"><?= __('field.time', '发生时间') ?> *</label>
+      <input type="date" name="spot_date" id="spot_date" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
       <small class="h5-hint"><?= __('inspection.no_past_date_hint', '不能选择过去的日期') ?></small>
     </div>
   </div>
@@ -87,14 +87,15 @@ $inspectionCount = count($confirmedInspections);
     <div class="h5-card-title">📷 <?= __('inspection.photo', '巡店现场照片') ?>（<?= __('field.required', '必填') ?>）</div>
     
     <div class="photo-upload-area" id="photo-area">
-      <input type="file" name="photos[]" id="photo-input" accept="image/*" capture="environment" multiple required style="position: absolute; width: 0; height: 0; opacity: 0; overflow: hidden;">
-      <button type="button" onclick="document.getElementById('photo-input').click()" class="h5-btn" style="background: #3498db;">
+      <label for="photo-input" style="display: none;"><?= __('inspection.photo', '巡店现场照片') ?></label>
+      <input type="file" name="photos[]" id="photo-input" accept="image/*" capture="environment" multiple required aria-label="<?= __('inspection.photo', '巡店现场照片') ?>" style="position: absolute; width: 0; height: 0; opacity: 0; overflow: hidden;">
+      <button type="button" onclick="document.getElementById('photo-input').click()" class="h5-btn" style="background: #3498db;" aria-label="<?= __('inspection.take_photo', '拍照') ?>">
         📸 <?= __('inspection.take_photo', '拍照') ?>
       </button>
       <div class="h5-hint required" style="margin-top: 8px;">
         <?= __('inspection.photo_required_hint', '只能调用相机，禁止相册上传。至少 1 张，建议 ≤5 张') ?>
       </div>
-      <div class="photo-preview" id="photo-preview"></div>
+      <div class="photo-preview" id="photo-preview" role="group" aria-label="<?= __('inspection.photo', '巡店现场照片') ?>"></div>
     </div>
   </div>
 
@@ -102,7 +103,8 @@ $inspectionCount = count($confirmedInspections);
   <div class="h5-card">
     <div class="h5-card-title">✏️ <?= __('inspection.note', '巡店说明') ?>（<?= __('field.optional', '可选') ?>）</div>
     <div class="h5-form-group">
-      <textarea name="note" placeholder="<?= __('inspection.note_hint', '如：吧台正常 / 后厨需注意卫生 / 高峰前检查') ?>"></textarea>
+      <label for="note"><?= __('inspection.note', '巡店说明') ?></label>
+      <textarea name="note" id="note" placeholder="<?= __('inspection.note_hint', '如：吧台正常 / 后厨需注意卫生 / 高峰前检查') ?>"></textarea>
     </div>
   </div>
 
