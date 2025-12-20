@@ -184,7 +184,25 @@ $currentLang = I18n::current();
       <span style="font-size: 13px; color: #6b7280;"><?= __('employee.status', '状态') ?>:</span>
       <span style="font-size: 13px; font-weight: 600;">
         <?php
-        if ($confirmedCount === $totalCount && $totalCount > 0) {
+        $statusCounts = $item['status_counts'] ?? [
+          'pending' => 0,
+          'confirmed' => 0,
+          'late' => 0,
+          'leave' => 0,
+          'off' => 0,
+          'abnormal' => 0
+        ];
+        
+        // 状态优先级：请假 > 调休 > 迟到 > 打卡异常 > 全部已到岗 > 部分到岗 > 未到岗
+        if ($statusCounts['leave'] > 0) {
+          echo '<span style="color: #3498db;">' . __('shift.status_leave', '请假') . '</span>';
+        } elseif ($statusCounts['off'] > 0) {
+          echo '<span style="color: #9b59b6;">' . __('shift.status_off', '调休') . '</span>';
+        } elseif ($statusCounts['late'] > 0) {
+          echo '<span style="color: #f39c12;">' . __('shift.status_late', '迟到') . '</span>';
+        } elseif ($statusCounts['abnormal'] > 0) {
+          echo '<span style="color: #e67e22;">' . __('shift.status_abnormal', '打卡异常') . '</span>';
+        } elseif ($confirmedCount === $totalCount && $totalCount > 0) {
           echo '<span style="color: #27ae60;">' . __('employee.all_confirmed', '全部已到岗') . '</span>';
         } elseif ($confirmedCount > 0) {
           echo '<span style="color: #f39c12;">' . sprintf(__('employee.partial_confirmed', '部分到岗 (%d/%d)'), $confirmedCount, $totalCount) . '</span>';

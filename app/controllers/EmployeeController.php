@@ -159,7 +159,15 @@ class EmployeeController {
             'employee' => $employee,
             'shifts' => [],
             'confirmed_count' => 0,
-            'total_count' => 0
+            'total_count' => 0,
+            'status_counts' => [
+              'pending' => 0,
+              'confirmed' => 0,
+              'late' => 0,
+              'leave' => 0,
+              'off' => 0,
+              'abnormal' => 0
+            ]
           ];
         }
       }
@@ -167,10 +175,23 @@ class EmployeeController {
       if (isset($employeesOnDuty[$employeeId])) {
         $employeesOnDuty[$employeeId]['shifts'][] = $shift;
         $employeesOnDuty[$employeeId]['total_count']++;
-        // 统计已到岗的数量（status = 'confirmed'）
-        if (($shift['status'] ?? 'pending') === 'confirmed') {
+        $status = $shift['status'] ?? 'pending';
+        
+        // 统计各种状态的数量
+        if ($status === 'confirmed') {
           $employeesOnDuty[$employeeId]['confirmed_count']++;
         }
+        if (!isset($employeesOnDuty[$employeeId]['status_counts'])) {
+          $employeesOnDuty[$employeeId]['status_counts'] = [
+            'pending' => 0,
+            'confirmed' => 0,
+            'late' => 0,
+            'leave' => 0,
+            'off' => 0,
+            'abnormal' => 0
+          ];
+        }
+        $employeesOnDuty[$employeeId]['status_counts'][$status]++;
       }
     }
     
