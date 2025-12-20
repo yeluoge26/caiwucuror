@@ -106,20 +106,6 @@ $inspectionCount = count($confirmedInspections);
     </div>
   </div>
 
-  <!-- 发现问题？（快捷入口） -->
-  <div class="h5-card">
-    <div class="h5-card-title">⚠ <?= __('inspection.found_issue', '是否发现问题？') ?></div>
-    <div style="display: flex; gap: 12px;">
-      <label style="flex: 1; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; text-align: center; cursor: pointer;">
-        <input type="radio" name="has_issue" value="no" checked style="margin-right: 8px;">
-        <?= __('inspection.no_issue', '无问题') ?>
-      </label>
-      <a href="/index.php?r=tasks/create?type=issue&inspection_id=current" style="flex: 1; padding: 12px; border: 2px solid #3498db; border-radius: 8px; text-align: center; text-decoration: none; color: #3498db; font-weight: 600;">
-        ➕ <?= __('inspection.record_issue', '记录问题') ?>
-      </a>
-    </div>
-  </div>
-
   <!-- 提交按钮（固定底部） -->
   <div class="fixed-bottom-btn">
     <button type="submit" class="h5-btn h5-btn-success" id="submit-btn" disabled>
