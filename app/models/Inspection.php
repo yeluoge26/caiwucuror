@@ -21,7 +21,15 @@ class Inspection {
     $sql .= " ORDER BY i.spot_date DESC, i.id DESC";
     $stmt = DB::conn()->prepare($sql);
     $stmt->execute($params);
-    return $stmt->fetchAll();
+    $results = $stmt->fetchAll();
+    
+    // 调试：记录查询结果
+    error_log("Inspection::list - Found " . count($results) . " inspections");
+    foreach ($results as $idx => $row) {
+      error_log("Inspection::list - Inspection ID: {$row['id']}, thumb_path: " . ($row['thumb_path'] ?? 'NULL') . ", photo_count: " . ($row['photo_count'] ?? 0));
+    }
+    
+    return $results;
   }
 
   public static function find($id) {

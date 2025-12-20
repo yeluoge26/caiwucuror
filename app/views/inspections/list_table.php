@@ -51,13 +51,22 @@
           $photoPath = $row['thumb_path'] ?? null;
           $photoCount = $row['photo_count'] ?? 0;
           
+          // 调试日志
+          error_log("list_table.php - Inspection ID: {$row['id']}, photoPath: " . var_export($photoPath, true) . ", photoCount: {$photoCount}");
+          
           if (!empty($photoPath)): 
             // 确保路径以 / 开头（如果路径是 uploads/inspections/xxx.jpg，需要加上 /）
             $photoUrl = (strpos($photoPath, '/') === 0) ? $photoPath : '/' . $photoPath;
+            error_log("list_table.php - Inspection ID: {$row['id']}, photoUrl: {$photoUrl}");
+            
+            // 检查文件是否存在
+            $fullPath = $_SERVER['DOCUMENT_ROOT'] . $photoUrl;
+            $fileExists = file_exists($fullPath);
+            error_log("list_table.php - Inspection ID: {$row['id']}, fullPath: {$fullPath}, fileExists: " . ($fileExists ? 'YES' : 'NO'));
           ?>
           <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
             <a href="<?= htmlspecialchars($photoUrl) ?>" target="_blank" style="display: inline-block;">
-              <img src="<?= htmlspecialchars($photoUrl) ?>" alt="照片" style="max-width: 50px; max-height: 50px; border-radius: 4px; object-fit: cover; border: 1px solid #ddd;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+              <img src="<?= htmlspecialchars($photoUrl) ?>" alt="照片" style="max-width: 50px; max-height: 50px; border-radius: 4px; object-fit: cover; border: 1px solid #ddd;" onerror="console.error('Image load error: <?= htmlspecialchars($photoUrl) ?>'); this.style.display='none'; this.nextElementSibling.style.display='inline';">
               <span style="display: none; color: #e74c3c; font-size: 11px;">图片加载失败</span>
             </a>
             <div style="display: flex; flex-direction: column; gap: 2px;">

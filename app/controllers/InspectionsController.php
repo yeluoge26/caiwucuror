@@ -164,6 +164,7 @@ class InspectionsController {
     }
 
     $items = Inspection::list(['date' => $date]);
+    error_log("InspectionsController::list - Loaded " . count($items) . " inspections for date: {$date}");
     include __DIR__ . '/../views/inspections/list.php';
   }
 
