@@ -392,6 +392,8 @@ return [
   'shift.status_leave' => 'Nghỉ phép',
   'shift.status_off' => 'Nghỉ bù',
   'shift.status_abnormal' => 'Bất thường',
+  'shift.submitted' => 'Đã gửi',
+  'shift.cannot_edit' => 'Đã gửi, không thể chỉnh sửa',
 'shift.morning' => 'Ca sáng',
 'shift.afternoon' => 'Ca chiều',
 'shift.evening' => 'Ca tối',

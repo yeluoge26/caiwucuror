@@ -5,13 +5,10 @@ $title = __('nav.inspections_create', '巡店记录');
 $show_back = true;
 include __DIR__ . '/../layout/h5_header.php';
 
-// 获取今日巡店次数
+// 获取今日巡店次数 - 统计所有今日的巡店记录（包括pending状态），因为店长自己创建的应该立即计入
 $today = date('Y-m-d');
 $todayInspections = Inspection::list(['date' => $today]);
-$confirmedInspections = array_filter($todayInspections, function($item) {
-  return $item['reviewed_status'] === 'confirmed';
-});
-$inspectionCount = count($confirmedInspections);
+$inspectionCount = count($todayInspections);
 ?>
 
 <!-- 巡店状态提示 -->
@@ -19,7 +16,7 @@ $inspectionCount = count($confirmedInspections);
   <div style="text-align: center;">
     <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">📅 <?= __('inspection.today_inspection', '今日巡店') ?></div>
     <div style="font-size: 24px; font-weight: bold; color: #3498db;">
-      <?= __('inspection.completed', '已完成') ?>: <?= $inspectionCount ?> / 2 <?= __('inspection.times', '次') ?>
+      <?= __('inspection.completed', '已完成') ?>: <?= $inspectionCount ?> / 24 <?= __('inspection.times', '次') ?>
     </div>
   </div>
 </div>

@@ -70,6 +70,12 @@ $currentLang = I18n::current();
           $type = $shift['shift_type'];
           $currentStatus = $shift['status'] ?? 'pending';
           $shiftId = $shift['id'];
+          $confirmedBy = $shift['confirmed_by'] ?? null;
+          
+          // 判断是否已提交：状态不是pending且已确认（confirmed_by不为空）
+          $isSubmitted = ($currentStatus !== 'pending' && !empty($confirmedBy));
+          // 只有老板可以修改已提交的状态
+          $canEdit = $isOwner || !$isSubmitted;
           
           $typeText = '';
           if ($type === 'morning') {
@@ -117,6 +123,9 @@ $currentLang = I18n::current();
               echo htmlspecialchars($statusTexts[$currentStatus] ?? $currentStatus);
               ?>
             </span>
+            <?php if ($isSubmitted && !$isOwner): ?>
+            <span style="font-size: 11px; color: #999; margin-left: 4px;">(<?= __('shift.submitted', '已提交') ?>)</span>
+            <?php endif; ?>
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
             <select 
@@ -125,8 +134,10 @@ $currentLang = I18n::current();
               class="shift-status-select" 
               data-shift-id="<?= $shiftId ?>"
               data-original-status="<?= $currentStatus ?>"
+              data-can-edit="<?= $canEdit ? '1' : '0' ?>"
               aria-label="<?= __('shift.status', '在岗状态') ?>"
-              style="padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; min-width: 100px;">
+              <?= !$canEdit ? 'disabled' : '' ?>
+              style="padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd; background: <?= $canEdit ? 'white' : '#f5f5f5' ?>; cursor: <?= $canEdit ? 'pointer' : 'not-allowed' ?>; min-width: 100px; <?= !$canEdit ? 'opacity: 0.6;' : '' ?>">
               <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending', '未确认') ?></option>
               <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed', '已到岗') ?></option>
               <option value="late" <?= $currentStatus === 'late' ? 'selected' : '' ?>><?= __('shift.status_late', '迟到') ?></option>
@@ -134,6 +145,7 @@ $currentLang = I18n::current();
               <option value="off" <?= $currentStatus === 'off' ? 'selected' : '' ?>><?= __('shift.status_off', '调休') ?></option>
               <option value="abnormal" <?= $currentStatus === 'abnormal' ? 'selected' : '' ?>><?= __('shift.status_abnormal', '打卡异常') ?></option>
             </select>
+            <?php if ($canEdit): ?>
             <button 
               type="button" 
               id="shift-submit-<?= $shiftId ?>"
@@ -143,6 +155,11 @@ $currentLang = I18n::current();
               style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; background: #3498db; color: white; white-space: nowrap;">
               <?= __('btn.submit', '提交') ?>
             </button>
+            <?php else: ?>
+            <span style="font-size: 11px; color: #999; padding: 6px 12px;">
+              <?= __('shift.cannot_edit', '已提交，不可修改') ?>
+            </span>
+            <?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
@@ -225,6 +242,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
+      // 检查是否可以编辑
+      const canEdit = select.getAttribute('data-can-edit') === '1';
+      if (!canEdit) {
+        alert('<?= __('shift.cannot_edit', '已提交，不可修改') ?>');
+        return;
+      }
+      
       const newStatus = select.value;
       const originalStatus = select.getAttribute('data-original-status') || select.value;
       
@@ -270,10 +294,34 @@ document.addEventListener('DOMContentLoaded', function() {
           // 更新原始状态
           select.setAttribute('data-original-status', newStatus);
           
-          // 恢复按钮状态
-          this.disabled = false;
-          select.disabled = false;
-          this.textContent = originalText;
+          // 如果不是老板，提交后禁用控件
+          const isOwner = <?= $isOwner ? 'true' : 'false' ?>;
+          if (!isOwner) {
+            select.disabled = true;
+            select.style.background = '#f5f5f5';
+            select.style.cursor = 'not-allowed';
+            select.style.opacity = '0.6';
+            select.setAttribute('data-can-edit', '0');
+            this.disabled = true;
+            this.style.display = 'none';
+            
+            // 添加"已提交"提示
+            const statusContainer = statusSpan.parentElement;
+            if (statusContainer && !statusContainer.querySelector('.submitted-hint')) {
+              const hint = document.createElement('span');
+              hint.className = 'submitted-hint';
+              hint.textContent = '(<?= __('shift.submitted', '已提交') ?>)';
+              hint.style.fontSize = '11px';
+              hint.style.color = '#999';
+              hint.style.marginLeft = '4px';
+              statusContainer.appendChild(hint);
+            }
+          } else {
+            // 老板可以继续编辑
+            this.disabled = false;
+            select.disabled = false;
+            this.textContent = originalText;
+          }
           
           // 刷新页面以更新统计
           setTimeout(() => {

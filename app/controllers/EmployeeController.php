@@ -177,6 +177,10 @@ class EmployeeController {
     // 转换为数组并排序
     $employeesOnDuty = array_values($employeesOnDuty);
     
+    // 获取当前用户信息，判断是否是老板
+    $user = Auth::user();
+    $isOwner = ($user['role_key'] ?? '') === 'owner';
+    
     include __DIR__ . '/../views/employees/today.php';
   }
 

@@ -30,6 +30,10 @@ class ShiftController {
     $total = Shift::count($filters);
     $totalPages = ceil($total / $perPage);
 
+    // 获取当前用户信息，判断是否是老板
+    $user = Auth::user();
+    $isOwner = ($user['role_key'] ?? '') === 'owner';
+
     $employees = Employee::active();
     // 获取老板和店长作为负责人选项
     $ownerRole = DB::conn()->query("SELECT id FROM roles WHERE `key` = 'owner' LIMIT 1")->fetch();

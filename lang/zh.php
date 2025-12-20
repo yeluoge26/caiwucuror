@@ -394,6 +394,8 @@ return [
   'shift.status_leave' => '请假',
   'shift.status_off' => '调休',
   'shift.status_abnormal' => '打卡异常',
+  'shift.submitted' => '已提交',
+  'shift.cannot_edit' => '已提交，不可修改',
 'shift.employee' => '员工',
 'shift.manager' => '负责人',
 'shift.is_confirmed' => '到岗确认',
