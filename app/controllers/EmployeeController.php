@@ -167,7 +167,8 @@ class EmployeeController {
       if (isset($employeesOnDuty[$employeeId])) {
         $employeesOnDuty[$employeeId]['shifts'][] = $shift;
         $employeesOnDuty[$employeeId]['total_count']++;
-        if ($shift['is_confirmed']) {
+        // 统计已到岗的数量（status = 'confirmed'）
+        if (($shift['status'] ?? 'pending') === 'confirmed') {
           $employeesOnDuty[$employeeId]['confirmed_count']++;
         }
       }
@@ -189,23 +190,27 @@ class EmployeeController {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (!Csrf::check($_POST['_csrf'] ?? '')) {
         http_response_code(403);
-        die('CSRF invalid');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'CSRF invalid']);
+        exit;
       }
 
       $shiftId = $_POST['shift_id'] ?? null;
-      $confirmed = isset($_POST['confirmed']) && $_POST['confirmed'] === '1';
+      $status = $_POST['status'] ?? 'pending';
 
       if ($shiftId) {
-        Shift::confirm($shiftId, Auth::user()['id'], $confirmed);
+        $result = Shift::updateStatus($shiftId, $status, Auth::user()['id']);
         // 返回 JSON 响应
         header('Content-Type: application/json');
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => $result]);
         exit;
       }
     }
 
     http_response_code(400);
-    die('Invalid request');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Invalid request']);
+    exit;
   }
 }
 

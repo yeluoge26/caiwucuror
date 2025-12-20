@@ -92,13 +92,21 @@ class Shift {
       $params[] = $filters['is_confirmed'];
     }
 
+    if (!empty($filters['status'])) {
+      $where[] = 's.status = ?';
+      $params[] = $filters['status'];
+    }
+
     $sql = "SELECT s.*,
       e.name as employee_name,
+      e.phone as phone,
+      r.name_zh as role_name_zh, r.name_vi as role_name_vi,
       m.name as manager_name,
       u1.display_name as creator_name,
       u2.display_name as confirmed_by_name
       FROM shifts s
       LEFT JOIN employees e ON s.employee_id = e.id
+      LEFT JOIN roles r ON e.role_id = r.id
       LEFT JOIN employees m ON s.manager_id = m.id
       LEFT JOIN users u1 ON s.created_by = u1.id
       LEFT JOIN users u2 ON s.confirmed_by = u2.id";
@@ -158,8 +166,24 @@ class Shift {
   public static function confirm($id, $userId, $confirmed = true) {
     $data = [
       'is_confirmed' => $confirmed ? 1 : 0,
+      'status' => $confirmed ? 'confirmed' : 'pending',
       'confirmed_at' => $confirmed ? date('Y-m-d H:i:s') : null,
       'confirmed_by' => $confirmed ? $userId : null
+    ];
+    return self::update($id, $data);
+  }
+
+  public static function updateStatus($id, $status, $userId) {
+    $validStatuses = ['pending', 'confirmed', 'late', 'leave', 'off', 'abnormal'];
+    if (!in_array($status, $validStatuses)) {
+      return false;
+    }
+    
+    $data = [
+      'status' => $status,
+      'is_confirmed' => ($status === 'confirmed') ? 1 : 0,
+      'confirmed_at' => ($status !== 'pending') ? date('Y-m-d H:i:s') : null,
+      'confirmed_by' => ($status !== 'pending') ? $userId : null
     ];
     return self::update($id, $data);
   }
