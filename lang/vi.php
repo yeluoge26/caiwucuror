@@ -170,6 +170,7 @@ return [
   'setting.vendor_created' => 'Tạo nhà cung cấp thành công',
   'setting.vendor_updated' => 'Cập nhật nhà cung cấp thành công',
   'setting.vendor_deleted' => 'Xóa nhà cung cấp thành công',
+  'setting.delete_failed' => 'Xóa thất bại',
   
   'csrf.invalid' => 'Xác thực bảo mật thất bại, vui lòng thử lại',
   'error.operation_failed' => 'Thao tác thất bại',

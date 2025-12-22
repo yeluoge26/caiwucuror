@@ -171,6 +171,7 @@ return [
   'setting.vendor_created' => '供应商创建成功',
   'setting.vendor_updated' => '供应商更新成功',
   'setting.vendor_deleted' => '供应商删除成功',
+  'setting.delete_failed' => '删除失败',
   
   'csrf.invalid' => '安全验证失败，请重试',
   'error.operation_failed' => '操作失败',

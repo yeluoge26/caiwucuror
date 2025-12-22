@@ -6,6 +6,18 @@ $current = $_GET['r'] ?? '';
 
 <h2 style="margin-bottom: 20px;"><?= __('setting.vendors') ?></h2>
 
+<?php if (isset($error) && $error): ?>
+<div class="alert alert-error" style="margin-bottom: 16px;">
+  <?= htmlspecialchars($error) ?>
+</div>
+<?php endif; ?>
+
+<?php if (isset($success) && $success): ?>
+<div class="alert alert-success" style="margin-bottom: 16px;">
+  <?= htmlspecialchars($success) ?>
+</div>
+<?php endif; ?>
+
 <div class="card" style="padding: 12px; margin-bottom: 16px;">
   <div style="display: flex; gap: 8px; flex-wrap: wrap;">
     <a class="btn <?= $current === 'settings/categories' ? 'btn-success' : '' ?>" href="/index.php?r=settings/categories"><?= __('setting.categories') ?></a>
