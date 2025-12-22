@@ -21,13 +21,15 @@ class Transaction {
   }
 
   public static function create($data) {
+    // 先插入记录，使用临时流水号占位符
     $sql = "INSERT INTO transactions
-      (`type`, amount, currency, category_id, payment_method_id, vendor_id, payer,
+      (serial_number, `type`, amount, currency, category_id, payment_method_id, vendor_id, payer,
        occurred_at, note, status, created_by)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
     $stmt = DB::conn()->prepare($sql);
     $result = $stmt->execute([
+      'TEMP', // 临时占位符，稍后会更新
       $data['type'],
       $data['amount'],
       $data['currency'] ?? 'VND',
