@@ -42,7 +42,23 @@ class Transaction {
     ]);
 
     if ($result) {
-      return DB::conn()->lastInsertId();
+      $id = DB::conn()->lastInsertId();
+      
+      // 获取记录的创建时间（使用created_at）
+      $dateStmt = DB::conn()->prepare("SELECT DATE(created_at) as create_date FROM transactions WHERE id = ?");
+      $dateStmt->execute([$id]);
+      $dateRow = $dateStmt->fetch();
+      $createDate = $dateRow ? str_replace('-', '', $dateRow['create_date']) : date('Ymd');
+      
+      // 生成流水号：日期(YYYYMMDD) + 类别(EXP/INC) + ID
+      $typePrefix = strtoupper(substr($data['type'], 0, 3)); // EXP 或 INC
+      $serialNumber = $createDate . '-' . $typePrefix . '-' . str_pad($id, 6, '0', STR_PAD_LEFT);
+      
+      // 更新流水号
+      $updateStmt = DB::conn()->prepare("UPDATE transactions SET serial_number = ? WHERE id = ?");
+      $updateStmt->execute([$serialNumber, $id]);
+      
+      return $id;
     }
     return false;
   }
@@ -237,7 +253,7 @@ class Transaction {
       WHERE status='approved'
         AND occurred_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
       GROUP BY day
-      ORDER BY day ASC
+      ORDER BY day DESC
     ");
     $stmt->execute([$days - 1]);
     return $stmt->fetchAll();

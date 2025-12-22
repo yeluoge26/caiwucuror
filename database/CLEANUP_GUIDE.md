@@ -173,3 +173,5 @@ mysql -u root -p coffee_finance < backup_YYYYMMDD_HHMMSS.sql
 3. 外键约束是否阻止删除
 4. 日志文件中的错误信息
 
+
+

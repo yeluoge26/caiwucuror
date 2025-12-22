@@ -42,6 +42,7 @@ class ExportController {
     
     // 表头
     echo '<tr>';
+    echo '<th>' . __('tx.serial_number') . '</th>';
     echo '<th>ID</th>';
     echo '<th>' . __('tx.type') . '</th>';
     echo '<th>' . __('tx.amount') . '</th>';
@@ -58,6 +59,7 @@ class ExportController {
     // 数据行
     foreach ($items as $row) {
       echo '<tr>';
+      echo '<td>' . htmlspecialchars($row['serial_number'] ?? '') . '</td>';
       echo '<td>' . htmlspecialchars($row['id']) . '</td>';
       echo '<td>' . ($row['type'] === 'income' ? __('tx.income') : __('tx.expense')) . '</td>';
       echo '<td>' . number_format($row['amount'], 2, '.', '') . '</td>';
@@ -114,7 +116,7 @@ class ExportController {
     
     // 表头
     fputcsv($output, [
-      'ID', __('tx.type'), __('tx.amount'), __('field.currency'),
+      __('tx.serial_number'), 'ID', __('tx.type'), __('tx.amount'), __('field.currency'),
       __('tx.category'), __('field.payment'), __('field.vendor'),
       __('field.time'), __('field.note'), __('tx.status'), __('tx.create')
     ]);
@@ -122,6 +124,7 @@ class ExportController {
     // 数据行
     foreach ($items as $row) {
       fputcsv($output, [
+        $row['serial_number'] ?? '',
         $row['id'],
         $row['type'] === 'income' ? __('tx.income') : __('tx.expense'),
         number_format($row['amount'], 2, '.', ''),

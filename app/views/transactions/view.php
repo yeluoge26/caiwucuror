@@ -9,6 +9,10 @@ $lang = I18n::current();
 <div class="card">
   <table>
     <tr>
+      <th style="width: 150px;"><?= __('tx.serial_number') ?></th>
+      <td style="font-family: monospace; font-weight: bold; font-size: 16px;"><?= htmlspecialchars($transaction['serial_number'] ?? '') ?></td>
+    </tr>
+    <tr>
       <th style="width: 150px;">ID</th>
       <td><?= $transaction['id'] ?></td>
     </tr>

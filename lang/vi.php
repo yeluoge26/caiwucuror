@@ -36,6 +36,7 @@ return [
   'tx.income' => 'Thu',
   'tx.expense' => 'Chi',
   'tx.type' => 'Loại',
+  'tx.serial_number' => 'Số phiếu',
   'tx.amount' => 'Số tiền',
   'tx.category' => 'Danh mục',
   'tx.payment' => 'Phương thức',

@@ -25,3 +25,5 @@ ALTER TABLE shifts ADD INDEX idx_shifts_status (status);
 -- SHOW COLUMNS FROM shifts LIKE 'status';
 -- SELECT status, COUNT(*) FROM shifts GROUP BY status;
 
+
+

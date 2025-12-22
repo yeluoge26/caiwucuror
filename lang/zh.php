@@ -36,6 +36,7 @@ return [
   'tx.income' => '收入',
   'tx.expense' => '支出',
   'tx.type' => '类型',
+  'tx.serial_number' => '流水号',
   'tx.amount' => '金额',
   'tx.category' => '分类',
   'tx.payment' => '支付方式',

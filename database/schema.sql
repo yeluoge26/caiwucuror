@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS vendors (
 -- 交易表（核心表）
 CREATE TABLE IF NOT EXISTS transactions (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  serial_number VARCHAR(32) NOT NULL COMMENT '流水号：日期-类别-ID',
   `type` ENUM('income','expense') NOT NULL COMMENT '类型：收入/支出',
   amount DECIMAL(12,2) NOT NULL COMMENT '金额',
   currency VARCHAR(8) NOT NULL DEFAULT 'VND' COMMENT '货币',
@@ -91,6 +92,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   CONSTRAINT fk_tx_payment FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id) ON DELETE RESTRICT,
   CONSTRAINT fk_tx_vendor FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE SET NULL,
   CONSTRAINT fk_tx_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+  INDEX idx_tx_serial_number (serial_number),
   INDEX idx_tx_occurred_at (occurred_at),
   INDEX idx_tx_type (`type`),
   INDEX idx_tx_status (status),

@@ -98,3 +98,5 @@ ALTER TABLE shifts DROP COLUMN status;
 
 注意：回滚会丢失所有状态数据，请谨慎操作。
 
+
+

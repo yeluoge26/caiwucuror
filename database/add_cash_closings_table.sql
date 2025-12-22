@@ -24,3 +24,5 @@ CREATE TABLE IF NOT EXISTS cash_closings (
   INDEX idx_cash_closing_date (date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='现金日结表';
 
+
+
