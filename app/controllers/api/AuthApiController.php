@@ -8,24 +8,44 @@ class AuthApiController {
     $data = json_decode(file_get_contents('php://input'), true) ?? [];
     $username = $data['username'] ?? '';
     $password = $data['password'] ?? '';
+    
+    if (empty($username) || empty($password)) {
+      Response::error('Username and password are required', 400);
+    }
+    
     if (Auth::login($username, $password)) {
       session_regenerate_id();
-      Response::json([
+      $user = Auth::user();
+      Response::success([
         'token' => session_id(),
         'user' => [
-          'id' => Auth::user()['id'],
-          'display_name' => Auth::user()['display_name'],
-          'role_key' => Auth::user()['role_key'],
+          'id' => $user['id'],
+          'username' => $user['username'],
+          'display_name' => $user['display_name'],
+          'role_key' => $user['role_key'],
+          'role_name' => $user['role_name_zh'] ?? $user['role_name_vi'] ?? '',
         ],
-      ]);
+      ], 'Login successful');
     } else {
-      Response::json(['error' => 'invalid_credentials'], 401);
+      Response::error('Invalid username or password', 401);
     }
+  }
+
+  public function logout() {
+    ApiGuard::requireLogin();
+    session_destroy();
+    Response::success(null, 'Logout successful');
   }
 
   public function me() {
     ApiGuard::requireLogin();
-    $u = Auth::user();
-    Response::json(['user' => $u]);
+    $user = Auth::user();
+    Response::success([
+      'id' => $user['id'],
+      'username' => $user['username'],
+      'display_name' => $user['display_name'],
+      'role_key' => $user['role_key'],
+      'role_name' => $user['role_name_zh'] ?? $user['role_name_vi'] ?? '',
+    ]);
   }
 }
