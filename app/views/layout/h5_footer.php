@@ -2,24 +2,20 @@
 <?php if (Auth::check() && Auth::user()['role_key'] === 'manager'): ?>
 <nav class="h5-bottom-nav">
   <a href="/index.php?r=manager/dashboard" class="h5-nav-item <?= ($_GET['r'] ?? '') === 'manager/dashboard' ? 'active' : '' ?>">
-    <span class="icon">🏠</span>
-    <span><?= __('nav.home') ?></span>
+    <span class="h5-nav-icon">🏠</span>
+    <span class="h5-nav-label"><?= __('nav.home') ?></span>
   </a>
   <a href="/index.php?r=inspections/create" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'inspections') === 0 ? 'active' : '' ?>">
-    <span class="icon">🔍</span>
-    <span><?= __('nav.inspections') ?></span>
+    <span class="h5-nav-icon">🔍</span>
+    <span class="h5-nav-label"><?= __('nav.inspections') ?></span>
   </a>
   <a href="/index.php?r=cash_closings/create" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'cash_closings') === 0 ? 'active' : '' ?>">
-    <span class="icon">💸</span>
-    <span><?= __('nav.cash_closing', '日结现金') ?></span>
-  </a>
-  <a href="/index.php?r=employees/today" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'employees') === 0 ? 'active' : '' ?>">
-    <span class="icon">👥</span>
-    <span><?= __('nav.employees', '员工') ?></span>
+    <span class="h5-nav-icon">💸</span>
+    <span class="h5-nav-label"><?= __('nav.cash_closing', '日结现金') ?></span>
   </a>
   <a href="/index.php?r=auth/profile" class="h5-nav-item <?= strpos($_GET['r'] ?? '', 'auth/profile') === 0 ? 'active' : '' ?>">
-    <span class="icon">👤</span>
-    <span><?= __('nav.profile') ?></span>
+    <span class="h5-nav-icon">👤</span>
+    <span class="h5-nav-label"><?= __('nav.profile') ?></span>
   </a>
 </nav>
 <?php endif; ?>

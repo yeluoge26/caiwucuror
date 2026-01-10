@@ -133,7 +133,6 @@ if (isset($_GET['import'])):
   <div class="table-scroll">
     <table>
       <tr>
-        <th><?= __('tx.serial_number') ?></th>
         <th>ID</th>
         <th><?= __('tx.type') ?></th>
         <th><?= __('tx.amount') ?></th>
@@ -147,7 +146,7 @@ if (isset($_GET['import'])):
       </tr>
       <?php if (empty($items)): ?>
       <tr>
-        <td colspan="11" style="text-align: center; color: #999; padding: 40px;">
+        <td colspan="10" style="text-align: center; color: #999; padding: 40px;">
           <?= __('list.no_data') ?>
         </td>
       </tr>
@@ -157,7 +156,6 @@ if (isset($_GET['import'])):
       foreach ($items as $row):
       ?>
       <tr>
-        <td style="font-family: monospace; font-weight: bold;"><?= htmlspecialchars($row['serial_number'] ?? '') ?></td>
         <td><?= $row['id'] ?></td>
         <td>
           <span class="badge <?= $row['type'] === 'income' ? 'badge-income' : 'badge-expense' ?>">

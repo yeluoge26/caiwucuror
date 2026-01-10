@@ -4,33 +4,58 @@ include __DIR__ . '/../layout/header.php';
 $lang = I18n::current();
 ?>
 
-<h2 style="margin-bottom: 20px;"><?= __('nav.dashboard') ?></h2>
+<div class="page-header">
+  <h1><?= __('nav.dashboard') ?></h1>
+</div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
   <!-- 今日统计 -->
-  <div class="card">
-    <h3 style="margin-bottom: 16px;">📅 <?= __('dashboard.today') ?></h3>
-    <div class="kpi income">+ <?= number_format($today['income'] ?? 0, 0, ',', '.') ?> ₫</div>
-    <div class="kpi expense">- <?= number_format($today['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
-    <div class="kpi net">
-      = <?= number_format(($today['income'] ?? 0) - ($today['expense'] ?? 0), 0, ',', '.') ?> ₫
+  <div class="kpi-card">
+    <div class="kpi-label">📅 <?= __('dashboard.today') ?></div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div>
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;"><?= __('tx.income') ?></div>
+        <div class="kpi-value income">+ <?= number_format($today['income'] ?? 0, 0, ',', '.') ?> ₫</div>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;"><?= __('tx.expense') ?></div>
+        <div class="kpi-value expense">- <?= number_format($today['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
+      </div>
+      <div style="padding-top: 12px; border-top: 1px solid rgba(139, 69, 19, 0.1);">
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;"><?= __('dashboard.net') ?></div>
+        <div class="kpi-value net">
+          <?= number_format(($today['income'] ?? 0) - ($today['expense'] ?? 0), 0, ',', '.') ?> ₫
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- 本月统计 -->
-  <div class="card">
-    <h3 style="margin-bottom: 16px;">📊 <?= __('dashboard.month') ?></h3>
-    <div class="kpi income">+ <?= number_format($month['income'] ?? 0, 0, ',', '.') ?> ₫</div>
-    <div class="kpi expense">- <?= number_format($month['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
-    <div class="kpi net">
-      = <?= number_format(($month['income'] ?? 0) - ($month['expense'] ?? 0), 0, ',', '.') ?> ₫
+  <div class="kpi-card">
+    <div class="kpi-label">📊 <?= __('dashboard.month') ?></div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div>
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;"><?= __('tx.income') ?></div>
+        <div class="kpi-value income">+ <?= number_format($month['income'] ?? 0, 0, ',', '.') ?> ₫</div>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;"><?= __('tx.expense') ?></div>
+        <div class="kpi-value expense">- <?= number_format($month['expense'] ?? 0, 0, ',', '.') ?> ₫</div>
+      </div>
+      <div style="padding-top: 12px; border-top: 1px solid rgba(139, 69, 19, 0.1);">
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;"><?= __('dashboard.net') ?></div>
+        <div class="kpi-value net">
+          <?= number_format(($month['income'] ?? 0) - ($month['expense'] ?? 0), 0, ',', '.') ?> ₫
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- 7天趋势 -->
 <div class="card">
-  <h3 style="margin-bottom: 16px;">📈 <?= __('dashboard.trend') ?> (7 <?= __('today') ?>)</h3>
+  <div class="card-title">📈 <?= __('dashboard.trend') ?> (7 <?= __('today') ?>)</div>
+  <div class="table-responsive">
   <table>
     <tr>
       <th><?= __('field.time') ?></th>
@@ -55,11 +80,13 @@ $lang = I18n::current();
     <?php endforeach; ?>
     <?php endif; ?>
   </table>
+  </div>
 </div>
 
 <!-- 最近流水 -->
 <div class="card">
-  <h3 style="margin-bottom: 16px;">🧾 <?= __('dashboard.latest') ?></h3>
+  <div class="card-title">🧾 <?= __('dashboard.latest') ?></div>
+  <div class="table-responsive">
   <table>
     <tr>
       <th>ID</th>
@@ -96,8 +123,9 @@ $lang = I18n::current();
     <?php endforeach; ?>
     <?php endif; ?>
   </table>
-  <div style="margin-top: 12px;">
-    <a href="/index.php?r=transactions/list" class="btn"><?= __('nav.list') ?></a>
+  </div>
+  <div style="margin-top: 16px;">
+    <a href="/index.php?r=transactions/list" class="btn btn-primary"><?= __('nav.list') ?></a>
   </div>
 </div>
 

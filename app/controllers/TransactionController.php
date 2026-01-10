@@ -184,7 +184,6 @@ class TransactionController {
     
     // CSV 表头（与导入格式一致）
     $headers = [
-      $lang === 'zh' ? '流水号' : 'Số phiếu',
       $lang === 'zh' ? '类型' : 'Loại',
       $lang === 'zh' ? '金额' : 'Số tiền',
       $lang === 'zh' ? '货币' : 'Tiền tệ',
@@ -200,7 +199,6 @@ class TransactionController {
     // 输出数据
     foreach ($items as $row) {
       fputcsv($out, [
-        $row['serial_number'] ?? '',
         $row['type'] === 'income' ? ($lang === 'zh' ? '收入' : 'Thu nhập') : ($lang === 'zh' ? '支出' : 'Chi tiêu'),
         $row['amount'],
         $row['currency'],

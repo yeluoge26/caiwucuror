@@ -67,6 +67,13 @@ class AdvancedReportController {
     // 月度对比（最近3个月）
     $monthlyCompare = Transaction::getMonthlyCompare(3) ?: [];
     
+    // 坪效分析（默认店铺面积100平方米，可在设置中配置）
+    $storeArea = 100; // 店铺面积（平方米），后续可从设置中读取
+    $salesPerSquareMeter = Transaction::getSalesPerSquareMeter([
+      'from' => $from,
+      'to' => $to
+    ], $storeArea);
+    
     include __DIR__ . '/../views/reports/advanced.php';
   }
   

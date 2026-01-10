@@ -3,7 +3,9 @@ $title = __('tx.create');
 include __DIR__ . '/../layout/header.php';
 ?>
 
-<h2 style="margin-bottom: 20px;"><?= __('tx.create') ?></h2>
+<div class="page-header">
+  <h1><?= __('tx.create') ?></h1>
+</div>
 
 <div class="card">
   <?php if (isset($error)): ?>
@@ -14,9 +16,9 @@ include __DIR__ . '/../layout/header.php';
     <input type="hidden" name="_csrf" value="<?= Csrf::token() ?>">
     
     <div class="form-group">
-      <label><?= __('tx.type') ?></label>
+      <label class="form-label"><?= __('tx.type') ?></label>
       <?php $selectedType = $_POST['type'] ?? 'income'; ?>
-      <select name="type" id="type-select" required>
+      <select name="type" id="type-select" class="form-select" required>
         <option value="income" <?= $selectedType === 'income' ? 'selected' : '' ?>><?= __('tx.income') ?></option>
         <option value="expense" <?= $selectedType === 'expense' ? 'selected' : '' ?>><?= __('tx.expense') ?></option>
       </select>
@@ -24,12 +26,12 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <label><?= __('field.amount') ?> (₫)</label>
-      <input type="number" name="amount" step="0.01" min="0" required>
+      <input type="number" name="amount" class="form-input" step="0.01" min="0" required>
     </div>
     
     <div class="form-group">
       <label><?= __('field.currency') ?></label>
-      <select name="currency">
+      <select name="currency" class="form-select">
         <option value="VND">VND</option>
         <option value="USD">USD</option>
         <option value="CNY">CNY</option>
@@ -38,7 +40,7 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <label><?= __('field.category') ?></label>
-      <select name="category_id" id="category-select" required>
+      <select name="category_id" id="category-select" class="form-select" required>
         <option value="">-- <?= __('field.category') ?> --</option>
         <?php
         $lang = I18n::current();
@@ -56,7 +58,7 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <label><?= __('field.payment') ?></label>
-      <select name="payment_method_id" required>
+      <select name="payment_method_id" class="form-select" required>
         <option value="">-- <?= __('field.payment') ?> --</option>
         <?php
         foreach ($paymentMethods as $pm):
@@ -71,7 +73,7 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group" id="vendor-group" style="display: none;">
       <label><?= __('field.vendor') ?></label>
-      <select name="vendor_id">
+      <select name="vendor_id" class="form-select">
         <option value="">-- <?= __('field.vendor') ?> --</option>
         <?php foreach ($vendors as $vendor): ?>
         <option value="<?= $vendor['id'] ?>" <?= ($_POST['vendor_id'] ?? '') == $vendor['id'] ? 'selected' : '' ?>>
@@ -83,18 +85,18 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <label><?= __('field.time') ?></label>
-      <input type="datetime-local" name="occurred_at" 
+      <input type="datetime-local" name="occurred_at" class="form-input"
              value="<?= $_POST['occurred_at'] ?? date('Y-m-d\TH:i') ?>" required>
     </div>
 
     <div class="form-group" id="payer-group" style="display: none;">
       <label><?= __('field.payer') ?></label>
-      <input type="text" name="payer" id="payer-input" value="<?= htmlspecialchars($_POST['payer'] ?? Auth::user()['display_name'] ?? '') ?>">
+      <input type="text" name="payer" id="payer-input" class="form-input" value="<?= htmlspecialchars($_POST['payer'] ?? Auth::user()['display_name'] ?? '') ?>">
     </div>
     
     <div class="form-group">
       <label><?= __('field.note') ?></label>
-      <textarea name="note"><?= htmlspecialchars($_POST['note'] ?? '') ?></textarea>
+      <textarea name="note" class="form-textarea"><?= htmlspecialchars($_POST['note'] ?? '') ?></textarea>
     </div>
 
     <div class="form-group">
@@ -107,7 +109,7 @@ include __DIR__ . '/../layout/header.php';
     
     <div class="form-group">
       <button type="submit" class="btn btn-success"><?= __('btn.save') ?></button>
-      <a href="/index.php?r=transactions/list" class="btn" style="background: #95a5a6;"><?= __('btn.cancel') ?></a>
+      <a href="/index.php?r=transactions/list" class="btn btn-secondary"><?= __('btn.cancel') ?></a>
     </div>
   </form>
 </div>

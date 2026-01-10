@@ -137,6 +137,41 @@ $lang = I18n::current();
 </div>
 <?php endif; ?>
 
+<!-- 坪效分析 -->
+<div class="card">
+  <h3 style="margin-bottom: 16px;"><?= __('report.sales_per_square_meter', '坪效分析') ?></h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+    <div style="text-align: center; padding: 20px; background: #e8f5e9; border-radius: 8px;">
+      <div style="font-size: 14px; color: #666; margin-bottom: 8px;"><?= __('report.total_sales', '总销售额') ?></div>
+      <div style="font-size: 24px; font-weight: bold; color: #27ae60;">
+        <?= number_format($salesPerSquareMeter['total_sales'] ?? 0, 0, ',', '.') ?> ₫
+      </div>
+    </div>
+    <div style="text-align: center; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+      <div style="font-size: 14px; color: #666; margin-bottom: 8px;"><?= __('report.store_area', '店铺面积') ?></div>
+      <div style="font-size: 24px; font-weight: bold; color: #3498db;">
+        <?= number_format($salesPerSquareMeter['store_area'] ?? 0, 2) ?> m²
+      </div>
+    </div>
+    <div style="text-align: center; padding: 20px; background: #fff3cd; border-radius: 8px;">
+      <div style="font-size: 14px; color: #666; margin-bottom: 8px;"><?= __('report.sales_per_square_meter', '坪效') ?></div>
+      <div style="font-size: 24px; font-weight: bold; color: #f39c12;">
+        <?= number_format($salesPerSquareMeter['sales_per_square_meter'] ?? 0, 0, ',', '.') ?> ₫/m²
+      </div>
+    </div>
+    <div style="text-align: center; padding: 20px; background: #f3e5f5; border-radius: 8px;">
+      <div style="font-size: 14px; color: #666; margin-bottom: 8px;"><?= __('report.transaction_count', '交易笔数') ?></div>
+      <div style="font-size: 24px; font-weight: bold; color: #9b59b6;">
+        <?= number_format($salesPerSquareMeter['transaction_count'] ?? 0, 0, ',', '.') ?>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top: 16px; padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 13px; color: #666;">
+    <strong><?= __('report.note', '说明') ?>:</strong> 
+    <?= __('report.sales_per_square_meter_note', '坪效 = 销售额 ÷ 店铺面积，反映单位面积的销售能力。当前店铺面积：{area} 平方米', ['area' => $salesPerSquareMeter['store_area'] ?? 100]) ?>
+  </div>
+</div>
+
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 

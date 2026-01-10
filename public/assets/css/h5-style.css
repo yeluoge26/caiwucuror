@@ -1,0 +1,809 @@
+/* ========================================
+   咖啡店ERP系统 - H5移动端样式
+   版本: 1.0
+   符合iOS Human Interface Guidelines和Material Design规范
+   ======================================== */
+
+/* 基础重置 */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  /* 防止iOS自动缩放 */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #F8F9FA;
+  color: #1F2937;
+  line-height: 1.6;
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   H5头部
+   ======================================== */
+.h5-header {
+  background: #FFFFFF;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* iOS安全区域适配 */
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+
+.h5-back-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -12px;
+  color: #8B4513;
+  font-size: 24px;
+  text-decoration: none;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.h5-back-btn:active {
+  background: rgba(139, 69, 19, 0.1);
+}
+
+.h5-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1F2937;
+  text-align: center;
+  margin-right: 44px; /* 平衡返回按钮的空间 */
+}
+
+.h5-header-action {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8B4513;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   内容区
+   ======================================== */
+.h5-content {
+  padding: 16px;
+  min-height: calc(100vh - 120px);
+}
+
+/* ========================================
+   卡片组件
+   ======================================== */
+.h5-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.h5-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.h5-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.h5-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.h5-card-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: #8B4513;
+  border-radius: 2px;
+}
+
+.h5-card-action {
+  color: #8B4513;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* 可点击卡片 */
+.h5-card-clickable {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.h5-card-clickable:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   状态卡片
+   ======================================== */
+.status-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.status-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.status-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.status-card-body {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.status-card-footer {
+  font-size: 14px;
+  color: #6B7280;
+}
+
+/* 状态颜色 */
+.status-red { color: #E74C3C; }
+.status-yellow { color: #F39C12; }
+.status-orange { color: #FF9800; }
+.status-green { color: #27AE60; }
+.status-blue { color: #3498DB; }
+
+/* ========================================
+   顶部信息区（渐变背景）
+   ======================================== */
+.top-info {
+  background: linear-gradient(135deg, #8B4513 0%, #5D3A1A 100%);
+  color: #FFFFFF;
+  padding: 24px 20px;
+  margin: -16px -16px 20px -16px;
+  border-radius: 0 0 24px 24px;
+}
+
+.top-info .greeting {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.top-info .date {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* ========================================
+   统计卡片网格
+   ======================================== */
+.h5-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.h5-stat-item {
+  text-align: center;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.h5-stat-label {
+  font-size: 12px;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.h5-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.h5-stat-value.income { color: #27AE60; }
+.h5-stat-value.expense { color: #E74C3C; }
+.h5-stat-value.net { color: #8B4513; }
+
+/* ========================================
+   按钮组件
+   ======================================== */
+.h5-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* 最小触控区域 44x44px */
+  min-height: 44px;
+}
+
+.h5-btn-primary {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+}
+
+.h5-btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.2);
+}
+
+.h5-btn-success {
+  background: linear-gradient(135deg, #27AE60 0%, #229954 100%);
+  color: #FFFFFF;
+}
+
+.h5-btn-success:active {
+  transform: scale(0.98);
+}
+
+.h5-btn-danger {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+  color: #FFFFFF;
+}
+
+.h5-btn-danger:active {
+  transform: scale(0.98);
+}
+
+.h5-btn-secondary {
+  background: #FFFFFF;
+  color: #8B4513;
+  border: 2px solid #8B4513;
+}
+
+.h5-btn-secondary:active {
+  background: #FFF8F0;
+}
+
+.h5-btn:disabled {
+  background: #D1D5DB;
+  color: #9CA3AF;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
+   表单组件
+   ======================================== */
+.h5-form-group {
+  margin-bottom: 20px;
+}
+
+.h5-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 15px;
+  color: #374151;
+}
+
+.h5-form-label.required::after {
+  content: ' *';
+  color: #E74C3C;
+}
+
+.h5-form-input,
+.h5-form-select,
+.h5-form-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  font-size: 16px; /* 防止iOS自动缩放 */
+  color: #1F2937;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.h5-form-input:focus,
+.h5-form-select:focus,
+.h5-form-textarea:focus {
+  outline: none;
+  border-color: #8B4513;
+  box-shadow: 0 0 0 4px rgba(139, 69, 19, 0.1);
+}
+
+.h5-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.h5-form-hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.h5-form-error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #E74C3C;
+}
+
+/* ========================================
+   底部导航
+   ======================================== */
+.h5-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  /* iOS安全区域适配 */
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid #E5E7EB;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.h5-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #6B7280;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 16px;
+  min-width: 64px;
+  transition: color 0.2s ease;
+  /* 最小触控区域 */
+  min-height: 44px;
+}
+
+.h5-nav-item.active {
+  color: #8B4513;
+}
+
+.h5-nav-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  transition: transform 0.2s ease;
+}
+
+.h5-nav-item.active .h5-nav-icon {
+  transform: scale(1.1);
+}
+
+.h5-nav-label {
+  white-space: nowrap;
+}
+
+/* ========================================
+   照片上传区
+   ======================================== */
+.photo-upload-area {
+  border: 3px dashed #D1D5DB;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  background: #F9FAFB;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.photo-upload-area.has-photos {
+  border-style: solid;
+  border-color: #8B4513;
+  background: #FFF8F0;
+}
+
+.photo-upload-area:active {
+  border-color: #8B4513;
+  background: #FFF8F0;
+}
+
+.photo-upload-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.photo-upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.photo-upload-hint {
+  font-size: 14px;
+  color: #6B7280;
+}
+
+.photo-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #F3F4F6;
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-item .remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(231, 76, 60, 0.9);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.photo-item .remove:active {
+  transform: scale(0.9);
+}
+
+/* ========================================
+   金额显示
+   ======================================== */
+.amount-display {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.amount-row:last-child {
+  border-bottom: none;
+  font-weight: bold;
+  font-size: 20px;
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
+.amount-label {
+  color: #6B7280;
+  font-size: 15px;
+}
+
+.amount-value {
+  font-weight: 600;
+  color: #1F2937;
+  font-size: 16px;
+}
+
+.amount-row:last-child .amount-value {
+  font-size: 20px;
+}
+
+.amount-positive { color: #27AE60; }
+.amount-negative { color: #E74C3C; }
+
+/* ========================================
+   固定底部按钮
+   ======================================== */
+.fixed-bottom-btn {
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: 16px;
+  right: 16px;
+  z-index: 99;
+}
+
+/* ========================================
+   提示信息
+   ======================================== */
+.h5-hint {
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 8px;
+}
+
+.h5-hint.required {
+  color: #E74C3C;
+  font-weight: 500;
+}
+
+/* ========================================
+   徽章
+   ======================================== */
+.h5-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.h5-badge-success {
+  background: #D4EDDA;
+  color: #155724;
+}
+
+.h5-badge-warning {
+  background: #FFF3CD;
+  color: #856404;
+}
+
+.h5-badge-danger {
+  background: #F8D7DA;
+  color: #721C24;
+}
+
+.h5-badge-info {
+  background: #D1ECF1;
+  color: #0C5460;
+}
+
+/* ========================================
+   问题类型选择
+   ======================================== */
+.issue-type-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.issue-type-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #FFFFFF;
+}
+
+.issue-type-item:active {
+  border-color: #8B4513;
+  background: #FFF8F0;
+}
+
+.issue-type-item input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  accent-color: #8B4513;
+}
+
+.issue-type-item.selected {
+  border-color: #8B4513;
+  background: #FFF8F0;
+}
+
+/* ========================================
+   响应式设计
+   ======================================== */
+@media (min-width: 768px) {
+  .h5-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .h5-bottom-nav {
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* 横屏适配 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .h5-header {
+    padding: 8px 16px;
+  }
+  
+  .h5-content {
+    padding: 12px 16px;
+  }
+}
+
+/* 大屏手机适配 */
+@media (min-width: 414px) {
+  .h5-content {
+    padding: 20px;
+  }
+  
+  .h5-card {
+    padding: 24px;
+  }
+}
+
+/* ========================================
+   现金日结特殊样式
+   ======================================== */
+.cash-closing-summary {
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.cash-closing-summary .summary-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cash-closing-summary .summary-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: #3498DB;
+  border-radius: 2px;
+}
+
+/* ========================================
+   加载状态
+   ======================================== */
+.h5-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #6B7280;
+}
+
+.h5-loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #E5E7EB;
+  border-top-color: #8B4513;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   空状态
+   ======================================== */
+.h5-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9CA3AF;
+}
+
+.h5-empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.h5-empty-text {
+  font-size: 14px;
+}
+
+/* ========================================
+   分割线
+   ======================================== */
+.h5-divider {
+  height: 1px;
+  background: #E5E7EB;
+  margin: 16px 0;
+}
+
+/* ========================================
+   标签组
+   ======================================== */
+.h5-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.h5-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #F3F4F6;
+  color: #6B7280;
+}
+
+.h5-tag.active {
+  background: #8B4513;
+  color: #FFFFFF;
+}

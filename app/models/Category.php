@@ -60,26 +60,8 @@ class Category {
   }
 
   public static function delete($id) {
-    // 检查是否被交易使用
-    $checkStmt = DB::conn()->prepare("SELECT COUNT(*) as count FROM transactions WHERE category_id = ? AND status != 'void'");
-    $checkStmt->execute([$id]);
-    $result = $checkStmt->fetch();
-    
-    if ($result && $result['count'] > 0) {
-      return ['error' => true, 'message' => '该分类正在被交易使用，无法删除'];
-    }
-    
-    // 检查是否有子分类
-    $childStmt = DB::conn()->prepare("SELECT COUNT(*) as count FROM categories WHERE parent_id = ?");
-    $childStmt->execute([$id]);
-    $childResult = $childStmt->fetch();
-    
-    if ($childResult && $childResult['count'] > 0) {
-      return ['error' => true, 'message' => '该分类下有子分类，无法删除'];
-    }
-    
-    // 真正删除
-    $stmt = DB::conn()->prepare("DELETE FROM categories WHERE id = ?");
-    return $stmt->execute([$id]) ? ['error' => false] : ['error' => true, 'message' => '删除失败'];
+    // 软删除，避免外键引用报错
+    $stmt = DB::conn()->prepare("UPDATE categories SET is_active = 0 WHERE id = ?");
+    return $stmt->execute([$id]);
   }
 }

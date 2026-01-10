@@ -39,11 +39,11 @@ if (!isset($theoretical)) {
 </div>
 
 <!-- 今日核心待办（第一优先级） -->
-<div class="h5-card" style="margin-bottom: 16px;">
+<div class="h5-card">
   <div class="h5-card-title">⭐ <?= __('manager.core_tasks', '今日核心待办') ?></div>
   
   <!-- 巡店卡 -->
-  <a href="/index.php?r=inspections/create" class="status-card" style="text-decoration: none; color: inherit; margin-bottom: 12px;">
+  <a href="/index.php?r=inspections/create" class="status-card h5-card-clickable">
     <div class="status-card-header">
       <span>🔍</span>
       <span class="status-card-title"><?= __('manager.today_inspections', '今日巡店') ?></span>
@@ -73,12 +73,12 @@ if (!isset($theoretical)) {
   </a>
   
   <!-- 记一笔卡 -->
-  <a href="/index.php?r=transactions/create" class="status-card" style="text-decoration: none; color: inherit;">
+  <a href="/index.php?r=transactions/create" class="status-card h5-card-clickable">
     <div class="status-card-header">
       <span>✏️</span>
       <span class="status-card-title"><?= __('nav.add', '记一笔') ?></span>
     </div>
-    <div class="status-card-body" style="color: #3498db;">
+    <div class="status-card-body status-blue">
       📝 <?= __('nav.add', '记一笔') ?>
     </div>
     <div class="status-card-footer">
@@ -88,16 +88,16 @@ if (!isset($theoretical)) {
 </div>
 
 <!-- 今日执行 & 异常（第二优先级） -->
-<div class="h5-card" style="margin-bottom: 16px;">
+<div class="h5-card">
   <div class="h5-card-title">📋 <?= __('manager.today_tasks', '今日执行') ?></div>
   
   <!-- 今日执行卡 -->
-  <a href="/index.php?r=tasks/list" class="status-card" style="text-decoration: none; color: inherit; margin-bottom: 12px;">
+  <a href="/index.php?r=tasks/list" class="status-card h5-card-clickable">
     <div class="status-card-header">
       <span>✅</span>
       <span class="status-card-title"><?= __('manager.today_tasks', '今日执行') ?></span>
     </div>
-    <div class="status-card-body" style="color: #3498db;">
+    <div class="status-card-body status-blue">
       <?= count($todayTasks) ?> <?= __('manager.tasks_pending', '项') ?>
     </div>
     <div class="status-card-footer">
@@ -116,12 +116,12 @@ if (!isset($theoretical)) {
   </a>
   
   <!-- 今日问题卡 -->
-  <a href="/index.php?r=tasks/create&type=issue" class="status-card" style="text-decoration: none; color: inherit;">
+  <a href="/index.php?r=tasks/create&type=issue" class="status-card h5-card-clickable">
     <div class="status-card-header">
-      <span>⚠</span>
+      <span>⚠️</span>
       <span class="status-card-title"><?= __('manager.today_issues', '今日问题') ?></span>
     </div>
-    <div class="status-card-body" style="color: #e74c3c;">
+    <div class="status-card-body status-red">
       <?= isset($todayIssuesCount) ? $todayIssuesCount : 0 ?> <?= __('manager.issues_recorded', '条') ?>
     </div>
     <div class="status-card-footer">
@@ -137,13 +137,13 @@ if (!isset($theoretical)) {
     <span>👥</span>
     <span class="status-card-title"><?= __('manager.week_schedule', '本周排班') ?></span>
   </div>
-  <div class="status-card-body" style="color: #27ae60; font-size: 18px;">
+  <div class="status-card-body status-green" style="font-size: 20px;">
     🟢 <?= __('manager.schedule_published', '已发布') ?>
   </div>
   <div class="status-card-footer">
     <?= __('manager.period', '周期') ?>: <?= date('m/d', strtotime($weekStart)) ?> - <?= date('m/d', strtotime($weekEnd)) ?>
   </div>
-  <a href="/index.php?r=shifts/schedule" class="h5-btn" style="margin-top: 12px;"><?= __('manager.view_schedule', '查看排班') ?></a>
+  <a href="/index.php?r=shifts/schedule" class="h5-btn h5-btn-primary" style="margin-top: 16px;"><?= __('manager.view_schedule', '查看排班') ?></a>
 </div>
 <?php endif; ?>
 

@@ -17,18 +17,18 @@ $inspectionCount = count($todayInspections);
 ?>
 
 <!-- 巡店状态提示 -->
-<div class="h5-card" style="background: #f0f7ff; border: 1px solid #3498db;">
+<div class="h5-card" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border: 2px solid #3498DB;">
   <div style="text-align: center;">
-    <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">📅 <?= __('inspection.today_inspection', '今日巡店') ?></div>
-    <div style="font-size: 24px; font-weight: bold; color: #3498db;">
+    <div style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500;">📅 <?= __('inspection.today_inspection', '今日巡店') ?></div>
+    <div style="font-size: 28px; font-weight: 700; color: #3498DB;">
       <?= __('inspection.completed', '已完成') ?>: <?= $inspectionCount ?> / 24 <?= __('inspection.times', '次') ?>
     </div>
   </div>
 </div>
 
 <?php if (!empty($error)): ?>
-<div class="h5-card" style="background: #fee; border: 1px solid #fcc;">
-  <div style="color: #c33;"><?= htmlspecialchars($error) ?></div>
+<div class="h5-card" style="background: #F8D7DA; border: 2px solid #F5C6CB;">
+  <div style="color: #721C24; font-weight: 500;"><?= htmlspecialchars($error) ?></div>
 </div>
 <?php endif; ?>
 
@@ -40,8 +40,8 @@ $inspectionCount = count($todayInspections);
     <div class="h5-card-title">📋 <?= __('inspection.basic_info', '基本信息') ?></div>
     
     <div class="h5-form-group">
-      <label for="store"><?= __('material.store', '店面') ?> *</label>
-      <select name="store" id="store" required>
+      <label for="store" class="h5-form-label required"><?= __('material.store', '店面') ?></label>
+      <select name="store" id="store" class="h5-form-select" required>
         <option value="coffee" selected><?= __('asset.category_coffee', '咖啡店') ?></option>
         <option value="office"><?= __('asset.category_office', '办公室') ?></option>
         <option value="whiskey"><?= __('asset.category_whiskey', '威士忌') ?></option>
@@ -49,8 +49,8 @@ $inspectionCount = count($todayInspections);
     </div>
 
     <div class="h5-form-group">
-      <label for="floor"><?= __('inspection.floor', '楼层') ?> *</label>
-      <select name="floor" id="floor" required>
+      <label for="floor" class="h5-form-label required"><?= __('inspection.floor', '楼层') ?></label>
+      <select name="floor" id="floor" class="h5-form-select" required>
         <option value="1F" selected>1F</option>
         <option value="2F">2F</option>
         <option value="3F">3F</option>
@@ -59,16 +59,16 @@ $inspectionCount = count($todayInspections);
     </div>
 
     <div class="h5-form-group">
-      <label for="visit_no"><?= __('inspection.visit_no', '巡店次数') ?> *</label>
-      <select name="visit_no" id="visit_no" required>
+      <label for="visit_no" class="h5-form-label required"><?= __('inspection.visit_no', '巡店次数') ?></label>
+      <select name="visit_no" id="visit_no" class="h5-form-select" required>
         <option value="1" <?= ($inspectionCount + 1) == 1 ? 'selected' : '' ?>><?= __('inspection.visit_first', '首次') ?></option>
         <option value="2" <?= ($inspectionCount + 1) == 2 ? 'selected' : '' ?>><?= __('inspection.visit_second', '二次') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label for="room"><?= __('inspection.room', '房间/区域') ?> *</label>
-      <select name="room" id="room" required>
+      <label for="room" class="h5-form-label required"><?= __('inspection.room', '房间/区域') ?></label>
+      <select name="room" id="room" class="h5-form-select" required>
         <option value="store" selected><?= __('inspection.room_store', '店面') ?></option>
         <option value="restroom"><?= __('inspection.room_restroom', '卫生间') ?></option>
         <option value="stair"><?= __('inspection.room_stair', '楼梯') ?></option>
@@ -76,16 +76,16 @@ $inspectionCount = count($todayInspections);
     </div>
 
     <div class="h5-form-group">
-      <label for="status"><?= __('inspection.status', '状态') ?> *</label>
-      <select name="status" id="status" required>
+      <label for="status" class="h5-form-label required"><?= __('inspection.status', '状态') ?></label>
+      <select name="status" id="status" class="h5-form-select" required>
         <option value="ok" selected><?= __('inspection.ok', 'OK') ?></option>
         <option value="issue"><?= __('inspection.issue', '问题') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label for="spot_date"><?= __('field.time', '发生时间') ?> *</label>
-      <input type="date" name="spot_date" id="spot_date" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
+      <label for="spot_date" class="h5-form-label required"><?= __('field.time', '发生时间') ?></label>
+      <input type="date" name="spot_date" id="spot_date" class="h5-form-input" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
       <small class="h5-hint"><?= __('inspection.no_past_date_hint', '不能选择过去的日期') ?></small>
     </div>
   </div>
@@ -94,20 +94,20 @@ $inspectionCount = count($todayInspections);
   <div class="h5-card">
     <div class="h5-card-title">📷 <?= __('inspection.photo', '巡店现场照片') ?></div>
     <div class="h5-form-group">
-      <label for="photos"><?= __('inspection.photo', '巡店现场照片') ?></label>
-      <input type="file" name="photos[]" id="photos" accept="image/*" multiple style="display: none;">
-      <button type="button" id="selectPhotosBtn" class="h5-btn" style="width: 100%; background: #3498db; color: white; margin-bottom: 10px;">
+      <label for="photos" class="h5-form-label required"><?= __('inspection.photo', '巡店现场照片') ?></label>
+      <input type="file" name="photos[]" id="photos" accept="image/*" capture="environment" multiple style="display: none;">
+      <button type="button" id="selectPhotosBtn" class="h5-btn h5-btn-primary" style="margin-bottom: 12px;">
         📷 <?= __('inspection.select_photos', '选择照片') ?>
       </button>
-      <small class="h5-hint"><?= __('asset.photo_hint', '支持 JPG/PNG/WEBP/GIF，单张不超过 5MB，可多选上传') ?></small>
+      <small class="h5-hint required"><?= __('asset.photo_hint', '支持 JPG/PNG/WEBP/GIF，单张不超过 5MB，可多选上传。至少上传1张照片。') ?></small>
       
       <!-- 已选择的照片预览 -->
-      <div id="photoPreview" style="margin-top: 15px; display: none;">
-        <div style="font-weight: 600; margin-bottom: 10px; color: #2c3e50;">
+      <div id="photoPreview" class="photo-preview" style="margin-top: 16px; display: none;">
+        <div style="font-weight: 600; margin-bottom: 12px; color: #1F2937; font-size: 15px;">
           <?= __('inspection.selected_photos', '已选择的照片') ?> (<span id="photoCount">0</span>)
         </div>
-        <div id="photoList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;"></div>
-        <button type="button" id="confirmUploadBtn" class="h5-btn" style="width: 100%; background: #27ae60; color: white; display: none;">
+        <div id="photoList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-bottom: 12px;"></div>
+        <button type="button" id="confirmUploadBtn" class="h5-btn h5-btn-success" style="display: none;">
           ✅ <?= __('inspection.confirm_upload', '确认上传') ?>
         </button>
       </div>
@@ -130,8 +130,8 @@ $inspectionCount = count($todayInspections);
   <div class="h5-card">
     <div class="h5-card-title">✏️ <?= __('inspection.note', '巡店说明') ?></div>
     <div class="h5-form-group">
-      <label for="note"><?= __('inspection.note', '巡店说明') ?></label>
-      <textarea name="note" id="note" placeholder="<?= __('inspection.note_hint', '如：吧台正常 / 后厨需注意卫生 / 高峰前检查') ?>"></textarea>
+      <label for="note" class="h5-form-label"><?= __('inspection.note', '巡店说明') ?></label>
+      <textarea name="note" id="note" class="h5-form-textarea" placeholder="<?= __('inspection.note_hint', '如：吧台正常 / 后厨需注意卫生 / 高峰前检查') ?>"></textarea>
     </div>
   </div>
 
@@ -200,34 +200,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     selectedFiles.forEach((file, index) => {
       const item = document.createElement('div');
-      item.style.cssText = 'position: relative; padding: 5px; background: #f5f5f5; border-radius: 6px;';
+      item.className = 'photo-item';
       
       const img = document.createElement('img');
-      img.style.cssText = 'width: 100%; height: 80px; object-fit: cover; border-radius: 4px;';
       img.src = URL.createObjectURL(file);
-      
-      const name = document.createElement('div');
-      name.style.cssText = 'font-size: 11px; color: #666; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
-      name.textContent = file.name;
-      
-      const size = document.createElement('div');
-      size.style.cssText = 'font-size: 10px; color: #999; margin-top: 2px;';
-      size.textContent = formatFileSize(file.size);
+      img.alt = file.name;
       
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
-      removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(231, 76, 60, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; cursor: pointer; line-height: 1;';
+      removeBtn.className = 'remove';
       removeBtn.textContent = '×';
       removeBtn.onclick = function() {
         selectedFiles.splice(index, 1);
         photosConfirmed = false;
-        // updateFileInput(); // 不需要更新文件输入框
         updatePhotoPreview();
       };
       
       item.appendChild(img);
-      item.appendChild(name);
-      item.appendChild(size);
       item.appendChild(removeBtn);
       photoList.appendChild(item);
     });

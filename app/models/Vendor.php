@@ -59,17 +59,8 @@ class Vendor {
   }
 
   public static function delete($id) {
-    // 检查是否被交易使用
-    $checkStmt = DB::conn()->prepare("SELECT COUNT(*) as count FROM transactions WHERE vendor_id = ? AND status != 'void'");
-    $checkStmt->execute([$id]);
-    $result = $checkStmt->fetch();
-    
-    if ($result && $result['count'] > 0) {
-      return ['error' => true, 'message' => '该供应商正在被交易使用，无法删除'];
-    }
-    
-    // 真正删除
-    $stmt = DB::conn()->prepare("DELETE FROM vendors WHERE id = ?");
-    return $stmt->execute([$id]) ? ['error' => false] : ['error' => true, 'message' => '删除失败'];
+    // 软删除，避免外键引用报错
+    $stmt = DB::conn()->prepare("UPDATE vendors SET is_active = 0 WHERE id = ?");
+    return $stmt->execute([$id]);
   }
 }

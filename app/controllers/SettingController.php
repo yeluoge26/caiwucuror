@@ -12,8 +12,7 @@ class SettingController {
     Auth::requireLogin();
     Auth::requireRole(['owner', 'manager', 'accountant']);
 
-    // 只显示激活的分类
-    $categories = Category::all(['is_active' => 1]);
+    $categories = Category::all();
     $error = null;
     $success = null;
 
@@ -42,37 +41,13 @@ class SettingController {
           ]);
           $success = __('setting.category_updated');
         } elseif ($action === 'delete') {
-          $result = Category::delete($_POST['id']);
-          if (is_array($result) && $result['error']) {
-            $error = $result['message'] ?? __('setting.delete_failed');
-          } else {
-            $success = __('setting.category_deleted');
-          }
-        }
-        
-        if ($error) {
-          // 有错误时，使用session保存错误信息
-          session_start();
-          $_SESSION['setting_error'] = $error;
-        } elseif ($success) {
-          session_start();
-          $_SESSION['setting_success'] = $success;
+          Category::delete($_POST['id']);
+          $success = __('setting.category_deleted');
         }
         
         header('Location: /index.php?r=settings/categories');
         exit;
       }
-    }
-
-    // 从session获取消息
-    session_start();
-    if (isset($_SESSION['setting_error'])) {
-      $error = $_SESSION['setting_error'];
-      unset($_SESSION['setting_error']);
-    }
-    if (isset($_SESSION['setting_success'])) {
-      $success = $_SESSION['setting_success'];
-      unset($_SESSION['setting_success']);
     }
 
     include __DIR__ . '/../views/settings/categories.php';
@@ -82,8 +57,7 @@ class SettingController {
     Auth::requireLogin();
     Auth::requireRole(['owner', 'manager', 'accountant']);
 
-    // 只显示激活的支付方式
-    $paymentMethods = PaymentMethod::all(['is_active' => 1]);
+    $paymentMethods = PaymentMethod::all();
     $error = null;
     $success = null;
 
@@ -108,37 +82,13 @@ class SettingController {
           ]);
           $success = __('setting.payment_method_updated');
         } elseif ($action === 'delete') {
-          $result = PaymentMethod::delete($_POST['id']);
-          if (is_array($result) && $result['error']) {
-            $error = $result['message'] ?? __('setting.delete_failed');
-          } else {
-            $success = __('setting.payment_method_deleted');
-          }
-        }
-        
-        if ($error) {
-          // 有错误时，使用session保存错误信息
-          session_start();
-          $_SESSION['setting_error'] = $error;
-        } elseif ($success) {
-          session_start();
-          $_SESSION['setting_success'] = $success;
+          PaymentMethod::delete($_POST['id']);
+          $success = __('setting.payment_method_deleted');
         }
         
         header('Location: /index.php?r=settings/paymentMethods');
         exit;
       }
-    }
-
-    // 从session获取消息
-    session_start();
-    if (isset($_SESSION['setting_error'])) {
-      $error = $_SESSION['setting_error'];
-      unset($_SESSION['setting_error']);
-    }
-    if (isset($_SESSION['setting_success'])) {
-      $success = $_SESSION['setting_success'];
-      unset($_SESSION['setting_success']);
     }
 
     include __DIR__ . '/../views/settings/payment_methods.php';
@@ -148,8 +98,7 @@ class SettingController {
     Auth::requireLogin();
     Auth::requireRole(['owner', 'manager', 'accountant']);
 
-    // 只显示激活的供应商
-    $vendors = Vendor::all(['is_active' => 1]);
+    $vendors = Vendor::all();
     $error = null;
     $success = null;
 
@@ -176,21 +125,8 @@ class SettingController {
           ]);
           $success = __('setting.vendor_updated');
         } elseif ($action === 'delete') {
-          $result = Vendor::delete($_POST['id']);
-          if (is_array($result) && $result['error']) {
-            $error = $result['message'] ?? __('setting.delete_failed');
-          } else {
-            $success = __('setting.vendor_deleted');
-          }
-        }
-        
-        if ($error) {
-          // 有错误时，使用session保存错误信息
-          session_start();
-          $_SESSION['setting_error'] = $error;
-        } elseif ($success) {
-          session_start();
-          $_SESSION['setting_success'] = $success;
+          Vendor::delete($_POST['id']);
+          $success = __('setting.vendor_deleted');
         }
         
         header('Location: /index.php?r=settings/vendors');
@@ -198,23 +134,12 @@ class SettingController {
       }
     }
 
-    // 从session获取消息
-    session_start();
-    if (isset($_SESSION['setting_error'])) {
-      $error = $_SESSION['setting_error'];
-      unset($_SESSION['setting_error']);
-    }
-    if (isset($_SESSION['setting_success'])) {
-      $success = $_SESSION['setting_success'];
-      unset($_SESSION['setting_success']);
-    }
-
     include __DIR__ . '/../views/settings/vendors.php';
   }
 
   public function users() {
     Auth::requireLogin();
-    Auth::requireRole(['owner']); // 只有老板可以管理用户
+    Auth::requireRole(['owner', 'manager', 'accountant']);
 
     $roles = DB::conn()->query("SELECT id, `key`, name_zh, name_vi FROM roles ORDER BY id ASC")->fetchAll();
     $users = User::all();

@@ -9,15 +9,15 @@ $isApproved = isset($existing) && $existing && $existing['status'] === 'approved
 ?>
 
 <?php if (isset($error)): ?>
-<div class="h5-card" style="background: #fee; border: 1px solid #fcc;">
-  <div style="color: #c33;"><?= htmlspecialchars($error) ?></div>
+<div class="h5-card" style="background: #F8D7DA; border: 2px solid #F5C6CB;">
+  <div style="color: #721C24; font-weight: 500;"><?= htmlspecialchars($error) ?></div>
 </div>
 <?php endif; ?>
 
 <?php if ($isSubmitted || $isApproved): ?>
-<div class="h5-card" style="background: #fff3cd; border: 1px solid #ffc107;">
+<div class="h5-card" style="background: linear-gradient(135deg, #FFF3CD 0%, #FFEEBA 100%); border: 2px solid #FFC107;">
   <div style="text-align: center; color: #856404;">
-    <div style="font-size: 18px; margin-bottom: 8px;">
+    <div style="font-size: 20px; margin-bottom: 8px; font-weight: 600;">
       <?= $isApproved ? '✅' : '⏳' ?>
       <?= $isApproved ? __('cash_closing.status_approved', '已审核通过') : __('cash_closing.status_submitted', '已提交，等待审核') ?>
     </div>
@@ -65,17 +65,19 @@ $isApproved = isset($existing) && $existing && $existing['status'] === 'approved
     <div class="h5-card-title">🧮 <?= __('cash_closing.cash_reconciliation', '现金对账') ?></div>
     
     <div class="h5-form-group">
-      <label><?= __('cash_closing.cash_counted', '实盘现金') ?>（<?= __('field.required', '必填') ?>）</label>
+      <label class="h5-form-label required"><?= __('cash_closing.cash_counted', '实盘现金') ?></label>
       <input type="number" 
              name="cash_counted" 
              id="cash-counted" 
+             class="h5-form-input"
              step="1000" 
              min="0" 
              value="<?= htmlspecialchars($data['cash_counted']) ?>" 
              required
              <?= ($isSubmitted || $isApproved) ? 'readonly' : '' ?>
-             placeholder="<?= __('cash_closing.enter_amount', '请输入现金金额') ?>">
-      <small><?= __('cash_closing.cash_counted_hint', '只能输入数字，不可负数') ?></small>
+             placeholder="<?= __('cash_closing.enter_amount', '请输入现金金额') ?>"
+             style="font-size: 20px; font-weight: 600; text-align: right;">
+      <small class="h5-hint"><?= __('cash_closing.cash_counted_hint', '只能输入数字，不可负数') ?></small>
     </div>
 
     <!-- 实时显示差额 -->
@@ -103,8 +105,10 @@ $isApproved = isset($existing) && $existing && $existing['status'] === 'approved
   <div class="h5-card" id="difference-note-card" style="display: none;">
     <div class="h5-card-title">✏️ <?= __('cash_closing.difference_note', '差额说明') ?>（<?= __('field.required', '必填') ?>）</div>
     <div class="h5-form-group">
+      <label class="h5-form-label required"><?= __('cash_closing.difference_note', '差额说明') ?></label>
       <textarea name="cash_note" 
                 id="cash-note" 
+                class="h5-form-textarea"
                 rows="4" 
                 placeholder="<?= __('cash_closing.difference_note_hint', '如：找零错误 / 顾客未付清 / 临时垫付') ?>"></textarea>
       <small class="h5-hint required"><?= __('cash_closing.difference_note_required', '差额不为0时必须填写说明') ?></small>

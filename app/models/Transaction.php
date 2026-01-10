@@ -21,15 +21,13 @@ class Transaction {
   }
 
   public static function create($data) {
-    // 先插入记录，使用临时流水号占位符
     $sql = "INSERT INTO transactions
-      (serial_number, `type`, amount, currency, category_id, payment_method_id, vendor_id, payer,
+      (`type`, amount, currency, category_id, payment_method_id, vendor_id, payer,
        occurred_at, note, status, created_by)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     $stmt = DB::conn()->prepare($sql);
     $result = $stmt->execute([
-      'TEMP', // 临时占位符，稍后会更新
       $data['type'],
       $data['amount'],
       $data['currency'] ?? 'VND',
@@ -44,23 +42,7 @@ class Transaction {
     ]);
 
     if ($result) {
-      $id = DB::conn()->lastInsertId();
-      
-      // 获取记录的创建时间（使用created_at）
-      $dateStmt = DB::conn()->prepare("SELECT DATE(created_at) as create_date FROM transactions WHERE id = ?");
-      $dateStmt->execute([$id]);
-      $dateRow = $dateStmt->fetch();
-      $createDate = $dateRow ? str_replace('-', '', $dateRow['create_date']) : date('Ymd');
-      
-      // 生成流水号：日期(YYYYMMDD) + 类别(EXP/INC) + ID
-      $typePrefix = strtoupper(substr($data['type'], 0, 3)); // EXP 或 INC
-      $serialNumber = $createDate . '-' . $typePrefix . '-' . str_pad($id, 6, '0', STR_PAD_LEFT);
-      
-      // 更新流水号
-      $updateStmt = DB::conn()->prepare("UPDATE transactions SET serial_number = ? WHERE id = ?");
-      $updateStmt->execute([$serialNumber, $id]);
-      
-      return $id;
+      return DB::conn()->lastInsertId();
     }
     return false;
   }
@@ -221,16 +203,6 @@ class Transaction {
       $params[] = $filters['to'];
     }
 
-    if (!empty($filters['payment_method_id'])) {
-      $where[] = 'payment_method_id=?';
-      $params[] = $filters['payment_method_id'];
-    }
-
-    if (!empty($filters['type'])) {
-      $where[] = '`type`=?';
-      $params[] = $filters['type'];
-    }
-
     $sql = "SELECT 
       SUM(CASE WHEN `type`='income' THEN amount ELSE 0 END) as income,
       SUM(CASE WHEN `type`='expense' THEN amount ELSE 0 END) as expense
@@ -255,7 +227,7 @@ class Transaction {
       WHERE status='approved'
         AND occurred_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
       GROUP BY day
-      ORDER BY day DESC
+      ORDER BY day ASC
     ");
     $stmt->execute([$days - 1]);
     return $stmt->fetchAll();
@@ -297,5 +269,150 @@ class Transaction {
     $stmt = DB::conn()->prepare($sql);
     $stmt->execute($params);
     return $stmt->fetchAll();
+  }
+
+  public static function getTrendByDate($from, $to) {
+    $stmt = DB::conn()->prepare("
+      SELECT
+        DATE(occurred_at) as day,
+        SUM(CASE WHEN `type`='income' THEN amount ELSE 0 END) as income,
+        SUM(CASE WHEN `type`='expense' THEN amount ELSE 0 END) as expense
+      FROM transactions
+      WHERE status='approved'
+        AND occurred_at >= ?
+        AND occurred_at <= ?
+      GROUP BY day
+      ORDER BY day ASC
+    ");
+    $stmt->execute([$from, $to]);
+    return $stmt->fetchAll();
+  }
+
+  public static function getByPaymentMethod($filters = []) {
+    $where = ['t.status = ?'];
+    $params = ['approved'];
+
+    if (!empty($filters['from'])) {
+      $where[] = 't.occurred_at>=?';
+      $params[] = $filters['from'];
+    }
+
+    if (!empty($filters['to'])) {
+      $where[] = 't.occurred_at<=?';
+      $params[] = $filters['to'];
+    }
+
+    $sql = "SELECT 
+      p.id, p.name_zh, p.name_vi,
+      SUM(CASE WHEN t.`type`='income' THEN t.amount ELSE 0 END) as income,
+      SUM(CASE WHEN t.`type`='expense' THEN t.amount ELSE 0 END) as expense
+      FROM payment_methods p
+      LEFT JOIN transactions t ON p.id = t.payment_method_id";
+    
+    if ($where) {
+      $sql .= " WHERE " . implode(' AND ', $where);
+    }
+    $sql .= " GROUP BY p.id, p.name_zh, p.name_vi
+      HAVING income > 0 OR expense > 0
+      ORDER BY (income + expense) DESC";
+
+    $stmt = DB::conn()->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+  }
+
+  public static function getByVendor($filters = []) {
+    $where = ['t.status = ?', 't.`type` = ?'];
+    $params = ['approved', 'expense'];
+
+    if (!empty($filters['from'])) {
+      $where[] = 't.occurred_at>=?';
+      $params[] = $filters['from'];
+    }
+
+    if (!empty($filters['to'])) {
+      $where[] = 't.occurred_at<=?';
+      $params[] = $filters['to'];
+    }
+
+    $sql = "SELECT 
+      v.id, v.name,
+      COUNT(t.id) as transaction_count,
+      SUM(t.amount) as total_amount
+      FROM vendors v
+      LEFT JOIN transactions t ON v.id = t.vendor_id";
+    
+    if ($where) {
+      $sql .= " WHERE " . implode(' AND ', $where);
+    }
+    $sql .= " GROUP BY v.id, v.name
+      HAVING transaction_count > 0
+      ORDER BY total_amount DESC";
+
+    $stmt = DB::conn()->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+  }
+
+  public static function getMonthlyCompare($months = 3) {
+    $stmt = DB::conn()->prepare("
+      SELECT
+        DATE_FORMAT(occurred_at, '%Y-%m') as month,
+        SUM(CASE WHEN `type`='income' THEN amount ELSE 0 END) as income,
+        SUM(CASE WHEN `type`='expense' THEN amount ELSE 0 END) as expense
+      FROM transactions
+      WHERE status='approved'
+        AND occurred_at >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+      GROUP BY month
+      ORDER BY month ASC
+    ");
+    $stmt->execute([$months - 1]);
+    return $stmt->fetchAll();
+  }
+
+  /**
+   * 计算坪效分析
+   * 坪效 = 销售额 / 店铺面积（平方米）
+   * 
+   * @param array $filters 筛选条件（from, to）
+   * @param float $storeArea 店铺面积（平方米），默认100平方米
+   * @return array 包含销售额、面积、坪效等数据
+   */
+  public static function getSalesPerSquareMeter($filters = [], $storeArea = 100) {
+    $where = ['status = ?', '`type` = ?'];
+    $params = ['approved', 'income'];
+
+    if (!empty($filters['from'])) {
+      $where[] = 'occurred_at>=?';
+      $params[] = $filters['from'];
+    }
+
+    if (!empty($filters['to'])) {
+      $where[] = 'occurred_at<=?';
+      $params[] = $filters['to'];
+    }
+
+    $sql = "SELECT 
+      SUM(amount) as total_sales,
+      COUNT(*) as transaction_count
+      FROM transactions";
+    
+    if ($where) {
+      $sql .= " WHERE " . implode(' AND ', $where);
+    }
+
+    $stmt = DB::conn()->prepare($sql);
+    $stmt->execute($params);
+    $result = $stmt->fetch();
+
+    $totalSales = $result['total_sales'] ?? 0;
+    $salesPerSquareMeter = $storeArea > 0 ? ($totalSales / $storeArea) : 0;
+
+    return [
+      'total_sales' => $totalSales,
+      'store_area' => $storeArea,
+      'sales_per_square_meter' => $salesPerSquareMeter,
+      'transaction_count' => $result['transaction_count'] ?? 0
+    ];
   }
 }
