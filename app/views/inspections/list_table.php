@@ -17,7 +17,7 @@
         <th><?= __('inspection.status') ?></th>
         <th><?= __('inspection.photo') ?></th>
         <th><?= __('field.note') ?></th>
-        <th><?= __('inspection.inspector', '巡店人') ?></th>
+        <th><?= __('inspection.inspector') ?></th>
         <th><?= __('inspection.manage') ?></th>
         <th><?= __('inspection.review_status') ?></th>
         <th><?= __('list.actions') ?></th>
@@ -72,7 +72,7 @@
             </a>
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <a href="/index.php?r=inspections/view&id=<?= $row['id'] ?>" style="font-size: 12px; color: #3498db; text-decoration: none;">
-                <?= __('inspection.view_photo', '查看照片') ?>
+                <?= __('inspection.view_photo') ?>
               </a>
               <?php if ($photoCount > 1): ?>
               <span style="font-size: 11px; color: #666;">共 <?= $photoCount ?> 张</span>

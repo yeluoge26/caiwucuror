@@ -299,6 +299,15 @@ return [
 'inspection.room_store' => 'Khu vực cửa hàng',
 'inspection.room_restroom' => 'Nhà vệ sinh',
 'inspection.room_stair' => 'Cầu thang',
+'inspection.batch_approve_title' => 'Duyệt hàng loạt',
+'inspection.batch_approve_hint' => 'Duyệt hàng loạt tất cả các nhiệm vụ kiểm tra có trạng thái "OK" và đang chờ duyệt',
+'inspection.batch_approve_btn' => 'Duyệt hàng loạt',
+'inspection.batch_approve_confirm' => 'Bạn có chắc muốn duyệt hàng loạt tất cả các nhiệm vụ kiểm tra có trạng thái "OK" không?',
+'inspection.batch_approve_success' => 'Đã duyệt thành công {count} bản kiểm tra',
+'inspection.batch_approve_failed' => 'Duyệt hàng loạt thất bại',
+'inspection.inspector' => 'Người kiểm tra',
+'inspection.no_past_date_hint' => 'Không thể chọn ngày trong tương lai',
+'inspection.photo_required_hint' => 'Phải tải lên ít nhất một ảnh',
 
 'task.title' => 'Nhiệm vụ',
 'task.create' => 'Tạo nhiệm vụ',
@@ -389,4 +398,7 @@ return [
 'btn.edit' => 'Chỉnh sửa',
 'btn.delete' => 'Xóa',
 'btn.clear' => 'Xóa tất cả',
+'btn.processing' => 'Đang xử lý...',
+
+'error.operation_failed' => 'Thao tác thất bại, vui lòng thử lại',
 ];

@@ -22,7 +22,11 @@ class Router {
       'employees' => 'Employee',
       'shifts' => 'Shift',
       'cash_closings' => 'CashClosing',
-      'manager' => 'Manager'
+      'manager' => 'Manager',
+      'inspections' => 'Inspections',
+      'assets' => 'Assets',
+      'materials' => 'Materials',
+      'drinks' => 'Drinks'
     ];
 
     // 如果路由在映射中，使用映射值，否则使用原值（首字母大写）

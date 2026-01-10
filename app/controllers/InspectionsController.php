@@ -365,8 +365,8 @@ class InspectionsController {
       if ($isAjax) {
         header('Content-Type: application/json; charset=utf-8');
         $message = $result['success'] 
-          ? str_replace('{count}', $result['count'], __('inspection.batch_approve_success', '成功审批通过 {count} 条巡店记录'))
-          : __('inspection.batch_approve_failed', '批量审批失败');
+          ? str_replace('{count}', $result['count'], __('inspection.batch_approve_success'))
+          : __('inspection.batch_approve_failed');
         echo json_encode([
           'success' => $result['success'],
           'count' => $result['count'],

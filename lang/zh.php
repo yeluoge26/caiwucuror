@@ -299,6 +299,15 @@ return [
 'inspection.room_store' => '店面',
 'inspection.room_restroom' => '卫生间',
 'inspection.room_stair' => '楼梯',
+'inspection.batch_approve_title' => '一键审批',
+'inspection.batch_approve_hint' => '批量审批通过所有状态为"OK"且待审批的巡店任务',
+'inspection.batch_approve_btn' => '一键审批通过',
+'inspection.batch_approve_confirm' => '确定要批量审批通过所有状态为"OK"的巡店任务吗？',
+'inspection.batch_approve_success' => '成功审批通过 {count} 条巡店记录',
+'inspection.batch_approve_failed' => '批量审批失败',
+'inspection.inspector' => '巡店人',
+'inspection.no_past_date_hint' => '不能选择未来日期',
+'inspection.photo_required_hint' => '必须上传至少一张照片',
 
 'task.title' => '任务',
 'task.create' => '创建任务',
@@ -389,4 +398,7 @@ return [
 'btn.edit' => '编辑',
 'btn.delete' => '删除',
 'btn.clear' => '清空',
+'btn.processing' => '处理中...',
+
+'error.operation_failed' => '操作失败，请重试',
 ];
