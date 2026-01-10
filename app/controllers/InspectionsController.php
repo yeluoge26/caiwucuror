@@ -186,7 +186,13 @@ class InspectionsController {
         foreach ($photos as $p) {
           InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
         }
-        header('Location: /index.php?r=inspections/list&date=' . urlencode($_POST['spot_date'] ?? $date));
+        // 跳转到首页
+        $user = Auth::user();
+        $redirectUrl = '/index.php?r=reports/dashboard';
+        if ($user && isset($user['role_key']) && $user['role_key'] === 'manager') {
+          $redirectUrl = '/index.php?r=manager/dashboard';
+        }
+        header('Location: ' . $redirectUrl);
         exit;
       }
     }
@@ -284,19 +290,29 @@ class InspectionsController {
             if ($isAjax) {
               // AJAX 请求：返回 JSON 响应
               header('Content-Type: application/json; charset=utf-8');
+              $user = Auth::user();
+              $redirectUrl = '/index.php?r=reports/dashboard';
+              if ($user && isset($user['role_key']) && $user['role_key'] === 'manager') {
+                $redirectUrl = '/index.php?r=manager/dashboard';
+              }
               $response = [
                 'success' => true,
                 'message' => __('inspection.create_success', '创建成功'),
                 'inspection_id' => $inspId,
                 'photo_count' => count($photos),
-                'photos' => $photos
+                'photos' => $photos,
+                'redirect_url' => $redirectUrl
               ];
               error_log("InspectionsController::create - JSON response: " . json_encode($response, JSON_UNESCAPED_UNICODE));
               echo json_encode($response, JSON_UNESCAPED_UNICODE);
               exit;
             } else {
-              // 普通表单提交：重定向
-              $redirectUrl = '/index.php?r=inspections/list&date=' . urlencode($spotDate);
+              // 普通表单提交：重定向到首页
+              $user = Auth::user();
+              $redirectUrl = '/index.php?r=reports/dashboard';
+              if ($user && isset($user['role_key']) && $user['role_key'] === 'manager') {
+                $redirectUrl = '/index.php?r=manager/dashboard';
+              }
               header('Location: ' . $redirectUrl);
               exit;
             }

@@ -308,6 +308,9 @@ return [
 'inspection.inspector' => '巡店人',
 'inspection.no_past_date_hint' => '不能选择未来日期',
 'inspection.photo_required_hint' => '必须上传至少一张照片',
+'inspection.today_inspection' => '今日巡店',
+'inspection.completed' => '已完成',
+'inspection.times' => '次',
 
 'task.title' => '任务',
 'task.create' => '创建任务',

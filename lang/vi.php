@@ -308,6 +308,9 @@ return [
 'inspection.inspector' => 'Người kiểm tra',
 'inspection.no_past_date_hint' => 'Không thể chọn ngày trong tương lai',
 'inspection.photo_required_hint' => 'Phải tải lên ít nhất một ảnh',
+'inspection.today_inspection' => 'Kiểm tra hôm nay',
+'inspection.completed' => 'Đã hoàn thành',
+'inspection.times' => 'lần',
 
 'task.title' => 'Nhiệm vụ',
 'task.create' => 'Tạo nhiệm vụ',

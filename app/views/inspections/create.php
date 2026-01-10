@@ -19,9 +19,9 @@ $inspectionCount = count($todayInspections);
 <!-- 巡店状态提示 -->
 <div class="h5-card" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border: 2px solid #3498DB;">
   <div style="text-align: center;">
-    <div style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500;">📅 <?= __('inspection.today_inspection', '今日巡店') ?></div>
+    <div style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500;">📅 <?= __('inspection.today_inspection') ?></div>
     <div style="font-size: 28px; font-weight: 700; color: #3498DB;">
-      <?= __('inspection.completed', '已完成') ?>: <?= $inspectionCount ?> / 24 <?= __('inspection.times', '次') ?>
+      <?= __('inspection.completed') ?>: <?= $inspectionCount ?> / 24 <?= __('inspection.times') ?>
     </div>
   </div>
 </div>
@@ -350,31 +350,12 @@ document.addEventListener('DOMContentLoaded', function() {
           uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?>' + 
             (response.photo_count > 0 ? ' (' + response.photo_count + ' 张照片)' : ' (0 张照片)') + '</div>';
           
-          // 重置表单，但不跳转
+          // 显示成功提示，然后跳转到首页
           setTimeout(function() {
-          // 重置表单
-          form.reset();
-          selectedFiles = [];
-          photosConfirmed = false;
-          photoPreview.style.display = 'none';
-          uploadProgress.style.display = 'none';
-          confirmUploadBtn.style.display = 'none';
-          confirmUploadBtn.disabled = false;
-          confirmUploadBtn.textContent = '✅ <?= __('inspection.confirm_upload', '确认上传') ?>';
-          confirmUploadBtn.style.background = '#27ae60';
-          
-          // 重置提交按钮
-          submitBtn.disabled = false;
-          submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
-          
-          // 显示成功提示
-          uploadStatus.innerHTML = '<div style="color: #27ae60; padding: 10px; background: #d4edda; border-radius: 6px; margin-top: 10px;">✅ <?= __('inspection.submit_success', '提交成功！可以继续添加新的巡店记录') ?></div>';
-          
-          // 3秒后隐藏成功提示
-          setTimeout(function() {
-            uploadStatus.innerHTML = '';
-          }, 3000);
-        }, 500);
+            // 使用服务器返回的跳转URL，如果没有则根据角色判断
+            const homeUrl = response.redirect_url || (<?= (Auth::user()['role_key'] ?? '') === 'manager' ? "'/index.php?r=manager/dashboard'" : "'/index.php?r=reports/dashboard'" ?>);
+            window.location.href = homeUrl;
+          }, 1000);
         } else {
           uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + (response.message || xhr.statusText) + '</div>';
           submitBtn.disabled = false;
