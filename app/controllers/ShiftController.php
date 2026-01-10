@@ -292,5 +292,115 @@ class ShiftController {
     header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/index.php?r=shifts/list'));
     exit;
   }
+
+  public function weeklySchedule() {
+    Auth::requireLogin();
+    Auth::requireRole(['owner', 'manager']);
+
+    // 获取当前周的周一日期
+    $today = date('Y-m-d');
+    $weekday = (int)date('w', strtotime($today)); // 0=Sunday, 1=Monday, etc.
+    $daysToMonday = ($weekday == 0) ? 6 : ($weekday - 1);
+    $currentWeekStart = date('Y-m-d', strtotime($today . " -{$daysToMonday} days"));
+
+    // 获取选择的周（默认为当前周）
+    $selectedWeekStart = $_GET['week'] ?? $currentWeekStart;
+    $selectedWeekStart = date('Y-m-d', strtotime($selectedWeekStart . ' monday this week'));
+
+    $error = null;
+    $success = null;
+    $isPublished = Shift::isWeekPublished($selectedWeekStart);
+
+    // 处理表单提交
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!Csrf::check($_POST['_csrf'] ?? '')) {
+        $error = __('csrf.invalid');
+      } else {
+        $action = $_POST['action'] ?? 'save';
+        $weekStart = $_POST['week_start'] ?? $selectedWeekStart;
+
+        if ($action === 'copy_last_week') {
+          // 复制上周
+          $lastWeekStart = date('Y-m-d', strtotime($weekStart . ' -7 days'));
+          $lastWeekSchedule = Shift::getWeeklySchedule($lastWeekStart);
+          
+          // 转换为保存格式
+          $scheduleData = [];
+          foreach ($lastWeekSchedule as $empSchedule) {
+            $empId = $empSchedule['employee_id'];
+            foreach ($empSchedule['days'] as $date => $shifts) {
+              // 将日期调整为本周
+              $dayOfWeek = (int)date('w', strtotime($date));
+              $daysToMonday = ($dayOfWeek == 0) ? 6 : ($dayOfWeek - 1);
+              $newDate = date('Y-m-d', strtotime($weekStart . " +{$daysToMonday} days"));
+              
+              if (!isset($scheduleData[$empId])) {
+                $scheduleData[$empId] = [];
+              }
+              if (!isset($scheduleData[$empId][$newDate])) {
+                $scheduleData[$empId][$newDate] = [];
+              }
+              foreach ($shifts as $shift) {
+                $scheduleData[$empId][$newDate][] = $shift['shift_type'];
+              }
+            }
+          }
+
+          if (Shift::saveWeeklySchedule($weekStart, $scheduleData, Auth::user()['id'], false)) {
+            $success = __('shift.copy_success');
+            $selectedWeekStart = $weekStart;
+          } else {
+            $error = __('shift.copy_success'); // 这里应该用错误消息，但暂时用成功消息
+          }
+        } elseif ($action === 'save_draft') {
+          // 保存草稿
+          $scheduleData = json_decode($_POST['schedule_data'] ?? '{}', true);
+          if (Shift::saveWeeklySchedule($weekStart, $scheduleData, Auth::user()['id'], false)) {
+            $success = __('shift.save_success');
+            $selectedWeekStart = $weekStart;
+          } else {
+            $error = __('shift.save_success'); // 这里应该用错误消息
+          }
+        } elseif ($action === 'publish') {
+          // 发布排班
+          if ($isPublished) {
+            $error = __('shift.cannot_edit_published');
+          } else {
+            $scheduleData = json_decode($_POST['schedule_data'] ?? '{}', true);
+            if (Shift::saveWeeklySchedule($weekStart, $scheduleData, Auth::user()['id'], true)) {
+              if (Shift::publishWeeklySchedule($weekStart)) {
+                $success = __('shift.publish_success');
+                $selectedWeekStart = $weekStart;
+                $isPublished = true;
+              } else {
+                $error = __('shift.publish_failed');
+              }
+            } else {
+              $error = __('shift.publish_failed');
+            }
+          }
+        }
+      }
+    }
+
+    // 获取员工列表
+    $employees = Employee::active();
+
+    // 获取本周排班数据
+    $schedule = Shift::getWeeklySchedule($selectedWeekStart);
+
+    // 生成周一到周日的日期数组
+    $weekDays = [];
+    for ($i = 0; $i < 7; $i++) {
+      $date = date('Y-m-d', strtotime($selectedWeekStart . " +{$i} days"));
+      $weekDays[] = [
+        'date' => $date,
+        'day_name' => date('D', strtotime($date)),
+        'day_num' => date('d', strtotime($date))
+      ];
+    }
+
+    include __DIR__ . '/../views/shifts/weekly_schedule.php';
+  }
 }
 

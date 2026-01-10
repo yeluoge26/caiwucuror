@@ -254,33 +254,33 @@ class InspectionsController {
           $photos = $this->uploadPhotos($fileInput, Auth::user()['id']);
           error_log("InspectionsController::create - uploadPhotos returned " . count($photos) . " photos");
           
-          $result = Inspection::create([
-            'store' => $_POST['store'] ?? 'coffee',
-            'floor' => $_POST['floor'] ?? '1F',
-            'visit_no' => (int)($_POST['visit_no'] ?? 1),
-            'room' => $_POST['room'] ?? 'general',
-            'status' => $_POST['status'] ?? 'ok',
-            'note' => $_POST['note'] ?? null,
-            'created_by' => Auth::user()['id'],
-            'spot_date' => $spotDate,
-          ]);
-          
-          if (!$result) {
-            $error = __('inspection.create_failed', '创建失败');
+          // 照片必填验证（至少1张照片）
+          if (empty($photos) || count($photos) === 0) {
+            $error = __('inspection.photo_required_hint');
           } else {
-            $inspId = DB::conn()->lastInsertId();
-            // 如果有照片，保存照片
-            if (!empty($photos)) {
+            $result = Inspection::create([
+              'store' => $_POST['store'] ?? 'coffee',
+              'floor' => $_POST['floor'] ?? '1F',
+              'visit_no' => (int)($_POST['visit_no'] ?? 1),
+              'room' => $_POST['room'] ?? 'general',
+              'status' => $_POST['status'] ?? 'ok',
+              'note' => $_POST['note'] ?? null,
+              'created_by' => Auth::user()['id'],
+              'spot_date' => $spotDate,
+            ]);
+            
+            if (!$result) {
+              $error = __('inspection.create_failed', '创建失败');
+            } else {
+              $inspId = DB::conn()->lastInsertId();
+              // 保存照片（此时photos不为空，因为已经通过验证）
               error_log("InspectionsController::create - Saving " . count($photos) . " photos for inspection ID: {$inspId}");
               foreach ($photos as $p) {
                 $result = InspectionPhoto::create($inspId, $p['path'], $p['mime'], Auth::user()['id']);
                 error_log("InspectionsController::create - Photo saved: {$p['path']}, result: " . ($result ? 'success' : 'failed'));
               }
-            } else {
-              error_log("InspectionsController::create - No photos to save for inspection ID: {$inspId}");
-            }
-            
-            // 检查是否是 AJAX 请求
+              
+              // 检查是否是 AJAX 请求
             $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
             
             error_log("InspectionsController::create - isAjax: " . ($isAjax ? 'yes' : 'no'));

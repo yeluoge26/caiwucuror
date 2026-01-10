@@ -81,8 +81,11 @@
       <a href="/index.php?r=employees/list" class="<?= strpos($_GET['r'] ?? '', 'employees') === 0 ? 'active' : '' ?>">
         <?= __('employee.list') ?>
       </a>
-      <a href="/index.php?r=shifts/list" class="<?= strpos($_GET['r'] ?? '', 'shifts') === 0 ? 'active' : '' ?>">
+      <a href="/index.php?r=shifts/list" class="<?= strpos($_GET['r'] ?? '', 'shifts') === 0 && ($_GET['r'] ?? '') !== 'shifts/weeklySchedule' ? 'active' : '' ?>">
         <?= __('shift.list') ?>
+      </a>
+      <a href="/index.php?r=shifts/weeklySchedule" class="<?= ($_GET['r'] ?? '') === 'shifts/weeklySchedule' ? 'active' : '' ?>">
+        <?= __('shift.weekly_schedule') ?>
       </a>
       <a href="/index.php?r=settings/categories" class="<?= strpos($_GET['r'] ?? '', 'settings') === 0 ? 'active' : '' ?>">
         <?= __('nav.settings') ?>

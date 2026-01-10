@@ -113,18 +113,18 @@ $currentLang = I18n::current();
             <span class="shift-status-<?= $shiftId ?>" style="font-size: 12px; color: <?= $statusColor ?>; font-weight: 600;">
               <?php
               $statusTexts = [
-                'pending' => __('shift.status_pending', '未确认'),
-                'confirmed' => __('shift.status_confirmed', '已到岗'),
-                'late' => __('shift.status_late', '迟到'),
-                'leave' => __('shift.status_leave', '请假'),
-                'off' => __('shift.status_off', '调休'),
-                'abnormal' => __('shift.status_abnormal', '打卡异常')
+                'pending' => __('shift.status_pending'),
+                'confirmed' => __('shift.status_confirmed'),
+                'late' => __('shift.status_late'),
+                'leave' => __('shift.status_leave'),
+                'off' => __('shift.status_off'),
+                'abnormal' => __('shift.status_abnormal')
               ];
-              echo htmlspecialchars($statusTexts[$currentStatus] ?? $currentStatus);
+              echo htmlspecialchars($statusTexts[$currentStatus] ?? __('shift.status_pending'));
               ?>
             </span>
             <?php if ($isSubmitted && !$isOwner): ?>
-            <span style="font-size: 11px; color: #999; margin-left: 4px;">(<?= __('shift.submitted', '已提交') ?>)</span>
+            <span style="font-size: 11px; color: #999; margin-left: 4px;">(<?= __('shift.submitted') ?>)</span>
             <?php endif; ?>
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
@@ -135,15 +135,15 @@ $currentLang = I18n::current();
               data-shift-id="<?= $shiftId ?>"
               data-original-status="<?= $currentStatus ?>"
               data-can-edit="<?= $canEdit ? '1' : '0' ?>"
-              aria-label="<?= __('shift.status', '在岗状态') ?>"
+              aria-label="<?= __('shift.status') ?>"
               <?= !$canEdit ? 'disabled' : '' ?>
               style="padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd; background: <?= $canEdit ? 'white' : '#f5f5f5' ?>; cursor: <?= $canEdit ? 'pointer' : 'not-allowed' ?>; min-width: 100px; <?= !$canEdit ? 'opacity: 0.6;' : '' ?>">
-              <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending', '未确认') ?></option>
-              <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed', '已到岗') ?></option>
-              <option value="late" <?= $currentStatus === 'late' ? 'selected' : '' ?>><?= __('shift.status_late', '迟到') ?></option>
-              <option value="leave" <?= $currentStatus === 'leave' ? 'selected' : '' ?>><?= __('shift.status_leave', '请假') ?></option>
-              <option value="off" <?= $currentStatus === 'off' ? 'selected' : '' ?>><?= __('shift.status_off', '调休') ?></option>
-              <option value="abnormal" <?= $currentStatus === 'abnormal' ? 'selected' : '' ?>><?= __('shift.status_abnormal', '打卡异常') ?></option>
+              <option value="pending" <?= $currentStatus === 'pending' ? 'selected' : '' ?>><?= __('shift.status_pending') ?></option>
+              <option value="confirmed" <?= $currentStatus === 'confirmed' ? 'selected' : '' ?>><?= __('shift.status_confirmed') ?></option>
+              <option value="late" <?= $currentStatus === 'late' ? 'selected' : '' ?>><?= __('shift.status_late') ?></option>
+              <option value="leave" <?= $currentStatus === 'leave' ? 'selected' : '' ?>><?= __('shift.status_leave') ?></option>
+              <option value="off" <?= $currentStatus === 'off' ? 'selected' : '' ?>><?= __('shift.status_off') ?></option>
+              <option value="abnormal" <?= $currentStatus === 'abnormal' ? 'selected' : '' ?>><?= __('shift.status_abnormal') ?></option>
             </select>
             <?php if ($canEdit): ?>
             <button 
@@ -151,13 +151,13 @@ $currentLang = I18n::current();
               id="shift-submit-<?= $shiftId ?>"
               class="shift-submit-btn" 
               data-shift-id="<?= $shiftId ?>"
-              aria-label="<?= __('shift.confirm_attendance', '确认到岗状态') ?>"
+              aria-label="<?= __('shift.confirm_attendance') ?>"
               style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; background: #3498db; color: white; white-space: nowrap;">
-              <?= __('btn.submit', '提交') ?>
+              <?= __('btn.submit') ?>
             </button>
             <?php else: ?>
             <span style="font-size: 11px; color: #999; padding: 6px 12px;">
-              <?= __('shift.cannot_edit', '已提交，不可修改') ?>
+              <?= __('shift.cannot_edit') ?>
             </span>
             <?php endif; ?>
           </div>
@@ -195,13 +195,13 @@ $currentLang = I18n::current();
         
         // 状态优先级：请假 > 调休 > 迟到 > 打卡异常 > 全部已到岗 > 部分到岗 > 未到岗
         if ($statusCounts['leave'] > 0) {
-          echo '<span style="color: #3498db;">' . __('shift.status_leave', '请假') . '</span>';
+          echo '<span style="color: #3498db;">' . __('shift.status_leave') . '</span>';
         } elseif ($statusCounts['off'] > 0) {
-          echo '<span style="color: #9b59b6;">' . __('shift.status_off', '调休') . '</span>';
+          echo '<span style="color: #9b59b6;">' . __('shift.status_off') . '</span>';
         } elseif ($statusCounts['late'] > 0) {
-          echo '<span style="color: #f39c12;">' . __('shift.status_late', '迟到') . '</span>';
+          echo '<span style="color: #f39c12;">' . __('shift.status_late') . '</span>';
         } elseif ($statusCounts['abnormal'] > 0) {
-          echo '<span style="color: #e67e22;">' . __('shift.status_abnormal', '打卡异常') . '</span>';
+          echo '<span style="color: #e67e22;">' . __('shift.status_abnormal') . '</span>';
         } elseif ($confirmedCount === $totalCount && $totalCount > 0) {
           echo '<span style="color: #27ae60;">' . __('employee.all_confirmed', '全部已到岗') . '</span>';
         } elseif ($confirmedCount > 0) {
@@ -241,12 +241,12 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   
   const statusTexts = {
-    'pending': '<?= __('shift.status_pending', '未确认') ?>',
-    'confirmed': '<?= __('shift.status_confirmed', '已到岗') ?>',
-    'late': '<?= __('shift.status_late', '迟到') ?>',
-    'leave': '<?= __('shift.status_leave', '请假') ?>',
-    'off': '<?= __('shift.status_off', '调休') ?>',
-    'abnormal': '<?= __('shift.status_abnormal', '打卡异常') ?>'
+    'pending': '<?= __('shift.status_pending') ?>',
+    'confirmed': '<?= __('shift.status_confirmed') ?>',
+    'late': '<?= __('shift.status_late') ?>',
+    'leave': '<?= __('shift.status_leave') ?>',
+    'off': '<?= __('shift.status_off') ?>',
+    'abnormal': '<?= __('shift.status_abnormal') ?>'
   };
   
   // 提交按钮点击事件
@@ -256,14 +256,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const select = document.querySelector('.shift-status-select[data-shift-id="' + shiftId + '"]');
       
       if (!select) {
-        alert('<?= __('error.operation_failed', '操作失败') ?>');
+        alert('<?= __('error.operation_failed') ?>');
         return;
       }
       
       // 检查是否可以编辑
       const canEdit = select.getAttribute('data-can-edit') === '1';
       if (!canEdit) {
-        alert('<?= __('shift.cannot_edit', '已提交，不可修改') ?>');
+        alert('<?= __('shift.cannot_edit') ?>');
         return;
       }
       
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
       this.disabled = true;
       select.disabled = true;
       const originalText = this.textContent;
-      this.textContent = '<?= __('btn.processing', '处理中...') ?>';
+      this.textContent = '<?= __('btn.processing') ?>';
       
       // 创建 FormData
       const formData = new FormData();
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statusContainer && !statusContainer.querySelector('.submitted-hint')) {
               const hint = document.createElement('span');
               hint.className = 'submitted-hint';
-              hint.textContent = '(<?= __('shift.submitted', '已提交') ?>)';
+              hint.textContent = '(<?= __('shift.submitted') ?>)';
               hint.style.fontSize = '11px';
               hint.style.color = '#999';
               hint.style.marginLeft = '4px';
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.reload();
           }, 500);
         } else {
-          alert('<?= __('error.operation_failed', '操作失败') ?>');
+          alert('<?= __('error.operation_failed') ?>');
           select.value = originalStatus;
           this.disabled = false;
           select.disabled = false;
