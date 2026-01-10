@@ -65,6 +65,9 @@
       <a href="/index.php?r=drinks/consume" class="<?= ($_GET['r'] ?? '') === 'drinks/consume' ? 'active' : '' ?>">
         <?= __('nav.consume') ?>
       </a>
+      <a href="/index.php?r=equipment_rentals/list" class="<?= strpos($_GET['r'] ?? '', 'equipment_rentals') === 0 ? 'active' : '' ?>">
+        <?= __('equipment_rental.list') ?>
+      </a>
       <?php endif; ?>
       <a href="/index.php?r=tasks/list" class="<?= strpos($_GET['r'] ?? '', 'tasks') === 0 ? 'active' : '' ?>">
         <?= __('task.list') ?>

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../models/Inspection.php';
 
-$title = __('nav.inspections_create', '巡店记录');
+$title = __('nav.inspections_create');
 $show_back = true;
 include __DIR__ . '/../layout/h5_header.php';
 
@@ -37,19 +37,19 @@ $inspectionCount = count($todayInspections);
 
   <!-- 基本信息 -->
   <div class="h5-card">
-    <div class="h5-card-title">📋 <?= __('inspection.basic_info', '基本信息') ?></div>
+    <div class="h5-card-title">📋 <?= __('inspection.basic_info') ?></div>
     
     <div class="h5-form-group">
-      <label for="store" class="h5-form-label required"><?= __('material.store', '店面') ?></label>
+      <label for="store" class="h5-form-label required"><?= __('material.store') ?></label>
       <select name="store" id="store" class="h5-form-select" required>
-        <option value="coffee" selected><?= __('asset.category_coffee', '咖啡店') ?></option>
-        <option value="office"><?= __('asset.category_office', '办公室') ?></option>
-        <option value="whiskey"><?= __('asset.category_whiskey', '威士忌') ?></option>
+        <option value="coffee" selected><?= __('asset.category_coffee') ?></option>
+        <option value="office"><?= __('asset.category_office') ?></option>
+        <option value="whiskey"><?= __('asset.category_whiskey') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label for="floor" class="h5-form-label required"><?= __('inspection.floor', '楼层') ?></label>
+      <label for="floor" class="h5-form-label required"><?= __('inspection.floor') ?></label>
       <select name="floor" id="floor" class="h5-form-select" required>
         <option value="1F" selected>1F</option>
         <option value="2F">2F</option>
@@ -59,63 +59,63 @@ $inspectionCount = count($todayInspections);
     </div>
 
     <div class="h5-form-group">
-      <label for="visit_no" class="h5-form-label required"><?= __('inspection.visit_no', '巡店次数') ?></label>
+      <label for="visit_no" class="h5-form-label required"><?= __('inspection.visit_no') ?></label>
       <select name="visit_no" id="visit_no" class="h5-form-select" required>
-        <option value="1" <?= ($inspectionCount + 1) == 1 ? 'selected' : '' ?>><?= __('inspection.visit_first', '首次') ?></option>
-        <option value="2" <?= ($inspectionCount + 1) == 2 ? 'selected' : '' ?>><?= __('inspection.visit_second', '二次') ?></option>
+        <option value="1" <?= ($inspectionCount + 1) == 1 ? 'selected' : '' ?>><?= __('inspection.visit_first') ?></option>
+        <option value="2" <?= ($inspectionCount + 1) == 2 ? 'selected' : '' ?>><?= __('inspection.visit_second') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label for="room" class="h5-form-label required"><?= __('inspection.room', '房间/区域') ?></label>
+      <label for="room" class="h5-form-label required"><?= __('inspection.room') ?></label>
       <select name="room" id="room" class="h5-form-select" required>
-        <option value="store" selected><?= __('inspection.room_store', '店面') ?></option>
-        <option value="restroom"><?= __('inspection.room_restroom', '卫生间') ?></option>
-        <option value="stair"><?= __('inspection.room_stair', '楼梯') ?></option>
+        <option value="store" selected><?= __('inspection.room_store') ?></option>
+        <option value="restroom"><?= __('inspection.room_restroom') ?></option>
+        <option value="stair"><?= __('inspection.room_stair') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label for="status" class="h5-form-label required"><?= __('inspection.status', '状态') ?></label>
+      <label for="status" class="h5-form-label required"><?= __('inspection.status') ?></label>
       <select name="status" id="status" class="h5-form-select" required>
-        <option value="ok" selected><?= __('inspection.ok', 'OK') ?></option>
-        <option value="issue"><?= __('inspection.issue', '问题') ?></option>
+        <option value="ok" selected><?= __('inspection.ok') ?></option>
+        <option value="issue"><?= __('inspection.issue') ?></option>
       </select>
     </div>
 
     <div class="h5-form-group">
-      <label for="spot_date" class="h5-form-label required"><?= __('field.time', '发生时间') ?></label>
+      <label for="spot_date" class="h5-form-label required"><?= __('field.time') ?></label>
       <input type="date" name="spot_date" id="spot_date" class="h5-form-input" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
-      <small class="h5-hint"><?= __('inspection.no_past_date_hint', '不能选择过去的日期') ?></small>
+      <small class="h5-hint"><?= __('inspection.no_past_date_hint') ?></small>
     </div>
   </div>
 
   <!-- 巡店拍照区 -->
   <div class="h5-card">
-    <div class="h5-card-title">📷 <?= __('inspection.photo', '巡店现场照片') ?></div>
+    <div class="h5-card-title">📷 <?= __('inspection.photo') ?></div>
     <div class="h5-form-group">
-      <label for="photos" class="h5-form-label required"><?= __('inspection.photo', '巡店现场照片') ?></label>
+      <label for="photos" class="h5-form-label required"><?= __('inspection.photo') ?></label>
       <input type="file" name="photos[]" id="photos" accept="image/*" capture="environment" multiple style="display: none;">
       <button type="button" id="selectPhotosBtn" class="h5-btn h5-btn-primary" style="margin-bottom: 12px;">
-        📷 <?= __('inspection.select_photos', '选择照片') ?>
+        📷 <?= __('inspection.select_photos') ?>
       </button>
-      <small class="h5-hint required"><?= __('asset.photo_hint', '支持 JPG/PNG/WEBP/GIF，单张不超过 5MB，可多选上传。至少上传1张照片。') ?></small>
+      <small class="h5-hint required"><?= __('asset.photo_hint') ?></small>
       
       <!-- 已选择的照片预览 -->
       <div id="photoPreview" class="photo-preview" style="margin-top: 16px; display: none;">
         <div style="font-weight: 600; margin-bottom: 12px; color: #1F2937; font-size: 15px;">
-          <?= __('inspection.selected_photos', '已选择的照片') ?> (<span id="photoCount">0</span>)
+          <?= __('inspection.selected_photos') ?> (<span id="photoCount">0</span>)
         </div>
         <div id="photoList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-bottom: 12px;"></div>
         <button type="button" id="confirmUploadBtn" class="h5-btn h5-btn-success" style="display: none;">
-          ✅ <?= __('inspection.confirm_upload', '确认上传') ?>
+          ✅ <?= __('inspection.confirm_upload') ?>
         </button>
       </div>
       
       <!-- 上传进度 -->
       <div id="uploadProgress" style="display: none; margin-top: 15px;">
         <div style="font-weight: 600; margin-bottom: 10px; color: #2c3e50;">
-          <?= __('inspection.upload_progress', '上传进度') ?>
+          <?= __('inspection.upload_progress') ?>
         </div>
         <div id="uploadStatus" style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 10px;"></div>
         <div style="background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
@@ -128,17 +128,17 @@ $inspectionCount = count($todayInspections);
 
   <!-- 巡店说明 -->
   <div class="h5-card">
-    <div class="h5-card-title">✏️ <?= __('inspection.note', '巡店说明') ?></div>
+    <div class="h5-card-title">✏️ <?= __('inspection.note') ?></div>
     <div class="h5-form-group">
-      <label for="note" class="h5-form-label"><?= __('inspection.note', '巡店说明') ?></label>
-      <textarea name="note" id="note" class="h5-form-textarea" placeholder="<?= __('inspection.note_hint', '如：吧台正常 / 后厨需注意卫生 / 高峰前检查') ?>"></textarea>
+      <label for="note" class="h5-form-label"><?= __('inspection.note') ?></label>
+      <textarea name="note" id="note" class="h5-form-textarea" placeholder="<?= __('inspection.note_hint') ?>"></textarea>
     </div>
   </div>
 
   <!-- 提交按钮（固定底部） -->
   <div class="fixed-bottom-btn">
     <button type="submit" id="submitBtn" class="h5-btn h5-btn-success">
-      ✅ <?= __('btn.save', '保存') ?>
+      ✅ <?= __('btn.save') ?>
     </button>
   </div>
 </form>
@@ -189,11 +189,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 显示确认上传按钮（如果已确认则显示为已确认状态）
     confirmUploadBtn.style.display = 'block';
     if (photosConfirmed) {
-      confirmUploadBtn.textContent = '✅ <?= __('inspection.photos_confirmed', '照片已确认') ?>';
+      confirmUploadBtn.textContent = '✅ <?= __('inspection.photos_confirmed') ?>';
       confirmUploadBtn.style.background = '#95a5a6';
       confirmUploadBtn.disabled = true;
     } else {
-      confirmUploadBtn.textContent = '✅ <?= __('inspection.confirm_upload', '确认上传') ?>';
+      confirmUploadBtn.textContent = '✅ <?= __('inspection.confirm_upload') ?>';
       confirmUploadBtn.style.background = '#27ae60';
       confirmUploadBtn.disabled = false;
     }
@@ -241,11 +241,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // 确认上传按钮点击
   confirmUploadBtn.addEventListener('click', function() {
     if (selectedFiles.length === 0) {
-      alert('<?= __('inspection.no_photos_selected', '请先选择照片') ?>');
+      alert('<?= __('inspection.no_photos_selected') ?>');
       return;
     }
     photosConfirmed = true;
-    confirmUploadBtn.textContent = '✅ <?= __('inspection.photos_confirmed', '照片已确认') ?>';
+    confirmUploadBtn.textContent = '✅ <?= __('inspection.photos_confirmed') ?>';
     confirmUploadBtn.style.background = '#95a5a6';
     confirmUploadBtn.disabled = true;
   });
@@ -256,19 +256,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 如果有照片但未确认，提示用户
     if (selectedFiles.length > 0 && !photosConfirmed) {
-      alert('<?= __('inspection.please_confirm_photos', '请先点击"确认上传"按钮确认照片') ?>');
+      alert('<?= __('inspection.please_confirm_photos') ?>');
       return;
     }
     
     if (selectedFiles.length === 0) {
-      if (!confirm('<?= __('inspection.no_photo_confirm', '未选择照片，确定要提交吗？') ?>')) {
+      if (!confirm('<?= __('inspection.no_photo_confirm') ?>')) {
         return;
       }
     }
     
     // 禁用提交按钮
     submitBtn.disabled = true;
-    submitBtn.textContent = '<?= __('btn.processing', '处理中...') ?>';
+    submitBtn.textContent = '<?= __('btn.processing') ?>';
     
     // 显示上传进度
     uploadProgress.style.display = 'block';
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 显示当前上传的文件
         const uploadedSize = formatFileSize(e.loaded);
         const totalSize = formatFileSize(e.total);
-        uploadStatus.innerHTML = '<div style="color: #3498db;">📤 <?= __('inspection.uploading', '正在上传') ?>: ' + uploadedSize + ' / ' + totalSize + '</div>';
+        uploadStatus.innerHTML = '<div style="color: #3498db;">📤 <?= __('inspection.uploading') ?>: ' + uploadedSize + ' / ' + totalSize + '</div>';
       }
     });
     
@@ -347,8 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log('Upload successful! Response:', response);
           console.log('Photo count:', response.photo_count);
           console.log('Photos:', response.photos);
-          uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success', '上传成功') ?>' + 
-            (response.photo_count > 0 ? ' (' + response.photo_count + ' 张照片)' : ' (0 张照片)') + '</div>';
+          uploadStatus.innerHTML = '<div style="color: #27ae60;">✅ <?= __('inspection.upload_success') ?>' + 
+            (response.photo_count > 0 ? ' (' + response.photo_count + ' <?= __('inspection.photo_count_unit') ?>)' : ' (0 <?= __('inspection.photo_count_unit') ?>)') + '</div>';
           
           // 显示成功提示，然后跳转到首页
           setTimeout(function() {
@@ -357,9 +357,9 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = homeUrl;
           }, 1000);
         } else {
-          uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + (response.message || xhr.statusText) + '</div>';
+          uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed') ?>: ' + (response.message || xhr.statusText) + '</div>';
           submitBtn.disabled = false;
-          submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+          submitBtn.textContent = '✅ <?= __('btn.save') ?>';
         }
       } else if (xhr.status === 302) {
         // 处理重定向（普通表单提交的情况）
@@ -368,9 +368,9 @@ document.addEventListener('DOMContentLoaded', function() {
           window.location.href = location;
         }
       } else {
-        uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed', '上传失败') ?>: ' + xhr.statusText + ' (HTTP ' + xhr.status + ')</div>';
+        uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_failed') ?>: ' + xhr.statusText + ' (HTTP ' + xhr.status + ')</div>';
         submitBtn.disabled = false;
-        submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+        submitBtn.textContent = '✅ <?= __('btn.save') ?>';
       }
     });
     
@@ -378,9 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
     xhr.addEventListener('error', function() {
       console.error('Upload error:', xhr.status, xhr.statusText);
       console.error('Response:', xhr.responseText);
-      uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_error', '上传出错，请重试') ?>: ' + xhr.statusText + '</div>';
+      uploadStatus.innerHTML = '<div style="color: #e74c3c;">❌ <?= __('inspection.upload_error') ?>: ' + xhr.statusText + '</div>';
       submitBtn.disabled = false;
-      submitBtn.textContent = '✅ <?= __('btn.save', '保存') ?>';
+      submitBtn.textContent = '✅ <?= __('btn.save') ?>';
     });
     
     // 监听响应
