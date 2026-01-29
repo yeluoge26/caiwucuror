@@ -2,7 +2,7 @@ import './globals.css';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://techcoffee.vn'),
+  metadataBase: new URL('https://techcafedanang.com'),
   title: {
     default: 'Tech Coffee Da Nang | AI Experience, Free Working Space & Whisky Bar',
     template: '%s | Tech Coffee Da Nang'
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     'Free WiFi Cafe Da Nang',
     'Digital Nomad Da Nang'
   ],
-  authors: [{ name: 'Tech Coffee', url: 'https://techcoffee.vn' }],
+  authors: [{ name: 'Tech Coffee', url: 'https://techcafedanang.com' }],
   creator: 'Tech Coffee',
   publisher: 'Tech Coffee',
   formatDetection: {
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'vi_VN',
     alternateLocale: ['en_US', 'ko_KR'],
-    url: 'https://techcoffee.vn',
+    url: 'https://techcafedanang.com',
     siteName: 'Tech Coffee Da Nang',
     title: 'Tech Coffee Da Nang — AI Experience & Free Working Space',
     description: 'Da Nang\'s first AI-powered coffee space with free working zone, camera rental, PS5 gaming, and a whisky bar.',
@@ -71,11 +71,11 @@ export const metadata: Metadata = {
     google: 'your-google-verification-code',
   },
   alternates: {
-    canonical: 'https://techcoffee.vn',
+    canonical: 'https://techcafedanang.com',
     languages: {
-      'en': 'https://techcoffee.vn/en',
-      'vi': 'https://techcoffee.vn/vi',
-      'ko': 'https://techcoffee.vn/ko',
+      'en': 'https://techcafedanang.com/en',
+      'vi': 'https://techcafedanang.com/vi',
+      'ko': 'https://techcafedanang.com/ko',
     },
   },
   category: 'food & drink',
@@ -88,7 +88,7 @@ const jsonLd = {
   name: 'Tech Coffee Da Nang',
   alternateName: 'Tech Coffee',
   description: 'Da Nang\'s first AI-powered creative space offering free working areas, ChatGPT Pro, Adobe Suite, PS5, GPU workstation, camera rental, and T Whisky Bar.',
-  url: 'https://techcoffee.vn',
+  url: 'https://techcafedanang.com',
   telephone: '+84388997186',
   email: 'techcafedanang@gmail.com',
   address: {
@@ -115,9 +115,9 @@ const jsonLd = {
   servesCuisine: ['Coffee', 'Tea', 'Cocktails', 'Whisky'],
   priceRange: '$$',
   image: [
-    'https://techcoffee.vn/images/interior/main-hall.jpg',
-    'https://techcoffee.vn/images/drinks/fruit-drinks.jpg',
-    'https://techcoffee.vn/images/interior/neon-lounge.jpg',
+    'https://techcafedanang.com/images/interior/main-hall.jpg',
+    'https://techcafedanang.com/images/drinks/fruit-drinks.jpg',
+    'https://techcafedanang.com/images/interior/neon-lounge.jpg',
   ],
   amenityFeature: [
     { '@type': 'LocationFeatureSpecification', name: 'Free WiFi', value: true },
@@ -129,9 +129,8 @@ const jsonLd = {
     { '@type': 'LocationFeatureSpecification', name: 'Whisky Bar', value: true },
   ],
   sameAs: [
-    'https://www.facebook.com/techcoffeedanang',
-    'https://www.instagram.com/techcoffeedanang',
-    'https://www.tiktok.com/@techcoffeedanang',
+    'https://www.facebook.com/profile.php?id=61580547364249',
+    'https://www.tiktok.com/@techcafedanang',
   ],
 };
 

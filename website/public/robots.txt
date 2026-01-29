@@ -1,11 +1,11 @@
 # Tech Coffee Website - robots.txt
-# https://techcoffee.vn
+# https://techcafedanang.com
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://techcoffee.vn/sitemap.xml
+Sitemap: https://techcafedanang.com/sitemap.xml
 
 # Disallow admin and private paths
 Disallow: /api/
