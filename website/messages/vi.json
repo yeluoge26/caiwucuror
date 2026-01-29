@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "Trang Chủ",
+    "about": "Về Chúng Tôi",
+    "menu": "Thực Đơn",
+    "spaces": "Không Gian",
+    "workingZone": "Khu Làm Việc Miễn Phí",
+    "aiExperience": "Trải Nghiệm AI",
+    "whiskyBar": "T Whisky Bar",
+    "equipmentRental": "Thuê Thiết Bị",
+    "events": "Sự Kiện & Cộng Đồng",
+    "blog": "Blog / Tin Tức",
+    "contact": "Liên Hệ"
+  },
+  "home": {
+    "title": "Tech Coffee Đà Nẵng",
+    "subtitle": "AI • Cà Phê • Whisky • Không Gian Sáng Tạo",
+    "hero": {
+      "title": "Không Gian Sáng Tạo Đầu Tiên Được Hỗ Trợ AI Tại Đà Nẵng",
+      "description": "Trải nghiệm khu làm việc miễn phí, ChatGPT Pro, Adobe Suite, PS5, máy trạm GPU 5080, thuê máy ảnh và T Whisky Bar",
+      "cta1": "Khám Phá Khu Làm Việc",
+      "cta2": "Trải Nghiệm AI",
+      "cta3": "Xem Thực Đơn"
+    },
+    "workingZone": {
+      "title": "Khu Làm Việc Miễn Phí",
+      "subtitle": "Không Gian AI & Sáng Tạo Hoàn Toàn Miễn Phí Duy Nhất Tại Đà Nẵng",
+      "features": {
+        "gpu": "GPU 5080 Miễn Phí",
+        "chatgpt": "ChatGPT Pro Miễn Phí",
+        "adobe": "Adobe / FCP Miễn Phí",
+        "gaming": "Khu Chơi Game Miễn Phí",
+        "tv": "Không Gian Làm Việc TV 100 inch Miễn Phí"
+      },
+      "button": "Xem Khu Làm Việc"
+    },
+    "aiExperience": {
+      "title": "Khu Trải Nghiệm AI",
+      "description": "Thử vẽ AI, thú cưng AI, chỉnh sửa video bằng AI, Stable Diffusion và công cụ OCR",
+      "button": "Trải Nghiệm AI"
+    },
+    "cameraRental": {
+      "title": "Thuê Máy Ảnh",
+      "description": "Thuê Pocket 3, GoPro, Insta360 X5, máy ảnh hành động và thiết bị vlog",
+      "button": "Thuê Thiết Bị"
+    },
+    "whiskyBar": {
+      "title": "T Whisky Bar",
+      "description": "Whisky cao cấp, cocktail đặc trưng và trải nghiệm đêm cao cấp",
+      "button": "Khám Phá T Whisky Bar"
+    },
+    "events": {
+      "title": "Sự Kiện & Cộng Đồng",
+      "description": "Tham gia workshop công nghệ, sự kiện game, nếm whisky và hội thảo AI",
+      "button": "Xem Tất Cả Sự Kiện"
+    }
+  },
+  "footer": {
+    "title": "Tech Coffee — AI • Cà Phê • Whisky • Không Gian Sáng Tạo",
+    "address": "Địa Chỉ",
+    "phone": "Điện Thoại",
+    "email": "Email",
+    "hours": "Giờ Làm Việc",
+    "hoursValue": "Thứ 2–Chủ Nhật: 8:00 – 23:00",
+    "copyright": "© 2025 Tech Coffee. Bảo lưu mọi quyền."
+  },
+  "contact": {
+    "title": "Liên Hệ & Hỗ Trợ",
+    "address": "90 Bạch Đằng, Hải Châu, Đà Nẵng 550000",
+    "phone": "(+84) 0388 997 186",
+    "email": "techcafedanang@gmail.com"
+  }
+}
+
+
+

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage -->
+  <url>
+    <loc>https://techcoffee.vn/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Menu -->
+  <url>
+    <loc>https://techcoffee.vn/menu</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en/menu"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi/menu"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko/menu"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- AI Experience -->
+  <url>
+    <loc>https://techcoffee.vn/ai-experience</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en/ai-experience"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi/ai-experience"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko/ai-experience"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Working Zone -->
+  <url>
+    <loc>https://techcoffee.vn/working-zone</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en/working-zone"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi/working-zone"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko/working-zone"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Whisky Bar -->
+  <url>
+    <loc>https://techcoffee.vn/whisky-bar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en/whisky-bar"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi/whisky-bar"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko/whisky-bar"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- About -->
+  <url>
+    <loc>https://techcoffee.vn/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en/about"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi/about"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko/about"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Contact -->
+  <url>
+    <loc>https://techcoffee.vn/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techcoffee.vn/en/contact"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://techcoffee.vn/vi/contact"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://techcoffee.vn/ko/contact"/>
+    <lastmod>2025-01-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

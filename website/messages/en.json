@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "menu": "Menu",
+    "spaces": "Spaces",
+    "workingZone": "Free Working Zone",
+    "aiExperience": "AI Experience",
+    "whiskyBar": "T Whisky Bar",
+    "equipmentRental": "Equipment Rental",
+    "events": "Events & Community",
+    "blog": "Blog / News",
+    "contact": "Contact"
+  },
+  "home": {
+    "title": "Tech Coffee Da Nang",
+    "subtitle": "AI • Coffee • Whisky • Creative Space",
+    "hero": {
+      "title": "Da Nang's First AI-Powered Creative Space",
+      "description": "Experience free working zones, ChatGPT Pro, Adobe Suite, PS5, 5080 GPU workstation, camera rental, and T Whisky Bar",
+      "cta1": "Explore Working Zone",
+      "cta2": "AI Experience",
+      "cta3": "View Menu"
+    },
+    "workingZone": {
+      "title": "Free Working Zone",
+      "subtitle": "Da Nang's Only Completely Free AI & Creator Space",
+      "features": {
+        "gpu": "Free 5080 GPU",
+        "chatgpt": "Free ChatGPT Pro",
+        "adobe": "Free Adobe / FCP",
+        "gaming": "Free Gaming Zone",
+        "tv": "Free 100-inch TV Workspace"
+      },
+      "button": "View Working Zone"
+    },
+    "aiExperience": {
+      "title": "AI Experience Zone",
+      "description": "Try AI drawing, AI pets, video editing with AI, Stable Diffusion, and OCR tools",
+      "button": "Experience AI"
+    },
+    "cameraRental": {
+      "title": "Camera Rental",
+      "description": "Rent Pocket 3, GoPro, Insta360 X5, action cameras, and vlog gear",
+      "button": "Rent Equipment"
+    },
+    "whiskyBar": {
+      "title": "T Whisky Bar",
+      "description": "Premium whisky, signature cocktails, and high-end night experience",
+      "button": "Explore T Whisky Bar"
+    },
+    "events": {
+      "title": "Events & Community",
+      "description": "Join tech workshops, gaming events, whisky tastings, and AI seminars",
+      "button": "View All Events"
+    }
+  },
+  "footer": {
+    "title": "Tech Coffee — AI • Coffee • Whisky • Creative Space",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": "Business Hours",
+    "hoursValue": "Mon–Sun: 8:00 AM – 11:00 PM",
+    "copyright": "© 2025 Tech Coffee. All rights reserved."
+  },
+  "contact": {
+    "title": "Contact & Support",
+    "address": "90 Bạch Đằng, Hải Châu, Đà Nẵng 550000",
+    "phone": "(+84) 0388 997 186",
+    "email": "techcafedanang@gmail.com"
+  }
+}
+
+
+

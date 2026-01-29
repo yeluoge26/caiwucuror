@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "홈",
+    "about": "회사 소개",
+    "menu": "메뉴",
+    "spaces": "공간",
+    "workingZone": "무료 작업 공간",
+    "aiExperience": "AI 체험",
+    "whiskyBar": "T 위스키 바",
+    "equipmentRental": "장비 대여",
+    "events": "이벤트 & 커뮤니티",
+    "blog": "블로그 / 뉴스",
+    "contact": "연락처"
+  },
+  "home": {
+    "title": "Tech Coffee 다낭",
+    "subtitle": "AI • 커피 • 위스키 • 창의적 공간",
+    "hero": {
+      "title": "다낭 최초의 AI 기반 창의적 공간",
+      "description": "무료 작업 공간, ChatGPT Pro, Adobe Suite, PS5, 5080 GPU 워크스테이션, 카메라 대여 및 T 위스키 바를 경험하세요",
+      "cta1": "작업 공간 둘러보기",
+      "cta2": "AI 체험",
+      "cta3": "메뉴 보기"
+    },
+    "workingZone": {
+      "title": "무료 작업 공간",
+      "subtitle": "다낭 유일의 완전 무료 AI & 크리에이터 공간",
+      "features": {
+        "gpu": "무료 5080 GPU",
+        "chatgpt": "무료 ChatGPT Pro",
+        "adobe": "무료 Adobe / FCP",
+        "gaming": "무료 게임 존",
+        "tv": "무료 100인치 TV 작업 공간"
+      },
+      "button": "작업 공간 보기"
+    },
+    "aiExperience": {
+      "title": "AI 체험 존",
+      "description": "AI 드로잉, AI 펫, AI 비디오 편집, Stable Diffusion 및 OCR 도구를 체험하세요",
+      "button": "AI 체험하기"
+    },
+    "cameraRental": {
+      "title": "카메라 대여",
+      "description": "Pocket 3, GoPro, Insta360 X5, 액션 카메라 및 vlog 장비를 대여하세요",
+      "button": "장비 대여하기"
+    },
+    "whiskyBar": {
+      "title": "T 위스키 바",
+      "description": "프리미엄 위스키, 시그니처 칵테일 및 고급 나이트 경험",
+      "button": "T 위스키 바 둘러보기"
+    },
+    "events": {
+      "title": "이벤트 & 커뮤니티",
+      "description": "기술 워크샵, 게임 이벤트, 위스키 시음회 및 AI 세미나에 참여하세요",
+      "button": "모든 이벤트 보기"
+    }
+  },
+  "footer": {
+    "title": "Tech Coffee — AI • 커피 • 위스키 • 창의적 공간",
+    "address": "주소",
+    "phone": "전화",
+    "email": "이메일",
+    "hours": "영업 시간",
+    "hoursValue": "월–일: 오전 8:00 – 오후 11:00",
+    "copyright": "© 2025 Tech Coffee. 모든 권리 보유."
+  },
+  "contact": {
+    "title": "연락처 & 지원",
+    "address": "90 Bạch Đằng, Hải Châu, Đà Nẵng 550000",
+    "phone": "(+84) 0388 997 186",
+    "email": "techcafedanang@gmail.com"
+  }
+}
+
+
+
